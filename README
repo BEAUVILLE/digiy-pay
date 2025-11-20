@@ -1,0 +1,203 @@
+DIGIY PAY — Dashboard Privé
+V1.0 · Pilote 2025
+
+Module strictement confidentiel — réservé aux administrateurs DIGIYLYFE.
+
+🟡 Présentation
+
+DIGIY PAY Dashboard est le centre financier de l’écosystème DIGIYLYFE.
+Il centralise et visualise les encaissements provenant de :
+
+DIGIY POS (boutiques)
+
+DIGIY LOC (hébergements)
+
+DIGIY DRIVER (chauffeurs)
+
+Et tous les futurs modules DIGIY (Market, Store Pro, Explore…)
+
+Ce module ne prend jamais l’argent et n’intercepte aucun flux.
+
+Paiement direct entre client et professionnel — 0% commission.
+DIGIY PAY éclaire les flux. Il ne les capture jamais.
+
+🔐 Statut & Sécurité
+
+Ce dépôt est privé et doit le rester.
+Les données affichées (même fictives ou manuelles) sont sensibles :
+
+Montants
+
+Méthodes de paiement
+
+Dates
+
+Modules (POS, LOC, DRIVER)
+
+Identifiants commerçants / chauffeurs / propriétaires
+
+Accès réservé à :
+
+Toi (fondateur DIGIYLYFE)
+
+Administrateurs DIGIY
+
+Partenaires bancaires / comptables (sur autorisation)
+
+🌍 Rôle dans l’écosystème DIGIY
+
+DIGIY PAY est la vision financière unifiée du mouvement DIGIYLYFE :
+
+Wave
+
+Orange Money
+
+Espèces
+
+Tous modules confondus
+
+Un tableau de bord simple, lisible, souverain —
+conçu pour le terrain africain, la diaspora, et la réalité économique locale.
+
+DIGIY PAY n’est pas un opérateur de paiement :
+
+C’est un thermomètre financier souverain.
+
+✨ Fonctionnalités actuelles (V1 · Pilote)
+🟩 Metrics globales (mock / manuelles)
+
+Total encaissé du jour / semaine / mois
+
+Wave
+
+Orange Money
+
+Cash (via POS)
+
+Visualisation simple en métriques
+
+📄 Journal des encaissements
+
+Tableau détaillé avec :
+
+Date & heure
+
+Module (POS / LOC / DRIVER)
+
+Commerçant / Chauffeur / Hébergement
+
+Méthode (Wave, OM, Cash)
+
+Montant
+
+Référence du paiement (tag DIGIY)
+
+🎛️ Filtres
+
+Méthode (Wave / OM / Cash)
+
+Période (Jour / Semaine / Mois)
+
+🔗 Intégration modules
+
+Compatible avec :
+
+DIGIY POS
+
+DIGIY LOC
+
+DIGIY DRIVER
+
+🚀 Roadmap (V2 / V3)
+🔌 Connexion DIGIY PULSE (temps réel)
+
+Webhooks WordPress (pages PAY)
+
+Logs de transactions
+
+Mise à jour auto des métriques
+
+Statuts live (encaissements en cours)
+
+📊 Export comptable
+
+PDF mensuel
+
+CSV
+
+Relevés par module / commerçant
+
+🔐 Sécurité renforcée
+
+Connexion PIN DIGIY Admin
+
+Accès protégé par mot de passe ou token
+
+💳 Comptes multiples
+
+ASTOU POS
+
+CHEZ BAPTISTE LOC
+
+Chauffeur X
+
+Futurs commerçants DIGIY
+
+🧱 Structure du projet
+DIGIY-PAY-DASHBOARD/
+│
+├── index.html          → Tableau de bord privé
+├── pay.js              → Logique encaissements (mock → PULSE plus tard)
+├── style.css           → Styles premium DIGIY
+├── assets/             → Logos, icônes, visuels
+└── README.md           → Ce fichier
+
+🧩 Déploiement
+🔸 GitHub Pages (PRIVÉ)
+
+Dépôt privé
+
+Pages → Private access
+
+Accès uniquement via ton compte GitHub connecté
+
+🔸 WordPress privé (option)
+
+Page masquée / protégée par mot de passe
+
+🔸 VPS interne (futur DIGIY Admin Pro)
+
+Hébergement sécurisé
+
+Connexion à PULSE pour les données réelles
+
+🧠 Logique de séparation des flux
+
+Chaque paiement DIGIY porte une référence unique :
+
+?m=ASTOU-SN-POS
+?m=CHEZ-BAPTISTE-SN-LOC
+?m=DRIVER-ALI-SN-001
+
+
+Ces tags permettent de ne jamais mélanger les caisses.
+Même page PAY, mais référence différente = compta propre.
+
+💛 Philosophie DIGIY PAY
+
+DIGIY PAY n’encaisse rien.
+Il n’intercepte rien.
+Il n’impose aucune commission.
+
+Il révèle.
+Il éclaire.
+Il redonne le pouvoir financier au peuple.
+
+Chaque commerçant, chauffeur ou propriétaire garde 100% de son argent et 100% de ses données.
+
+DIGIY PAY est un miroir de la souveraineté digitale africaine.
+
+📞 Contact interne
+
+DIGIY Sénégal · Saly / Dakar
+💬 WhatsApp Admin : +221 77 134 28 89
