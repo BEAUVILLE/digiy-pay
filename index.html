@@ -2,542 +2,947 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>DIGIY PAY — Dashboard V1</title>
+  <title>DIGIY PAY — Dashboard Temps Réel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="DIGIY PAY Dashboard — Vue centrale des encaissements Wave, Orange Money et Espèces.">
+
+  <!-- Chart.js pour le graphique -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root{
       --bg:#050814;
       --bg-soft:#0b1220;
       --card:#020617;
-      --card-alt:#020617;
-      --accent:#facc15;
-      --accent-soft:#f97316;
-      --ink:#f9fafb;
-      --muted:#9ca3af;
-      --line:#1f2937;
-      --good:#22c55e;
-      --info:#38bdf8;
+      --card-soft:#0f172a;
+      --accent:#facc15;      /* or / gold */
+      --accent-soft:#fde68a;
       --danger:#ef4444;
+      --ok:#22c55e;
+      --muted:#9ca3af;
+      --ink:#f9fafb;
+      --line:#1f2937;
     }
+
     *{
+      box-sizing:border-box;
       margin:0;
       padding:0;
-      box-sizing:border-box;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     }
+
     body{
-      min-height:100vh;
-      background:
-        radial-gradient(circle at top,#111827 0,#020617 55%);
+      background:radial-gradient(circle at top, #1f2937 0, #020617 42%, #000 100%);
       color:var(--ink);
+      min-height:100vh;
       display:flex;
+      align-items:stretch;
       justify-content:center;
-      padding:16px;
     }
+
     .app{
       width:100%;
-      max-width:1100px;
-      background:linear-gradient(145deg,rgba(15,23,42,0.98),rgba(3,7,18,0.98));
-      border-radius:26px;
-      border:1px solid rgba(250,204,21,0.35);
-      box-shadow:0 24px 60px rgba(0,0,0,0.7);
-      padding:18px 18px 20px;
+      max-width:1400px;
+      margin:12px;
+      border-radius:24px;
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.06), transparent 50%), #020617;
+      box-shadow:0 24px 80px rgba(0,0,0,0.65);
+      overflow:hidden;
+      display:flex;
+      flex-direction:row;
+      border:1px solid rgba(148,163,184,0.25);
+    }
+
+    /* ========== SIDEBAR ========== */
+    .sidebar{
+      width:260px;
+      padding:20px 18px;
+      background:linear-gradient(180deg, #020617 0%, #020617 45%, #030712 100%);
+      border-right:1px solid rgba(148,163,184,0.18);
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap:18px;
     }
-    header{
+
+    .logo-row{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
     }
-    .logo{
-      width:40px;
-      height:40px;
-      border-radius:16px;
-      background:radial-gradient(circle at 30% 20%,#fff7d1 0,#facc15 40%,#b45309 100%);
+    .logo-badge{
+      width:36px;
+      height:36px;
+      border-radius:14px;
+      background:radial-gradient(circle at 20% 0%, #facc15, #eab308 40%, #92400e 100%);
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:800;
-      font-size:20px;
+      font-weight:700;
+      letter-spacing:1px;
       color:#111827;
-      box-shadow:0 10px 30px rgba(0,0,0,0.4);
+      font-size:16px;
+      box-shadow:0 0 0 1px rgba(250,204,21,0.4), 0 12px 30px rgba(0,0,0,0.8);
     }
-    .head-main h1{
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .brand-text span:first-child{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:0.18em;
+      color:var(--muted);
+    }
+    .brand-text span:last-child{
+      font-size:15px;
+      font-weight:600;
+      color:var(--accent-soft);
+    }
+
+    .sidebar-section-title{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.16em;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    .merchant-card{
+      margin-top:6px;
+      padding:10px 10px;
+      border-radius:14px;
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.08), rgba(15,23,42,0.95));
+      border:1px solid rgba(148,163,184,0.4);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .merchant-name{
+      font-size:14px;
+      font-weight:600;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .merchant-tag{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.95);
+      border:1px solid rgba(148,163,184,0.4);
+      color:var(--muted);
+    }
+    .merchant-id{
+      font-size:11px;
+      color:var(--muted);
+      letter-spacing:0.08em;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 8px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.95);
+      border:1px solid rgba(148,163,184,0.25);
+      font-size:11px;
+      color:var(--muted);
+    }
+    .status-dot{
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e);
+      box-shadow:0 0 0 2px rgba(34,197,94,0.35);
+    }
+
+    .box-filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:8px;
+    }
+    .box-filter-btn{
+      flex:0 1 48%;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.45);
+      background:rgba(15,23,42,0.95);
+      color:var(--muted);
+      font-size:11px;
+      padding:6px 8px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      transition:all 0.16s ease-out;
+    }
+    .box-filter-btn span{
+      font-weight:500;
+    }
+    .box-filter-btn small{
+      font-size:10px;
+      opacity:0.8;
+    }
+    .box-filter-btn.active{
+      border-color:var(--accent);
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.22), #020617);
+      color:var(--accent-soft);
+      box-shadow:0 0 0 1px rgba(250,204,21,0.7);
+    }
+
+    .info-box{
+      margin-top:8px;
+      padding:8px 9px;
+      border-radius:12px;
+      border:1px dashed rgba(148,163,184,0.5);
+      background:rgba(15,23,42,0.9);
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+    .info-box b{
+      color:var(--accent-soft);
+      font-weight:600;
+    }
+
+    .simu-btn{
+      margin-top:4px;
+      width:100%;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      background:rgba(15,23,42,0.95);
+      color:var(--ink);
+      font-size:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:all 0.16s ease-out;
+    }
+    .simu-btn:hover{
+      border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(250,204,21,0.5);
+    }
+
+    /* ========== MAIN LAYOUT ========== */
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      padding:18px 18px 16px 18px;
+      gap:14px;
+      background:radial-gradient(circle at top, rgba(250,204,21,0.08), rgba(15,23,42,1));
+    }
+
+    .main-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .title-block h1{
       font-size:18px;
-      letter-spacing:.12em;
+      font-weight:600;
+      letter-spacing:0.08em;
       text-transform:uppercase;
     }
-    .head-main p{
+    .title-block p{
       font-size:12px;
+      color:var(--muted);
+      margin-top:3px;
+    }
+
+    .time-range{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .chip{
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.45);
+      background:rgba(15,23,42,0.95);
+    }
+
+    .top-cards{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:10px;
+    }
+    .card{
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.32);
+      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.95));
+      padding:10px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-height:72px;
+    }
+    .card-title{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      color:var(--muted);
+    }
+    .card-value{
+      font-size:20px;
+      font-weight:600;
+      margin-top:4px;
+    }
+    .card-sub{
+      font-size:11px;
       color:var(--muted);
       margin-top:2px;
     }
-    .tag{
-      margin-left:auto;
+    .trend{
       font-size:11px;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid rgba(250,204,21,0.7);
-      color:#facc15;
-      text-transform:uppercase;
-      letter-spacing:0.08em;
+      margin-top:2px;
     }
-    .subbar{
-      margin-top:6px;
+    .trend.positive{
+      color:var(--ok);
+    }
+    .trend.negative{
+      color:var(--danger);
+    }
+
+    .content-row{
+      display:grid;
+      grid-template-columns: minmax(0,2.1fr) minmax(0,1.4fr);
+      gap:12px;
+      min-height:0;
+      flex:1;
+    }
+
+    .panel{
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.3);
+      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      padding:10px 12px;
       display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+      flex-direction:column;
+      min-height:0;
+    }
+    .panel-header{
+      display:flex;
       justify-content:space-between;
       align-items:center;
-      font-size:11px;
-      color:var(--muted);
-      padding:6px 10px;
-      border-radius:999px;
-      background:radial-gradient(circle at left,#111827 0,rgba(15,23,42,0.6) 50%,rgba(15,23,42,0) 100%);
-      border:1px solid rgba(15,23,42,0.9);
+      margin-bottom:6px;
     }
-    .pill{
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.7);
-      padding:3px 8px;
-      font-size:10px;
+    .panel-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      color:var(--muted);
+    }
+    .panel-header span strong{
+      color:var(--accent-soft);
     }
 
-    .filters{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      font-size:11px;
-      margin-top:6px;
+    .chart-wrap{
+      flex:1;
+      min-height:220px;
+      position:relative;
     }
-    .filter-group{
+
+    .tickets-list{
+      margin-top:8px;
+      border-radius:14px;
+      border:1px solid rgba(55,65,81,0.8);
+      background:radial-gradient(circle at top, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      padding:4px 0;
+      flex:1;
+      min-height:0;
+      overflow:auto;
+    }
+
+    .ticket-row{
       display:flex;
+      padding:6px 10px;
+      gap:8px;
+      justify-content:space-between;
+      align-items:flex-start;
+      border-bottom:1px solid rgba(31,41,55,0.9);
+      font-size:12px;
+    }
+    .ticket-main{
+      display:flex;
+      flex-direction:column;
+      gap:1px;
+    }
+    .ticket-amount{
+      font-weight:600;
+    }
+    .ticket-sub{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .ticket-right{
+      text-align:right;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .ticket-box{
+      padding:2px 7px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.6);
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+    }
+
+    .pill-pay{
+      display:inline-flex;
       align-items:center;
       gap:4px;
-      color:var(--muted);
-    }
-    select, input[type="date"]{
-      background:#020617;
       border-radius:999px;
-      border:1px solid var(--line);
-      color:var(--ink);
-      font-size:11px;
-      padding:3px 8px;
+      border:1px solid rgba(148,163,184,0.5);
+      padding:2px 7px;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
     }
 
-    main{
-      display:grid;
-      grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);
-      gap:12px;
-      margin-top:6px;
+    .pill-pay[data-method="cash"]{
+      border-color:rgba(163,230,53,0.8);
+      color:#bbf7d0;
     }
-    @media(max-width:900px){
-      main{
-        grid-template-columns:1fr;
+    .pill-pay[data-method="wave"]{
+      border-color:rgba(59,130,246,0.8);
+      color:#bfdbfe;
+    }
+    .pill-pay[data-method="om"]{
+      border-color:rgba(249,115,22,0.9);
+      color:#fed7aa;
+    }
+    .pill-pay[data-method="card"]{
+      border-color:rgba(248,250,252,0.9);
+      color:#e5e7eb;
+    }
+
+    .empty-state{
+      padding:14px;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    @media (max-width:1024px){
+      .app{
+        flex-direction:column;
+      }
+      .sidebar{
+        width:100%;
+        flex-direction:row;
+        align-items:flex-start;
+        justify-content:space-between;
+      }
+      .box-filters{
+        max-width:280px;
       }
     }
 
-    .metrics-row{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:8px;
-      margin-bottom:8px;
-    }
-    .metric{
-      background:var(--card);
-      border-radius:16px;
-      border:1px solid rgba(148,163,184,.5);
-      padding:8px 10px;
-      font-size:11px;
-    }
-    .metric-label{
-      color:var(--muted);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:2px;
-    }
-    .metric-main{
-      font-size:16px;
-      font-weight:700;
-      display:flex;
-      align-items:baseline;
-      gap:4px;
-    }
-    .metric-main span.unit{
-      font-size:11px;
-      color:var(--muted);
-      font-weight:400;
-    }
-    .metric-note{
-      margin-top:2px;
-      font-size:10px;
-      color:#bbf7d0;
-    }
-    .metric-note.bad{
-      color:#fecaca;
-    }
-
-    .card{
-      background:var(--card);
-      border-radius:18px;
-      border:1px solid var(--line);
-      box-shadow:0 16px 32px rgba(0,0,0,0.65);
-      padding:10px;
-      font-size:12px;
-      color:var(--muted);
-    }
-    .card h2{
-      font-size:14px;
-      margin-bottom:4px;
-      color:var(--ink);
-    }
-    .card small{
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:6px;
-      font-size:11px;
-    }
-    th, td{
-      padding:4px 6px;
-      border-bottom:1px solid #111827;
-      text-align:left;
-      white-space:nowrap;
-    }
-    th{
-      color:#e5e7eb;
-      font-weight:500;
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-    }
-    tbody tr:last-child td{
-      border-bottom:none;
-    }
-    tbody tr:nth-child(even){
-      background:rgba(15,23,42,0.6);
-    }
-    .badge-method{
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.6);
-      padding:1px 6px;
-      font-size:10px;
-    }
-    .method-wave{
-      border-color:#22c55e;
-      color:#bbf7d0;
-    }
-    .method-om{
-      border-color:#f97316;
-      color:#fed7aa;
-    }
-    .method-cash{
-      border-color:#e5e7eb;
-      color:#e5e7eb;
-    }
-
-    .tag-module{
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.6);
-      padding:1px 6px;
-      font-size:10px;
-      color:#c4b5fd;
-    }
-
-    .right-stack{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .list{
-      margin:4px 0 0 14px;
-      padding:0;
-    }
-    .list li{
-      margin-bottom:3px;
-    }
-
-    footer{
-      margin-top:6px;
-      font-size:10px;
-      color:var(--muted);
-      text-align:center;
+    @media (max-width:768px){
+      .sidebar{
+        flex-direction:column;
+      }
+      .content-row{
+        grid-template-columns:1fr;
+      }
+      .top-cards{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+      }
     }
   </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="logo">P</div>
-    <div class="head-main">
-      <h1>DIGIY PAY — Dashboard</h1>
-      <p>Vue centrale des encaissements Wave · Orange Money · Espèces — Tous modules DIGIY.</p>
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+    <div class="logo-row">
+      <div class="logo-badge">DG</div>
+      <div class="brand-text">
+        <span>DIGIY PAY</span>
+        <span>Dashboard Temps Réel</span>
+      </div>
     </div>
-    <div class="tag">V1 · Pilote</div>
-  </header>
 
-  <div class="subbar">
     <div>
-      Suivi des flux financiers DIGIY (POS, LOC, DRIVER).
-      <span class="pill">0% commission DIGIY</span>
-      <span class="pill">Paiement direct au pro</span>
-    </div>
-    <div class="filters">
-      <div class="filter-group">
-        <span>Période :</span>
-        <select id="filterPeriod">
-          <option value="day">Aujourd'hui</option>
-          <option value="week">Cette semaine</option>
-          <option value="month" selected>Ce mois</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <span>Méthode :</span>
-        <select id="filterMethod">
-          <option value="all">Toutes</option>
-          <option value="wave">Wave</option>
-          <option value="om">Orange Money</option>
-          <option value="cash">Espèces</option>
-        </select>
+      <div class="sidebar-section-title">Commerçant / Token</div>
+      <div class="merchant-card">
+        <div class="merchant-name">
+          <span id="uiMerchantName">—</span>
+          <span class="merchant-tag">LIVE PULSE</span>
+        </div>
+        <div class="merchant-id" id="uiMerchantId">Merchant: —</div>
+        <div style="margin-top:6px;">
+          <span class="pill">
+            <span class="status-dot" id="uiStatusDot"></span>
+            <span id="uiStatusLabel">En attente du flux…</span>
+          </span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <main>
-    <!-- COLONNE GAUCHE : METRICS + TABLE -->
-    <section>
-      <div class="metrics-row">
-        <div class="metric">
-          <div class="metric-label">
-            <span>Total encaissé (mock)</span>
-            <span class="pill">Tous modules</span>
-          </div>
-          <div class="metric-main">
-            <span id="totalAll">0</span><span class="unit">F CFA</span>
-          </div>
-          <div class="metric-note">
-            À brancher plus tard sur DIGIY PULSE + logs paiements.
-          </div>
-        </div>
-
-        <div class="metric">
-          <div class="metric-label">
-            <span>Wave</span>
-            <span class="pill">Mobile money</span>
-          </div>
-          <div class="metric-main">
-            <span id="totalWave">0</span><span class="unit">F</span>
-          </div>
-          <div class="metric-note">
-            Encaissements Wave (POS, LOC, DRIVER).
-          </div>
-        </div>
-
-        <div class="metric">
-          <div class="metric-label">
-            <span>Orange Money</span>
-            <span class="pill">Mobile money</span>
-          </div>
-          <div class="metric-main">
-            <span id="totalOM">0</span><span class="unit">F</span>
-          </div>
-          <div class="metric-note">
-            À surveiller pour les volumes réels.
-          </div>
-        </div>
-
-        <div class="metric">
-          <div class="metric-label">
-            <span>Espèces</span>
-            <span class="pill">Caisse</span>
-          </div>
-          <div class="metric-main">
-            <span id="totalCash">0</span><span class="unit">F</span>
-          </div>
-          <div class="metric-note bad">
-            Non suivi par DIGIY PAY, mais visible via POS.
-          </div>
-        </div>
+    <div>
+      <div class="sidebar-section-title">Filtre par box</div>
+      <div class="box-filters">
+        <button class="box-filter-btn active" data-box="ALL">
+          <span>ALL</span><small>Vue globale</small>
+        </button>
+        <button class="box-filter-btn" data-box="POS-1">
+          <span>POS-1</span><small>Caisse 1</small>
+        </button>
+        <button class="box-filter-btn" data-box="POS-2">
+          <span>POS-2</span><small>Caisse 2</small>
+        </button>
+        <button class="box-filter-btn" data-box="DRIVER-1">
+          <span>DRIVER</span><small>Courses</small>
+        </button>
+        <button class="box-filter-btn" data-box="MARKET-1">
+          <span>MARKET</span><small>Boutique</small>
+        </button>
       </div>
+    </div>
 
-      <div class="card">
-        <h2>Derniers encaissements (exemple)</h2>
-        <small>Données fictives pour la V1 — à brancher plus tard sur les vrais flux.</small>
-
-        <table id="tablePay">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Module</th>
-              <th>Commerçant / Client</th>
-              <th>Méthode</th>
-              <th>Montant</th>
-              <th>Réf.</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- rempli par JS -->
-          </tbody>
-        </table>
+    <div>
+      <div class="sidebar-section-title">Infos / Test</div>
+      <div class="info-box">
+        <b>Tip :</b> ce dashboard écoute PULSE sur<br>
+        <code id="uiPulseUrl" style="font-size:10px;"></code><br><br>
+        Envoie tes encaissements via<br>
+        <code style="font-size:10px;">POST /event</code><br>
+        avec <code>merchant</code>, <code>box</code>, <code>total</code>, <code>pay_method</code>.
       </div>
+      <button class="simu-btn" id="btnSimu">
+        <span>⚡ Simuler une vente</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main">
+    <header class="main-header">
+      <div class="title-block">
+        <h1>DIGIY PAY — PANEL CA & TICKETS</h1>
+        <p>Vue temps réel des encaissements (PULSE API → Dashboard PAY).</p>
+      </div>
+      <div class="time-range">
+        <span class="chip">Aujourd’hui</span>
+        <span class="chip">Filtre box actif</span>
+      </div>
+    </header>
+
+    <!-- Top KPI cards -->
+    <section class="top-cards">
+      <article class="card">
+        <div class="card-title">CA total (filtre actif)</div>
+        <div class="card-value" id="uiCA">0 FCFA</div>
+        <div class="card-sub">Tous modes de paiement</div>
+      </article>
+      <article class="card">
+        <div class="card-title">Tickets</div>
+        <div class="card-value" id="uiTickets">0</div>
+        <div class="card-sub">Tickets encaissés</div>
+      </article>
+      <article class="card">
+        <div class="card-title">Panier moyen</div>
+        <div class="card-value" id="uiAvg">0 FCFA</div>
+        <div class="card-sub">CA / nombre de tickets</div>
+      </article>
+      <article class="card">
+        <div class="card-title">Dernier encaissement</div>
+        <div class="card-value" id="uiLastPay">—</div>
+        <div class="card-sub" id="uiLastMeta">En attente…</div>
+      </article>
     </section>
 
-    <!-- COLONNE DROITE : CONTEXTE -->
-    <aside class="right-stack">
-      <div class="card">
-        <h2>Logique DIGIY PAY</h2>
-        <p>
-          DIGIY PAY ne prend pas l’argent au milieu. Il sert de
-          <strong>couche de visibilité</strong> : chaque paiement reste
-          direct entre le client et le professionnel (commerçant, chauffeur, propriétaire).
-        </p>
-        <ul class="list">
-          <li>Chaque lien PAY a une référence : <code>?m=CHEZ-BAPTISTE-SN-LOC</code></li>
-          <li>Chaque pro peut avoir son propre compte Wave / OM.</li>
-          <li>Le Dashboard agrège visuellement les flux, sans toucher l’argent.</li>
-        </ul>
-      </div>
+    <!-- Graph + tickets -->
+    <section class="content-row">
+      <!-- Graph & stats paiement -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Répartition par mode de paiement</div>
+          <span style="font-size:11px;color:var(--muted);">
+            Cash / Wave / OM / Card · <strong id="uiBoxFilterLabel">Filtre : ALL</strong>
+          </span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="payChart"></canvas>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px;font-size:11px;color:var(--muted);flex-wrap:wrap;">
+          <span class="pill-pay" data-method="cash">💵 Cash&nbsp;<span id="statCash">0</span></span>
+          <span class="pill-pay" data-method="wave">🌊 Wave&nbsp;<span id="statWave">0</span></span>
+          <span class="pill-pay" data-method="om">🟠 OM&nbsp;<span id="statOM">0</span></span>
+          <span class="pill-pay" data-method="card">💳 Card&nbsp;<span id="statCard">0</span></span>
+        </div>
+      </section>
 
-      <div class="card">
-        <h2>Prochaines étapes</h2>
-        <ul class="list">
-          <li>➕ Relier les pages PAY WordPress à DIGIY PULSE (webhooks / logs).</li>
-          <li>➕ Ajouter filtre par commerçant / module (ASTOU, CHEZ BAPTISTE, DRIVER X…).</li>
-          <li>🔐 Ajouter un accès sécurisé (PIN / login DIGIY Admin).</li>
-          <li>📊 Export des données (CSV / PDF) pour banque, fisc, partenaires.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>Vision DIGIY PAY</h2>
-        <p>
-          DIGIY PAY doit devenir le <strong>thermomètre instantané</strong> de ton écosystème :
-          combien est entré aujourd’hui, par qui, par quel canal, sans casser la souveraineté du pro.
-        </p>
-      </div>
-    </aside>
+      <!-- Tickets temps réel -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Tickets en temps réel</div>
+          <span style="font-size:11px;color:var(--muted);">
+            Derniers encaissements PULSE
+          </span>
+        </div>
+        <div class="tickets-list" id="ticketList">
+          <div class="empty-state">
+            En attente de ton premier encaissement DIGIY PAY…<br>
+            Lance une vente pour voir le flux arriver en live.
+          </div>
+        </div>
+      </section>
+    </section>
   </main>
-
-  <footer>
-    DIGIY PAY Dashboard — V1 Pilote · Centralisation Wave / OM / Espèces · Sans captation de valeur.
-  </footer>
 </div>
 
 <script>
-  // ================================
-  // MOCK DATA (exemple)
-  // ================================
-  const PAYMENTS = [
-    {
-      date: "2025-11-20 10:14",
-      module: "POS",
-      moduleLabel: "DIGIY POS",
-      merchant: "ASTOU BOUTIQUE",
-      method: "wave",
-      amount: 18000,
-      ref: "ASTOU-SN-POS-20251120-001"
-    },
-    {
-      date: "2025-11-20 09:32",
-      module: "LOC",
-      moduleLabel: "DIGIY LOC",
-      merchant: "CHEZ BAPTISTE",
-      method: "om",
-      amount: 30000,
-      ref: "CHEZ-BAPTISTE-SN-LOC-ACOMPTE"
-    },
-    {
-      date: "2025-11-19 19:07",
-      module: "DRIVER",
-      moduleLabel: "DIGIY DRIVER",
-      merchant: "Chauffeur Alpha",
-      method: "cash",
-      amount: 2500,
-      ref: "DRIVER-ALPHA-SN-TEST"
-    },
-    {
-      date: "2025-11-19 18:55",
-      module: "POS",
-      moduleLabel: "DIGIY POS",
-      merchant: "ASTOU BOUTIQUE",
-      method: "wave",
-      amount: 6000,
-      ref: "ASTOU-SN-POS-20251119-004"
+/**
+ * ================================
+ * CONFIG À ADAPTER
+ * ================================
+ */
+const PULSE_URL = "http://127.0.0.1:3200"; // ← adapte si PULSE est en ligne
+const MERCHANT_TOKEN = "ASTOU-SN-001";    // ← ton token commerçant réel
+
+/**
+ * ================================
+ * ÉTAT GLOBAL
+ * ================================
+ */
+const STATE = {
+  events: [],       // tous les events reçus
+  activeBox: "ALL", // filtre box
+  chart: null
+};
+
+const STATS = {
+  cash: 0,
+  wave: 0,
+  om: 0,
+  card: 0
+};
+
+/**
+ * ================================
+ * INIT UI
+ * ================================
+ */
+document.getElementById("uiMerchantName").textContent = "DIGIY PAY";
+document.getElementById("uiMerchantId").textContent = "Merchant: " + MERCHANT_TOKEN;
+document.getElementById("uiPulseUrl").textContent = PULSE_URL + "/events?m=" + MERCHANT_TOKEN;
+
+/**
+ * ================================
+ * OUTILS
+ * ================================
+ */
+function formatFCFA(amount){
+  if (!amount) return "0 FCFA";
+  return amount.toLocaleString("fr-FR") + " FCFA";
+}
+
+function updateStatus(online){
+  const dot = document.getElementById("uiStatusDot");
+  const label = document.getElementById("uiStatusLabel");
+  if(online){
+    dot.style.background = "radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e)";
+    dot.style.boxShadow = "0 0 0 2px rgba(34,197,94,0.35)";
+    label.textContent = "Flux PULSE connecté";
+  }else{
+    dot.style.background = "radial-gradient(circle at 30% 0%, #fee2e2, #ef4444)";
+    dot.style.boxShadow = "0 0 0 2px rgba(248,113,113,0.5)";
+    label.textContent = "Déconnecté / en attente…";
+  }
+}
+
+/**
+ * ================================
+ * GESTION DES STATISTIQUES
+ * ================================
+ */
+function recomputeStats(){
+  // reset
+  STATS.cash = STATS.wave = STATS.om = STATS.card = 0;
+  let total = 0;
+  let count = 0;
+
+  const filterBox = STATE.activeBox;
+
+  STATE.events.forEach(ev => {
+    if (ev.type !== "sale") return;
+    if (filterBox !== "ALL" && ev.box !== filterBox) return;
+
+    const t = Number(ev.total) || 0;
+    total += t;
+    count++;
+
+    const m = (ev.pay_method || "").toLowerCase();
+    if (STATS[m] !== undefined) {
+      STATS[m] += t;
     }
+  });
+
+  // CA, tickets, panier moyen
+  document.getElementById("uiCA").textContent = formatFCFA(total);
+  document.getElementById("uiTickets").textContent = count.toString();
+  const avg = count ? Math.round(total / count) : 0;
+  document.getElementById("uiAvg").textContent = formatFCFA(avg);
+
+  // Stats par mode
+  document.getElementById("statCash").textContent = STATS.cash.toLocaleString("fr-FR");
+  document.getElementById("statWave").textContent = STATS.wave.toLocaleString("fr-FR");
+  document.getElementById("statOM").textContent = STATS.om.toLocaleString("fr-FR");
+  document.getElementById("statCard").textContent = STATS.card.toLocaleString("fr-FR");
+
+  // Mettre à jour le graphique
+  updateChart();
+}
+
+/**
+ * ================================
+ * GRAPHIQUE CHART.JS
+ * ================================
+ */
+function initChart(){
+  const ctx = document.getElementById("payChart").getContext("2d");
+  STATE.chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Cash", "Wave", "OM", "Card"],
+      datasets: [{
+        label: "CA par mode (FCFA)",
+        data: [0, 0, 0, 0],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { color:"rgba(55,65,81,0.5)" },
+          ticks: { color:"#e5e7eb", font:{ size:11 } }
+        },
+        y: {
+          grid: { color:"rgba(55,65,81,0.5)" },
+          ticks: { color:"#9ca3af", font:{ size:11 } }
+        }
+      },
+      plugins:{
+        legend:{ labels:{ color:"#e5e7eb", font:{ size:11 } } }
+      }
+    }
+  });
+}
+
+function updateChart(){
+  if (!STATE.chart) return;
+  STATE.chart.data.datasets[0].data = [
+    STATS.cash,
+    STATS.wave,
+    STATS.om,
+    STATS.card
   ];
+  STATE.chart.update();
+}
 
-  const tbody = document.querySelector("#tablePay tbody");
-  const filterPeriod = document.getElementById("filterPeriod");
-  const filterMethod = document.getElementById("filterMethod");
+/**
+ * ================================
+ * TICKETS TEMPS RÉEL
+ * ================================
+ */
+function renderTickets(){
+  const list = document.getElementById("ticketList");
+  list.innerHTML = "";
 
-  function formatMoney(x){
-    return (x||0).toLocaleString("fr-FR") + " F";
+  const filterBox = STATE.activeBox;
+  const filtered = STATE.events
+    .filter(ev => ev.type === "sale")
+    .filter(ev => filterBox === "ALL" || ev.box === filterBox)
+    .sort((a,b) => (b.id||0) - (a.id||0));
+
+  if (!filtered.length){
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "Aucun ticket pour l’instant sur ce filtre box.";
+    list.appendChild(empty);
+    return;
   }
 
-  function renderTable(){
-    const methodFilter = filterMethod.value;
-    tbody.innerHTML = "";
+  filtered.forEach(ev => {
+    const row = document.createElement("div");
+    row.className = "ticket-row";
 
-    let totalAll = 0;
-    let totalWave = 0;
-    let totalOM = 0;
-    let totalCash = 0;
+    const m = (ev.pay_method || "").toLowerCase();
+    const methodLabel = m === "cash" ? "Cash" :
+                        m === "wave" ? "Wave" :
+                        m === "om" ? "Orange Money" :
+                        m === "card" ? "Carte" : m.toUpperCase();
+    const amount = formatFCFA(Number(ev.total) || 0);
 
-    PAYMENTS.forEach(p => {
-      if(methodFilter !== "all" && p.method !== methodFilter) return;
+    const time = ev.at ? new Date(ev.at) : new Date();
+    const timeStr = time.toLocaleTimeString("fr-FR",{ hour:"2-digit", minute:"2-digit", second:"2-digit" });
 
-      totalAll += p.amount;
-      if(p.method === "wave") totalWave += p.amount;
-      if(p.method === "om") totalOM += p.amount;
-      if(p.method === "cash") totalCash += p.amount;
+    const box = ev.box || "—";
 
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${p.date}</td>
-        <td><span class="tag-module">${p.module}</span></td>
-        <td>${p.merchant}</td>
-        <td>${renderMethod(p.method)}</td>
-        <td>${formatMoney(p.amount)}</td>
-        <td>${p.ref}</td>
-      `;
-      tbody.appendChild(tr);
+    const main = document.createElement("div");
+    main.className = "ticket-main";
+    const title = document.createElement("div");
+    title.className = "ticket-amount";
+    title.textContent = amount;
+    const sub = document.createElement("div");
+    sub.className = "ticket-sub";
+    sub.textContent = `Ticket ${ev.id || ""}`.trim();
+
+    main.appendChild(title);
+    main.appendChild(sub);
+
+    const mid = document.createElement("div");
+    const pill = document.createElement("span");
+    pill.className = "pill-pay";
+    pill.setAttribute("data-method", m || "");
+    pill.textContent = methodLabel;
+    mid.appendChild(pill);
+
+    const right = document.createElement("div");
+    right.className = "ticket-right";
+    const spanTime = document.createElement("div");
+    spanTime.textContent = timeStr;
+    const spanBox = document.createElement("div");
+    spanBox.className = "ticket-box";
+    spanBox.textContent = box;
+    right.appendChild(spanTime);
+    right.appendChild(spanBox);
+
+    row.appendChild(main);
+    row.appendChild(mid);
+    row.appendChild(right);
+
+    list.appendChild(row);
+  });
+}
+
+/**
+ * ================================
+ * NOUVEL EVENT REÇU
+ * ================================
+ */
+function handleIncomingEvent(ev){
+  // normaliser
+  if (!ev.merchant) ev.merchant = MERCHANT_TOKEN;
+  if (!ev.type) ev.type = "sale";
+  if (!ev.pay_method) ev.pay_method = "cash";
+  if (!ev.box) ev.box = "POS-1";
+  if (!ev.at) ev.at = new Date().toISOString();
+  if (!ev.id) ev.id = Date.now();
+
+  STATE.events.push(ev);
+
+  // Dernier encaissement
+  document.getElementById("uiLastPay").textContent = formatFCFA(Number(ev.total) || 0);
+  document.getElementById("uiLastMeta").textContent =
+    (ev.pay_method || "").toUpperCase() + " · Box " + (ev.box || "—");
+
+  recomputeStats();
+  renderTickets();
+}
+
+/**
+ * ================================
+ * CONNECTER AU FLUX PULSE (SSE)
+ * ================================
+ */
+function connectSSE(){
+  try{
+    const url = PULSE_URL + "/events?m=" + encodeURIComponent(MERCHANT_TOKEN);
+    const es = new EventSource(url);
+
+    es.onopen = () => {
+      updateStatus(true);
+    };
+
+    es.onerror = () => {
+      updateStatus(false);
+    };
+
+    es.onmessage = (e) => {
+      try{
+        const data = JSON.parse(e.data);
+        handleIncomingEvent(data);
+      }catch(err){
+        console.error("Event SSE invalide:", err);
+      }
+    };
+  }catch(err){
+    console.error("Erreur SSE:", err);
+    updateStatus(false);
+  }
+}
+
+/**
+ * ================================
+ * FILTRE BOX
+ * ================================
+ */
+function setupBoxFilters(){
+  const buttons = document.querySelectorAll(".box-filter-btn");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const box = btn.getAttribute("data-box");
+      STATE.activeBox = box;
+      document.getElementById("uiBoxFilterLabel").textContent = "Filtre : " + box;
+      recomputeStats();
+      renderTickets();
     });
+  });
+}
 
-    document.getElementById("totalAll").textContent = totalAll.toLocaleString("fr-FR");
-    document.getElementById("totalWave").textContent = totalWave.toLocaleString("fr-FR");
-    document.getElementById("totalOM").textContent = totalOM.toLocaleString("fr-FR");
-    document.getElementById("totalCash").textContent = totalCash.toLocaleString("fr-FR");
-  }
+/**
+ * ================================
+ * BOUTON SIMULATION
+ * ================================
+ */
+function setupSimu(){
+  const btn = document.getElementById("btnSimu");
+  btn.addEventListener("click", () => {
+    const modes = ["cash","wave","om","card"];
+    const boxes = ["POS-1","POS-2","DRIVER-1","MARKET-1"];
+    const m = modes[Math.floor(Math.random()*modes.length)];
+    const b = boxes[Math.floor(Math.random()*boxes.length)];
+    const total = [2000,3000,5000,6000,8000,10000,15000][Math.floor(Math.random()*7)];
+    const fake = {
+      merchant: MERCHANT_TOKEN,
+      box: b,
+      type: "sale",
+      total,
+      pay_method: m,
+      items:[{ name:"Produit test", qty:1, price:total }],
+      at: new Date().toISOString()
+    };
+    handleIncomingEvent(fake);
+  });
+}
 
-  function renderMethod(method){
-    let cls = "badge-method ";
-    let label = "";
-    if(method === "wave"){
-      cls += "method-wave";
-      label = "Wave";
-    } else if(method === "om"){
-      cls += "method-om";
-      label = "Orange Money";
-    } else {
-      cls += "method-cash";
-      label = "Espèces";
-    }
-    return `<span class="${cls}">${label}</span>`;
-  }
-
-  filterMethod.addEventListener("change", renderTable);
-  // filterPeriod est visuel pour l'instant
-  filterPeriod.addEventListener("change", ()=>{ /* à brancher plus tard */ });
-
-  renderTable();
+/**
+ * ================================
+ * DÉMARRAGE
+ * ================================
+ */
+window.addEventListener("load", () => {
+  initChart();
+  setupBoxFilters();
+  setupSimu();
+  connectSSE();
+});
 </script>
 </body>
 </html>
