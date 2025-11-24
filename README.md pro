@@ -1,0 +1,162 @@
+# 💰 DIGIY PAY
+
+> *Reprends le contrôle de ton argent*
+
+[![Private](https://img.shields.io/badge/status-private-red.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
+[![Made in Senegal](https://img.shields.io/badge/made%20in-Senegal%20🇸🇳-green.svg)]()
+
+## 🎯 Vision
+
+DIGIY PAY est le premier coach financier personnel adapté à la réalité africaine. 
+
+Nous unifions tous tes comptes (Wave, Orange Money, banques) pour te donner 
+enfin une vue claire de ton argent.
+
+**Part of DIGIYLYFE ∞ ecosystem**
+
+---
+
+## ✨ Features
+
+- 💰 **Agrégateur multi-comptes** - Wave, OM, banques en un coup d'œil
+- 📊 **Catégorisation automatique** - Vois où va ton argent réellement
+- 🎯 **Objectifs d'épargne** - Construis ton matelas de sécurité pierre par pierre
+- 📚 **Éducation financière** - Tips quotidiens adaptés au Sénégal
+- 📈 **Analytics temps réel** - Dashboard intelligent et réactif
+- 🔐 **Sécurité maximale** - Tes données restent chez toi
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+```bash
+# Clone le repo (accès restreint)
+git clone https://github.com/beauville/digiy-pay.git
+cd digiy-pay
+
+# Configure les variables d'environnement
+cp .env.example .env
+# Édite .env avec tes vraies clés
+
+# Si tu utilises Node.js
+npm install
+
+# Lance le serveur de dev
+npm run dev
+# Ou ouvre simplement app.html dans ton navigateur
+```
+
+### Configuration
+
+1. Copie `.env.example` vers `.env`
+2. Remplis tes vraies API keys (Wave, OM, Firebase)
+3. Configure l'URL de ta database
+4. Lance l'application
+
+---
+
+## 🏗️ Tech Stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
+- **Charts:** Chart.js
+- **Icons:** Font Awesome 6.4
+- **Storage:** LocalStorage (MVP) → PostgreSQL (v2)
+- **Real-time:** Server-Sent Events (SSE)
+- **Architecture:** Master Panel PULSE system
+
+---
+
+## 📁 Structure
+```
+digiy-pay/
+├── app.html              # Application principale
+├── index.html            # Landing page
+├── assets/
+│   ├── css/              # Styles
+│   ├── js/               # Scripts
+│   └── images/           # Assets visuels
+├── config/               # Configuration
+├── docs/                 # Documentation
+├── .env.example          # Template variables d'environnement
+└── README.md
+```
+
+---
+
+## 📱 Roadmap
+
+### Phase 1 - MVP (Mois 1-3) ✅
+- [x] Dashboard finances temps réel
+- [x] Saisie manuelle des comptes
+- [x] Catégorisation transactions
+- [x] Objectifs d'épargne simples
+- [x] Tips éducation
+
+### Phase 2 - Intégrations (Mois 4-6)
+- [ ] API Wave (lecture solde)
+- [ ] API Orange Money
+- [ ] Open Banking (banques locales)
+- [ ] Synchronisation automatique
+
+### Phase 3 - Monétisation (Mois 6-9)
+- [ ] Mode Premium (1,990 FCFA/mois)
+- [ ] Export CSV/PDF
+- [ ] Alertes intelligentes
+- [ ] Support prioritaire
+
+### Phase 4 - Scale (Mois 9-12)
+- [ ] Mobile app (PWA)
+- [ ] iOS & Android natifs
+- [ ] Intégration avec DIGIY DRIVER
+- [ ] Multi-devises (FCFA, EUR)
+
+---
+
+## 🔐 Security
+
+Ce repo est **PRIVÉ**.
+
+- Code propriétaire
+- Accès restreint à l'équipe core
+- Secrets dans `.env` (jamais commités)
+- 2FA obligatoire pour tous les collaborateurs
+- Audit de sécurité avant chaque release
+
+### Bonnes pratiques
+
+1. ⚠️ **Ne JAMAIS commit le fichier `.env`**
+2. ⚠️ **Ne JAMAIS commit d'API keys en dur**
+3. ✅ Utiliser `.env.example` comme template
+4. ✅ Rotate les secrets régulièrement
+5. ✅ Review de code obligatoire
+
+---
+
+## 👥 Team
+
+**Founder & CEO:** [Ton nom]  
+**Vision:** Unifier les services digitaux en Afrique ∞
+
+---
+
+## 📄 License
+
+**Proprietary - All rights reserved © DIGIYLYFE 2024**
+
+Ce code est la propriété exclusive de DIGIYLYFE.  
+Toute reproduction, distribution ou utilisation non autorisée est interdite.
+
+---
+
+## 📞 Contact
+
+**Email:** founder@digiylyfe.com  
+**Website:** https://digiylyfe.com  
+**Location:** Saly, Sénégal 🇸🇳
+
+---
+
+*Built with ❤️ in Senegal*  
+*Part of the DIGIYLYFE ∞ ecosystem*
