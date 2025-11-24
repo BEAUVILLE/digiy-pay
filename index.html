@@ -2,25 +2,25 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>DIGIY PAY — Dashboard Temps Réel</title>
+  <title>DIGIY PAY - Reprends le Contrôle de Ton Argent | Coach Financier Personnel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-  <!-- Chart.js pour le graphique -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <meta name="description" content="Centralise tous tes comptes (Wave, Orange Money, banques). Vois ENFIN où va ton argent. Épargne intelligemment. 0 euro de frais cachés.">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
     :root{
       --bg:#050814;
-      --bg-soft:#0b1220;
-      --card:#020617;
-      --card-soft:#0f172a;
-      --accent:#facc15;      /* or / gold */
+      --accent:#facc15;
       --accent-soft:#fde68a;
-      --danger:#ef4444;
+      --accent-dark:#ca8a04;
       --ok:#22c55e;
+      --danger:#ef4444;
       --muted:#9ca3af;
       --ink:#f9fafb;
-      --line:#1f2937;
+      --purple:#a855f7;
+      --blue:#3b82f6;
     }
 
     *{
@@ -30,921 +30,1155 @@
       font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     }
 
+    html{
+      scroll-behavior:smooth;
+    }
+
     body{
-      background:radial-gradient(circle at top, #1f2937 0, #020617 42%, #000 100%);
+      background:#050814;
       color:var(--ink);
-      min-height:100vh;
-      display:flex;
-      align-items:stretch;
-      justify-content:center;
+      overflow-x:hidden;
     }
 
-    .app{
-      width:100%;
-      max-width:1400px;
-      margin:12px;
-      border-radius:24px;
-      background:radial-gradient(circle at top left, rgba(250,204,21,0.06), transparent 50%), #020617;
-      box-shadow:0 24px 80px rgba(0,0,0,0.65);
-      overflow:hidden;
-      display:flex;
-      flex-direction:row;
-      border:1px solid rgba(148,163,184,0.25);
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(20px); }
+      to { opacity:1; transform:translateY(0); }
     }
 
-    /* ========== SIDEBAR ========== */
-    .sidebar{
-      width:260px;
-      padding:20px 18px;
-      background:linear-gradient(180deg, #020617 0%, #020617 45%, #030712 100%);
-      border-right:1px solid rgba(148,163,184,0.18);
-      display:flex;
-      flex-direction:column;
-      gap:18px;
+    @keyframes slideInLeft {
+      from { opacity:0; transform:translateX(-40px); }
+      to { opacity:1; transform:translateX(0); }
     }
 
-    .logo-row{
+    @keyframes float {
+      0%, 100% { transform:translateY(0); }
+      50% { transform:translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity:1; }
+      50% { opacity:0.6; }
+    }
+
+    /* Header Navigation */
+    .header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:1000;
+      background:rgba(5,8,20,0.95);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(148,163,184,0.2);
+      padding:16px 0;
+    }
+
+    .nav-container{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .logo{
       display:flex;
       align-items:center;
-      gap:10px;
-    }
-    .logo-badge{
-      width:36px;
-      height:36px;
-      border-radius:14px;
-      background:radial-gradient(circle at 20% 0%, #facc15, #eab308 40%, #92400e 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      gap:12px;
+      font-size:20px;
       font-weight:700;
-      letter-spacing:1px;
-      color:#111827;
-      font-size:16px;
-      box-shadow:0 0 0 1px rgba(250,204,21,0.4), 0 12px 30px rgba(0,0,0,0.8);
-    }
-    .brand-text{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .brand-text span:first-child{
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:0.18em;
-      color:var(--muted);
-    }
-    .brand-text span:last-child{
-      font-size:15px;
-      font-weight:600;
-      color:var(--accent-soft);
+      color:var(--accent);
+      text-decoration:none;
     }
 
-    .sidebar-section-title{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:0.16em;
-      color:var(--muted);
-      margin-top:6px;
+    .logo-icon{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#111;
     }
 
-    .merchant-card{
-      margin-top:6px;
-      padding:10px 10px;
-      border-radius:14px;
-      background:radial-gradient(circle at top left, rgba(250,204,21,0.08), rgba(15,23,42,0.95));
-      border:1px solid rgba(148,163,184,0.4);
+    .nav-links{
       display:flex;
-      flex-direction:column;
-      gap:4px;
+      gap:32px;
+      align-items:center;
     }
-    .merchant-name{
+
+    .nav-links a{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:14px;
+      font-weight:500;
+      transition:all 0.3s ease;
+    }
+
+    .nav-links a:hover{
+      color:var(--accent);
+    }
+
+    .btn{
+      padding:10px 24px;
+      border-radius:999px;
       font-size:14px;
       font-weight:600;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    .merchant-tag{
-      font-size:11px;
-      padding:2px 8px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.95);
-      border:1px solid rgba(148,163,184,0.4);
-      color:var(--muted);
-    }
-    .merchant-id{
-      font-size:11px;
-      color:var(--muted);
-      letter-spacing:0.08em;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      text-decoration:none;
+      display:inline-block;
+      border:none;
     }
 
-    .pill{
+    .btn-primary{
+      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color:#111;
+      box-shadow:0 4px 12px rgba(250,204,21,0.3);
+    }
+
+    .btn-primary:hover{
+      box-shadow:0 8px 24px rgba(250,204,21,0.5);
+      transform:translateY(-2px);
+    }
+
+    .btn-secondary{
+      background:transparent;
+      border:1px solid var(--accent);
+      color:var(--accent);
+    }
+
+    .btn-secondary:hover{
+      background:rgba(250,204,21,0.1);
+    }
+
+    /* Hero Section */
+    .hero{
+      padding:140px 24px 80px;
+      background:radial-gradient(circle at top, #1f2937 0%, #050814 40%);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:800px;
+      height:800px;
+      background:radial-gradient(circle, rgba(250,204,21,0.1), transparent 70%);
+      pointer-events:none;
+    }
+
+    .hero-container{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:60px;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+
+    .hero-content{
+      animation:slideInLeft 0.8s ease-out;
+    }
+
+    .hero-badge{
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      padding:5px 8px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.95);
-      border:1px solid rgba(148,163,184,0.25);
-      font-size:11px;
-      color:var(--muted);
-    }
-    .status-dot{
-      width:9px;
-      height:9px;
-      border-radius:999px;
-      background:radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e);
-      box-shadow:0 0 0 2px rgba(34,197,94,0.35);
-    }
-
-    .box-filters{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-top:8px;
-    }
-    .box-filter-btn{
-      flex:0 1 48%;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.45);
-      background:rgba(15,23,42,0.95);
-      color:var(--muted);
-      font-size:11px;
-      padding:6px 8px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      transition:all 0.16s ease-out;
-    }
-    .box-filter-btn span{
-      font-weight:500;
-    }
-    .box-filter-btn small{
-      font-size:10px;
-      opacity:0.8;
-    }
-    .box-filter-btn.active{
-      border-color:var(--accent);
-      background:radial-gradient(circle at top left, rgba(250,204,21,0.22), #020617);
-      color:var(--accent-soft);
-      box-shadow:0 0 0 1px rgba(250,204,21,0.7);
-    }
-
-    .info-box{
-      margin-top:8px;
-      padding:8px 9px;
-      border-radius:12px;
-      border:1px dashed rgba(148,163,184,0.5);
-      background:rgba(15,23,42,0.9);
-      font-size:11px;
-      color:var(--muted);
-      line-height:1.4;
-    }
-    .info-box b{
-      color:var(--accent-soft);
-      font-weight:600;
-    }
-
-    .simu-btn{
-      margin-top:4px;
-      width:100%;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.7);
-      background:rgba(15,23,42,0.95);
-      color:var(--ink);
-      font-size:12px;
-      padding:8px 10px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
       gap:8px;
-      transition:all 0.16s ease-out;
-    }
-    .simu-btn:hover{
-      border-color:var(--accent);
-      box-shadow:0 0 0 1px rgba(250,204,21,0.5);
-    }
-
-    /* ========== MAIN LAYOUT ========== */
-    .main{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      padding:18px 18px 16px 18px;
-      gap:14px;
-      background:radial-gradient(circle at top, rgba(250,204,21,0.08), rgba(15,23,42,1));
+      padding:8px 16px;
+      border-radius:999px;
+      background:rgba(250,204,21,0.15);
+      border:1px solid rgba(250,204,21,0.3);
+      font-size:12px;
+      font-weight:600;
+      color:var(--accent-soft);
+      margin-bottom:24px;
     }
 
-    .main-header{
+    .hero h1{
+      font-size:52px;
+      font-weight:800;
+      line-height:1.1;
+      margin-bottom:24px;
+      background:linear-gradient(135deg, var(--ink), var(--accent-soft));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .hero h1 .highlight{
+      color:var(--accent);
+      -webkit-text-fill-color:var(--accent);
+    }
+
+    .hero-subtitle{
+      font-size:20px;
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:32px;
+    }
+
+    .hero-cta{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
       gap:16px;
+      margin-bottom:32px;
     }
-    .title-block h1{
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:24px;
+      margin-top:48px;
+    }
+
+    .stat{
+      text-align:center;
+    }
+
+    .stat-value{
+      font-size:32px;
+      font-weight:700;
+      color:var(--accent);
+    }
+
+    .stat-label{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .hero-visual{
+      animation:fadeIn 0.8s ease-out 0.3s both;
+    }
+
+    .phone-mockup{
+      position:relative;
+      max-width:400px;
+      margin:0 auto;
+    }
+
+    .phone-frame{
+      background:linear-gradient(135deg, #1f2937, #111);
+      border-radius:40px;
+      padding:12px;
+      box-shadow:0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(250,204,21,0.3);
+      animation:float 3s ease-in-out infinite;
+    }
+
+    .phone-screen{
+      border-radius:32px;
+      overflow:hidden;
+      background:#0f172a;
+      aspect-ratio:9/19.5;
+    }
+
+    /* Problem Section */
+    .problem{
+      padding:80px 24px;
+      background:linear-gradient(180deg, #050814, #0f172a);
+    }
+
+    .problem-container{
+      max-width:1000px;
+      margin:0 auto;
+      text-align:center;
+    }
+
+    .section-title{
+      font-size:42px;
+      font-weight:700;
+      margin-bottom:24px;
+      background:linear-gradient(135deg, var(--ink), var(--accent-soft));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .section-subtitle{
+      font-size:18px;
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:48px;
+    }
+
+    .problems-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:24px;
+      margin-top:48px;
+    }
+
+    .problem-card{
+      padding:32px 24px;
+      border-radius:20px;
+      background:rgba(15,23,42,0.6);
+      border:1px solid rgba(239,68,68,0.3);
+      text-align:center;
+      transition:all 0.3s ease;
+    }
+
+    .problem-card:hover{
+      border-color:rgba(239,68,68,0.6);
+      transform:translateY(-4px);
+    }
+
+    .problem-icon{
+      font-size:48px;
+      margin-bottom:16px;
+    }
+
+    .problem-title{
       font-size:18px;
       font-weight:600;
-      letter-spacing:0.08em;
-      text-transform:uppercase;
-    }
-    .title-block p{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:3px;
-    }
-
-    .time-range{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:11px;
-      color:var(--muted);
-    }
-    .chip{
-      padding:5px 8px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.45);
-      background:rgba(15,23,42,0.95);
-    }
-
-    .top-cards{
-      display:grid;
-      grid-template-columns:repeat(4, minmax(0,1fr));
-      gap:10px;
-    }
-    .card{
-      border-radius:18px;
-      border:1px solid rgba(148,163,184,0.32);
-      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.95));
-      padding:10px 12px;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-height:72px;
-    }
-    .card-title{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:0.14em;
-      color:var(--muted);
-    }
-    .card-value{
-      font-size:20px;
-      font-weight:600;
-      margin-top:4px;
-    }
-    .card-sub{
-      font-size:11px;
-      color:var(--muted);
-      margin-top:2px;
-    }
-    .trend{
-      font-size:11px;
-      margin-top:2px;
-    }
-    .trend.positive{
-      color:var(--ok);
-    }
-    .trend.negative{
+      margin-bottom:12px;
       color:var(--danger);
     }
 
-    .content-row{
-      display:grid;
-      grid-template-columns: minmax(0,2.1fr) minmax(0,1.4fr);
-      gap:12px;
-      min-height:0;
-      flex:1;
-    }
-
-    .panel{
-      border-radius:18px;
-      border:1px solid rgba(148,163,184,0.3);
-      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.98));
-      padding:10px 12px;
-      display:flex;
-      flex-direction:column;
-      min-height:0;
-    }
-    .panel-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:6px;
-    }
-    .panel-title{
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.14em;
+    .problem-text{
+      font-size:14px;
       color:var(--muted);
-    }
-    .panel-header span strong{
-      color:var(--accent-soft);
+      line-height:1.5;
     }
 
-    .chart-wrap{
-      flex:1;
-      min-height:220px;
+    /* Solution Section */
+    .solution{
+      padding:80px 24px;
+      background:#050814;
+    }
+
+    .solution-container{
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    .features-grid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:32px;
+      margin-top:48px;
+    }
+
+    .feature-card{
+      padding:32px;
+      border-radius:24px;
+      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(5,8,20,0.95));
+      border:1px solid rgba(148,163,184,0.2);
+      transition:all 0.3s ease;
+    }
+
+    .feature-card:hover{
+      border-color:var(--accent);
+      box-shadow:0 8px 32px rgba(250,204,21,0.15);
+      transform:translateY(-4px);
+    }
+
+    .feature-icon{
+      width:56px;
+      height:56px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(250,204,21,0.2), rgba(250,204,21,0.05));
+      border:1px solid rgba(250,204,21,0.3);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+      color:var(--accent);
+      margin-bottom:20px;
+    }
+
+    .feature-title{
+      font-size:22px;
+      font-weight:600;
+      margin-bottom:12px;
+    }
+
+    .feature-text{
+      font-size:15px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    /* How It Works */
+    .how-it-works{
+      padding:80px 24px;
+      background:linear-gradient(180deg, #050814, #0f172a);
+    }
+
+    .steps-container{
+      max-width:1000px;
+      margin:0 auto;
+    }
+
+    .steps{
+      display:grid;
+      gap:32px;
+      margin-top:48px;
+    }
+
+    .step{
+      display:grid;
+      grid-template-columns:80px 1fr;
+      gap:24px;
+      align-items:start;
+    }
+
+    .step-number{
+      width:80px;
+      height:80px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:32px;
+      font-weight:700;
+      color:#111;
+      box-shadow:0 8px 24px rgba(250,204,21,0.3);
+    }
+
+    .step-content h3{
+      font-size:24px;
+      margin-bottom:12px;
+    }
+
+    .step-content p{
+      font-size:16px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    /* Pricing Section */
+    .pricing{
+      padding:80px 24px;
+      background:#050814;
+    }
+
+    .pricing-container{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .pricing-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:32px;
+      margin-top:48px;
+    }
+
+    .pricing-card{
+      padding:40px 32px;
+      border-radius:24px;
+      background:rgba(15,23,42,0.6);
+      border:1px solid rgba(148,163,184,0.2);
+      text-align:center;
+      transition:all 0.3s ease;
       position:relative;
     }
 
-    .tickets-list{
-      margin-top:8px;
-      border-radius:14px;
-      border:1px solid rgba(55,65,81,0.8);
-      background:radial-gradient(circle at top, rgba(15,23,42,1), rgba(15,23,42,0.98));
-      padding:4px 0;
-      flex:1;
-      min-height:0;
-      overflow:auto;
+    .pricing-card.featured{
+      border-color:var(--accent);
+      box-shadow:0 12px 40px rgba(250,204,21,0.2);
+      transform:scale(1.05);
     }
 
-    .ticket-row{
-      display:flex;
-      padding:6px 10px;
-      gap:8px;
-      justify-content:space-between;
-      align-items:flex-start;
-      border-bottom:1px solid rgba(31,41,55,0.9);
-      font-size:12px;
+    .pricing-badge{
+      position:absolute;
+      top:-12px;
+      left:50%;
+      transform:translateX(-50%);
+      padding:6px 16px;
+      border-radius:999px;
+      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color:#111;
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.1em;
     }
-    .ticket-main{
+
+    .pricing-name{
+      font-size:18px;
+      font-weight:600;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .pricing-price{
+      font-size:48px;
+      font-weight:700;
+      color:var(--accent);
+      margin-bottom:8px;
+    }
+
+    .pricing-period{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:24px;
+    }
+
+    .pricing-features{
+      list-style:none;
+      margin-bottom:32px;
+      text-align:left;
+    }
+
+    .pricing-features li{
+      padding:12px 0;
+      font-size:14px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .pricing-features li i{
+      color:var(--ok);
+      font-size:16px;
+    }
+
+    .pricing-features li.disabled{
+      opacity:0.4;
+    }
+
+    .pricing-features li.disabled i{
+      color:var(--muted);
+    }
+
+    /* Education Section */
+    .education{
+      padding:80px 24px;
+      background:linear-gradient(135deg, rgba(168,85,247,0.05), rgba(59,130,246,0.05));
+    }
+
+    .education-container{
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    .education-content{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:60px;
+      align-items:center;
+    }
+
+    .education-text h2{
+      font-size:38px;
+      font-weight:700;
+      margin-bottom:20px;
+    }
+
+    .education-text p{
+      font-size:18px;
+      color:var(--muted);
+      line-height:1.7;
+      margin-bottom:16px;
+    }
+
+    .education-modules{
+      display:grid;
+      gap:16px;
+    }
+
+    .module{
+      padding:20px;
+      border-radius:16px;
+      background:rgba(15,23,42,0.6);
+      border:1px solid rgba(148,163,184,0.2);
+      display:flex;
+      align-items:center;
+      gap:16px;
+      transition:all 0.3s ease;
+    }
+
+    .module:hover{
+      border-color:var(--accent);
+      transform:translateX(8px);
+    }
+
+    .module-icon{
+      width:48px;
+      height:48px;
+      border-radius:12px;
+      background:linear-gradient(135deg, rgba(250,204,21,0.2), rgba(250,204,21,0.05));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:var(--accent);
+    }
+
+    .module-text h4{
+      font-size:16px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+
+    .module-text p{
+      font-size:13px;
+      color:var(--muted);
+      margin:0;
+    }
+
+    /* CTA Section */
+    .cta{
+      padding:100px 24px;
+      background:radial-gradient(circle at center, #1f2937, #050814);
+      text-align:center;
+    }
+
+    .cta-container{
+      max-width:800px;
+      margin:0 auto;
+    }
+
+    .cta h2{
+      font-size:48px;
+      font-weight:700;
+      margin-bottom:24px;
+      background:linear-gradient(135deg, var(--ink), var(--accent-soft));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .cta p{
+      font-size:20px;
+      color:var(--muted);
+      margin-bottom:40px;
+      line-height:1.6;
+    }
+
+    .cta-buttons{
+      display:flex;
+      gap:16px;
+      justify-content:center;
+    }
+
+    /* Footer */
+    .footer{
+      padding:60px 24px 24px;
+      background:#020617;
+      border-top:1px solid rgba(148,163,184,0.2);
+    }
+
+    .footer-container{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr;
+      gap:60px;
+    }
+
+    .footer-brand{
       display:flex;
       flex-direction:column;
-      gap:1px;
-    }
-    .ticket-amount{
-      font-weight:600;
-    }
-    .ticket-sub{
-      font-size:11px;
-      color:var(--muted);
-    }
-    .ticket-right{
-      text-align:right;
-      font-size:11px;
-      color:var(--muted);
-    }
-    .ticket-box{
-      padding:2px 7px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.6);
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:0.12em;
+      gap:16px;
     }
 
-    .pill-pay{
-      display:inline-flex;
+    .footer-logo{
+      display:flex;
       align-items:center;
-      gap:4px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.5);
-      padding:2px 7px;
-      font-size:10px;
+      gap:12px;
+      font-size:20px;
+      font-weight:700;
+      color:var(--accent);
+    }
+
+    .footer-text{
+      font-size:14px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .footer-section h4{
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:16px;
       text-transform:uppercase;
-      letter-spacing:0.12em;
+      letter-spacing:0.1em;
     }
 
-    .pill-pay[data-method="cash"]{
-      border-color:rgba(163,230,53,0.8);
-      color:#bbf7d0;
-    }
-    .pill-pay[data-method="wave"]{
-      border-color:rgba(59,130,246,0.8);
-      color:#bfdbfe;
-    }
-    .pill-pay[data-method="om"]{
-      border-color:rgba(249,115,22,0.9);
-      color:#fed7aa;
-    }
-    .pill-pay[data-method="card"]{
-      border-color:rgba(248,250,252,0.9);
-      color:#e5e7eb;
+    .footer-links{
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
 
-    .empty-state{
-      padding:14px;
+    .footer-links a{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:14px;
+      transition:all 0.3s ease;
+    }
+
+    .footer-links a:hover{
+      color:var(--accent);
+    }
+
+    .footer-bottom{
+      margin-top:48px;
+      padding-top:24px;
+      border-top:1px solid rgba(148,163,184,0.2);
       text-align:center;
-      font-size:12px;
+      font-size:13px;
       color:var(--muted);
     }
 
+    /* Responsive */
     @media (max-width:1024px){
-      .app{
-        flex-direction:column;
+      .hero-container,
+      .education-content{
+        grid-template-columns:1fr;
       }
-      .sidebar{
-        width:100%;
-        flex-direction:row;
-        align-items:flex-start;
-        justify-content:space-between;
+      
+      .pricing-grid{
+        grid-template-columns:1fr;
       }
-      .box-filters{
-        max-width:280px;
+      
+      .pricing-card.featured{
+        transform:scale(1);
+      }
+      
+      .features-grid{
+        grid-template-columns:1fr;
+      }
+      
+      .problems-grid{
+        grid-template-columns:1fr;
+      }
+      
+      .footer-container{
+        grid-template-columns:1fr;
       }
     }
 
     @media (max-width:768px){
-      .sidebar{
-        flex-direction:column;
+      .hero h1{
+        font-size:36px;
       }
-      .content-row{
+      
+      .section-title{
+        font-size:32px;
+      }
+      
+      .nav-links{
+        display:none;
+      }
+      
+      .hero-stats{
         grid-template-columns:1fr;
-      }
-      .top-cards{
-        grid-template-columns:repeat(2, minmax(0,1fr));
       }
     }
   </style>
 </head>
 <body>
-<div class="app">
-  <!-- ========== SIDEBAR ========== -->
-  <aside class="sidebar">
-    <div class="logo-row">
-      <div class="logo-badge">DG</div>
-      <div class="brand-text">
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">∞</div>
         <span>DIGIY PAY</span>
-        <span>Dashboard Temps Réel</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Fonctionnalités</a>
+        <a href="#how">Comment ça marche</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="#" class="btn btn-primary">Commencer gratuitement</a>
       </div>
-    </div>
+    </nav>
+  </header>
 
-    <div>
-      <div class="sidebar-section-title">Commerçant / Token</div>
-      <div class="merchant-card">
-        <div class="merchant-name">
-          <span id="uiMerchantName">—</span>
-          <span class="merchant-tag">LIVE PULSE</span>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fas fa-bolt"></i>
+          <span>100% gratuit pendant 30 jours · Sans carte bancaire</span>
         </div>
-        <div class="merchant-id" id="uiMerchantId">Merchant: —</div>
-        <div style="margin-top:6px;">
-          <span class="pill">
-            <span class="status-dot" id="uiStatusDot"></span>
-            <span id="uiStatusLabel">En attente du flux…</span>
-          </span>
+        
+        <h1>
+          Reprends le <span class="highlight">contrôle</span><br>
+          de ton argent
+        </h1>
+        
+        <p class="hero-subtitle">
+          Tu gagnes 150,000 FCFA/mois mais tu finis toujours à sec ?<br>
+          Wave, Orange Money, banque, cash... Ton argent est <strong>partout</strong> et tu ne le vois <strong>nulle part</strong>.
+        </p>
+        
+        <div class="hero-cta">
+          <a href="#" class="btn btn-primary">
+            <i class="fas fa-rocket"></i> Essayer gratuitement
+          </a>
+          <a href="#how" class="btn btn-secondary">
+            <i class="fas fa-play-circle"></i> Voir comment ça marche
+          </a>
         </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="sidebar-section-title">Filtre par box</div>
-      <div class="box-filters">
-        <button class="box-filter-btn active" data-box="ALL">
-          <span>ALL</span><small>Vue globale</small>
-        </button>
-        <button class="box-filter-btn" data-box="POS-1">
-          <span>POS-1</span><small>Caisse 1</small>
-        </button>
-        <button class="box-filter-btn" data-box="POS-2">
-          <span>POS-2</span><small>Caisse 2</small>
-        </button>
-        <button class="box-filter-btn" data-box="DRIVER-1">
-          <span>DRIVER</span><small>Courses</small>
-        </button>
-        <button class="box-filter-btn" data-box="MARKET-1">
-          <span>MARKET</span><small>Boutique</small>
-        </button>
-      </div>
-    </div>
-
-    <div>
-      <div class="sidebar-section-title">Infos / Test</div>
-      <div class="info-box">
-        <b>Tip :</b> ce dashboard écoute PULSE sur<br>
-        <code id="uiPulseUrl" style="font-size:10px;"></code><br><br>
-        Envoie tes encaissements via<br>
-        <code style="font-size:10px;">POST /event</code><br>
-        avec <code>merchant</code>, <code>box</code>, <code>total</code>, <code>pay_method</code>.
-      </div>
-      <button class="simu-btn" id="btnSimu">
-        <span>⚡ Simuler une vente</span>
-      </button>
-    </div>
-  </aside>
-
-  <!-- ========== MAIN ========== -->
-  <main class="main">
-    <header class="main-header">
-      <div class="title-block">
-        <h1>DIGIY PAY — PANEL CA & TICKETS</h1>
-        <p>Vue temps réel des encaissements (PULSE API → Dashboard PAY).</p>
-      </div>
-      <div class="time-range">
-        <span class="chip">Aujourd’hui</span>
-        <span class="chip">Filtre box actif</span>
-      </div>
-    </header>
-
-    <!-- Top KPI cards -->
-    <section class="top-cards">
-      <article class="card">
-        <div class="card-title">CA total (filtre actif)</div>
-        <div class="card-value" id="uiCA">0 FCFA</div>
-        <div class="card-sub">Tous modes de paiement</div>
-      </article>
-      <article class="card">
-        <div class="card-title">Tickets</div>
-        <div class="card-value" id="uiTickets">0</div>
-        <div class="card-sub">Tickets encaissés</div>
-      </article>
-      <article class="card">
-        <div class="card-title">Panier moyen</div>
-        <div class="card-value" id="uiAvg">0 FCFA</div>
-        <div class="card-sub">CA / nombre de tickets</div>
-      </article>
-      <article class="card">
-        <div class="card-title">Dernier encaissement</div>
-        <div class="card-value" id="uiLastPay">—</div>
-        <div class="card-sub" id="uiLastMeta">En attente…</div>
-      </article>
-    </section>
-
-    <!-- Graph + tickets -->
-    <section class="content-row">
-      <!-- Graph & stats paiement -->
-      <section class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Répartition par mode de paiement</div>
-          <span style="font-size:11px;color:var(--muted);">
-            Cash / Wave / OM / Card · <strong id="uiBoxFilterLabel">Filtre : ALL</strong>
-          </span>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="payChart"></canvas>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:10px;font-size:11px;color:var(--muted);flex-wrap:wrap;">
-          <span class="pill-pay" data-method="cash">💵 Cash&nbsp;<span id="statCash">0</span></span>
-          <span class="pill-pay" data-method="wave">🌊 Wave&nbsp;<span id="statWave">0</span></span>
-          <span class="pill-pay" data-method="om">🟠 OM&nbsp;<span id="statOM">0</span></span>
-          <span class="pill-pay" data-method="card">💳 Card&nbsp;<span id="statCard">0</span></span>
-        </div>
-      </section>
-
-      <!-- Tickets temps réel -->
-      <section class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Tickets en temps réel</div>
-          <span style="font-size:11px;color:var(--muted);">
-            Derniers encaissements PULSE
-          </span>
-        </div>
-        <div class="tickets-list" id="ticketList">
-          <div class="empty-state">
-            En attente de ton premier encaissement DIGIY PAY…<br>
-            Lance une vente pour voir le flux arriver en live.
+        
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-value">2,500+</div>
+            <div class="stat-label">Utilisateurs</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">0%</div>
+            <div class="stat-label">Frais cachés</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">4.9/5</div>
+            <div class="stat-label">Note moyenne</div>
           </div>
         </div>
-      </section>
-    </section>
-  </main>
-</div>
+      </div>
+      
+      <div class="hero-visual">
+        <div class="phone-mockup">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <img src="https://via.placeholder.com/400x866/0f172a/facc15?text=DIGIY+PAY+Dashboard" alt="App Preview" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-/**
- * ================================
- * CONFIG À ADAPTER
- * ================================
- */
-const PULSE_URL = "http://127.0.0.1:3200"; // ← adapte si PULSE est en ligne
-const MERCHANT_TOKEN = "ASTOU-SN-001";    // ← ton token commerçant réel
+  <!-- Problem Section -->
+  <section class="problem" id="problem">
+    <div class="problem-container">
+      <h2 class="section-title">Tu te reconnais ?</h2>
+      <p class="section-subtitle">
+        La majorité des Sénégalais ne savent pas où va leur argent.<br>
+        Et ce n'est pas de leur faute.
+      </p>
+      
+      <div class="problems-grid">
+        <div class="problem-card">
+          <div class="problem-icon">😵‍💫</div>
+          <h3 class="problem-title">Argent invisible</h3>
+          <p class="problem-text">
+            Wave, OM, banque, cash... Tu as 4-5 comptes mais aucune vue d'ensemble.
+          </p>
+        </div>
+        
+        <div class="problem-card">
+          <div class="problem-icon">💸</div>
+          <h3 class="problem-title">Dépenses mystères</h3>
+          <p class="problem-text">
+            "Où sont passés mes 50,000 FCFA ?" Tu ne te souviens jamais de tes achats.
+          </p>
+        </div>
+        
+        <div class="problem-card">
+          <div class="problem-icon">😰</div>
+          <h3 class="problem-title">Zéro épargne</h3>
+          <p class="problem-text">
+            Toujours à sec en fin de mois. Aucun matelas de sécurité. Aucun projet.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/**
- * ================================
- * ÉTAT GLOBAL
- * ================================
- */
-const STATE = {
-  events: [],       // tous les events reçus
-  activeBox: "ALL", // filtre box
-  chart: null
-};
+  <!-- Solution Section -->
+  <section class="solution" id="features">
+    <div class="solution-container">
+      <h2 class="section-title">DIGIY PAY : Ton coach financier personnel</h2>
+      <p class="section-subtitle" style="text-align:center;max-width:700px;margin:0 auto;">
+        Centralise TOUS tes comptes en un seul endroit. Vois ENFIN où va ton argent.<br>
+        Épargne intelligemment. Construis ton avenir.
+      </p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3 class="feature-title">Vue centralisée</h3>
+          <p class="feature-text">
+            Connecte Wave, Orange Money, tes banques et même ton cash. Vois TOUT ton argent en un coup d'œil. Plus besoin de jongler entre 5 apps.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <h3 class="feature-title">Catégorisation automatique</h3>
+          <p class="feature-text">
+            Alimentation, transport, sorties, factures... Chaque dépense est classée automatiquement. Tu VOIS enfin où part ton argent.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-piggy-bank"></i>
+          </div>
+          <h3 class="feature-title">Objectifs d'épargne</h3>
+          <p class="feature-text">
+            Définis tes rêves : nouvelle moto, voyage, mariage, business. DIGIY PAY t'aide à y arriver avec un plan concret et du coaching quotidien.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <h3 class="feature-title">Éducation financière</h3>
+          <p class="feature-text">
+            1 tip par jour, défis d'épargne, communauté d'entraide. On t'apprend ce que l'école ne t'a jamais appris : gérer ton argent.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-const STATS = {
-  cash: 0,
-  wave: 0,
-  om: 0,
-  card: 0
-};
+  <!-- How It Works -->
+  <section class="how-it-works" id="how">
+    <div class="steps-container">
+      <h2 class="section-title" style="text-align:center;">Comment ça marche ?</h2>
+      <p class="section-subtitle" style="text-align:center;">
+        3 étapes pour reprendre le contrôle
+      </p>
+      
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Connecte tes comptes</h3>
+            <p>
+              Ajoute tes comptes Wave, Orange Money, ta banque et ton cash. En 2 minutes, tu as une vue complète de ton patrimoine.
+            </p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Analyse tes habitudes</h3>
+            <p>
+              DIGIY PAY catégorise automatiquement tes dépenses. Tu découvres que tu dépenses 40,000 FCFA/mois en sorties ? Maintenant tu le sais.
+            </p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Épargne sans effort</h3>
+            <p>
+              Définis un objectif (ex: 200,000 FCFA en 6 mois). DIGIY PAY te dit combien mettre de côté chaque semaine et te motive tous les jours.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/**
- * ================================
- * INIT UI
- * ================================
- */
-document.getElementById("uiMerchantName").textContent = "DIGIY PAY";
-document.getElementById("uiMerchantId").textContent = "Merchant: " + MERCHANT_TOKEN;
-document.getElementById("uiPulseUrl").textContent = PULSE_URL + "/events?m=" + MERCHANT_TOKEN;
+  <!-- Education -->
+  <section class="education">
+    <div class="education-container">
+      <div class="education-content">
+        <div class="education-text">
+          <h2>L'argent appelle l'argent</h2>
+          <p>
+            Mais personne ne t'a appris <strong>comment</strong>. DIGIY PAY comble ce vide avec des modules d'éducation financière adaptés à ta réalité africaine.
+          </p>
+          <p>
+            Pas de jargon compliqué. Juste des conseils pratiques que tu peux appliquer <strong>aujourd'hui</strong>.
+          </p>
+        </div>
+        
+        <div class="education-modules">
+          <div class="module">
+            <div class="module-icon">
+              <i class="fas fa-seedling"></i>
+            </div>
+            <div class="module-text">
+              <h4>Les bases de l'épargne</h4>
+              <p>Comment épargner même avec un petit salaire</p>
+            </div>
+          </div>
+          
+          <div class="module">
+            <div class="module-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="module-text">
+              <h4>Matelas de sécurité</h4>
+              <p>Constituer 3-6 mois de dépenses en réserve</p>
+            </div>
+          </div>
+          
+          <div class="module">
+            <div class="module-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="module-text">
+              <h4>Faire fructifier ton argent</h4>
+              <p>Investissements simples et accessibles</p>
+            </div>
+          </div>
+          
+          <div class="module">
+            <div class="module-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="module-text">
+              <h4>Communauté d'entraide</h4>
+              <p>Partage d'expériences et défis collectifs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-/**
- * ================================
- * OUTILS
- * ================================
- */
-function formatFCFA(amount){
-  if (!amount) return "0 FCFA";
-  return amount.toLocaleString("fr-FR") + " FCFA";
-}
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="pricing-container">
+      <h2 class="section-title" style="text-align:center;">Un prix honnête, sans frais cachés</h2>
+      <p class="section-subtitle" style="text-align:center;">
+        Commence gratuitement. Upgrade quand tu es prêt. Annule quand tu veux.
+      </p>
+      
+      <div class="pricing-grid">
+        <!-- Free Plan -->
+        <div class="pricing-card">
+          <div class="pricing-name">GRATUIT</div>
+          <div class="pricing-price">0 FCFA</div>
+          <div class="pricing-period">Pour toujours</div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> 2 comptes connectés</li>
+            <li><i class="fas fa-check"></i> Vue d'ensemble basique</li>
+            <li><i class="fas fa-check"></i> Catégorisation manuelle</li>
+            <li><i class="fas fa-check"></i> 1 objectif d'épargne</li>
+            <li class="disabled"><i class="fas fa-times"></i> Alertes intelligentes</li>
+            <li class="disabled"><i class="fas fa-times"></i> Export de données</li>
+          </ul>
+          <a href="#" class="btn btn-secondary" style="width:100%;">Commencer</a>
+        </div>
+        
+        <!-- Premium Plan -->
+        <div class="pricing-card featured">
+          <div class="pricing-badge">⭐ Le plus populaire</div>
+          <div class="pricing-name">PREMIUM</div>
+          <div class="pricing-price">1,990<span style="font-size:20px;"> FCFA</span></div>
+          <div class="pricing-period">Par mois</div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> <strong>Comptes illimités</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Vue temps réel</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Catégorisation auto</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Objectifs illimités</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Alertes & notifications</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Export CSV/PDF</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Éducation financière</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Support prioritaire</strong></li>
+          </ul>
+          <a href="#" class="btn btn-primary" style="width:100%;">Essayer 30 jours gratuit</a>
+        </div>
+        
+        <!-- Family Plan -->
+        <div class="pricing-card">
+          <div class="pricing-name">FAMILLE</div>
+          <div class="pricing-price">3,990<span style="font-size:20px;"> FCFA</span></div>
+          <div class="pricing-period">Par mois</div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> <strong>Tout du Premium</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Jusqu'à 5 profils</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Objectifs partagés</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Budget familial</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Éducation enfants</strong></li>
+            <li><i class="fas fa-check"></i> <strong>Tableau de bord famille</strong></li>
+          </ul>
+          <a href="#" class="btn btn-secondary" style="width:100%;">Commencer</a>
+        </div>
+      </div>
+      
+      <p style="text-align:center;margin-top:32px;font-size:14px;color:var(--muted);">
+        <i class="fas fa-lock"></i> Paiement sécurisé · Annulation en 1 clic · Pas d'engagement
+      </p>
+    </div>
+  </section>
 
-function updateStatus(online){
-  const dot = document.getElementById("uiStatusDot");
-  const label = document.getElementById("uiStatusLabel");
-  if(online){
-    dot.style.background = "radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e)";
-    dot.style.boxShadow = "0 0 0 2px rgba(34,197,94,0.35)";
-    label.textContent = "Flux PULSE connecté";
-  }else{
-    dot.style.background = "radial-gradient(circle at 30% 0%, #fee2e2, #ef4444)";
-    dot.style.boxShadow = "0 0 0 2px rgba(248,113,113,0.5)";
-    label.textContent = "Déconnecté / en attente…";
-  }
-}
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-container">
+      <h2>Prêt à reprendre le contrôle ?</h2>
+      <p>
+        Rejoins les 2,500+ Sénégalais qui ont déjà transformé leur relation avec l'argent.
+      </p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-primary" style="font-size:16px;padding:14px 32px;">
+          <i class="fas fa-rocket"></i> Commencer gratuitement
+        </a>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-top:24px;">
+        30 jours d'essai gratuit · Sans carte bancaire · Annule quand tu veux
+      </p>
+    </div>
+  </section>
 
-/**
- * ================================
- * GESTION DES STATISTIQUES
- * ================================
- */
-function recomputeStats(){
-  // reset
-  STATS.cash = STATS.wave = STATS.om = STATS.card = 0;
-  let total = 0;
-  let count = 0;
-
-  const filterBox = STATE.activeBox;
-
-  STATE.events.forEach(ev => {
-    if (ev.type !== "sale") return;
-    if (filterBox !== "ALL" && ev.box !== filterBox) return;
-
-    const t = Number(ev.total) || 0;
-    total += t;
-    count++;
-
-    const m = (ev.pay_method || "").toLowerCase();
-    if (STATS[m] !== undefined) {
-      STATS[m] += t;
-    }
-  });
-
-  // CA, tickets, panier moyen
-  document.getElementById("uiCA").textContent = formatFCFA(total);
-  document.getElementById("uiTickets").textContent = count.toString();
-  const avg = count ? Math.round(total / count) : 0;
-  document.getElementById("uiAvg").textContent = formatFCFA(avg);
-
-  // Stats par mode
-  document.getElementById("statCash").textContent = STATS.cash.toLocaleString("fr-FR");
-  document.getElementById("statWave").textContent = STATS.wave.toLocaleString("fr-FR");
-  document.getElementById("statOM").textContent = STATS.om.toLocaleString("fr-FR");
-  document.getElementById("statCard").textContent = STATS.card.toLocaleString("fr-FR");
-
-  // Mettre à jour le graphique
-  updateChart();
-}
-
-/**
- * ================================
- * GRAPHIQUE CHART.JS
- * ================================
- */
-function initChart(){
-  const ctx = document.getElementById("payChart").getContext("2d");
-  STATE.chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Cash", "Wave", "OM", "Card"],
-      datasets: [{
-        label: "CA par mode (FCFA)",
-        data: [0, 0, 0, 0],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          grid: { color:"rgba(55,65,81,0.5)" },
-          ticks: { color:"#e5e7eb", font:{ size:11 } }
-        },
-        y: {
-          grid: { color:"rgba(55,65,81,0.5)" },
-          ticks: { color:"#9ca3af", font:{ size:11 } }
-        }
-      },
-      plugins:{
-        legend:{ labels:{ color:"#e5e7eb", font:{ size:11 } } }
-      }
-    }
-  });
-}
-
-function updateChart(){
-  if (!STATE.chart) return;
-  STATE.chart.data.datasets[0].data = [
-    STATS.cash,
-    STATS.wave,
-    STATS.om,
-    STATS.card
-  ];
-  STATE.chart.update();
-}
-
-/**
- * ================================
- * TICKETS TEMPS RÉEL
- * ================================
- */
-function renderTickets(){
-  const list = document.getElementById("ticketList");
-  list.innerHTML = "";
-
-  const filterBox = STATE.activeBox;
-  const filtered = STATE.events
-    .filter(ev => ev.type === "sale")
-    .filter(ev => filterBox === "ALL" || ev.box === filterBox)
-    // tri par date (at) pour être robuste même si id est une string
-    .sort((a,b) => new Date(b.at || 0) - new Date(a.at || 0));
-
-  if (!filtered.length){
-    const empty = document.createElement("div");
-    empty.className = "empty-state";
-    empty.textContent = "Aucun ticket pour l’instant sur ce filtre box.";
-    list.appendChild(empty);
-    return;
-  }
-
-  filtered.forEach(ev => {
-    const row = document.createElement("div");
-    row.className = "ticket-row";
-
-    const m = (ev.pay_method || "").toLowerCase();
-    const methodLabel = m === "cash" ? "Cash" :
-                        m === "wave" ? "Wave" :
-                        m === "om" ? "Orange Money" :
-                        m === "card" ? "Carte" : (m || "").toUpperCase();
-    const amount = formatFCFA(Number(ev.total) || 0);
-
-    const time = ev.at ? new Date(ev.at) : new Date();
-    const timeStr = time.toLocaleTimeString("fr-FR",{ hour:"2-digit", minute:"2-digit", second:"2-digit" });
-
-    const box = ev.box || "—";
-
-    const main = document.createElement("div");
-    main.className = "ticket-main";
-    const title = document.createElement("div");
-    title.className = "ticket-amount";
-    title.textContent = amount;
-    const sub = document.createElement("div");
-    sub.className = "ticket-sub";
-    sub.textContent = ev.id ? `Ticket ${ev.id}` : "Ticket";
-
-    main.appendChild(title);
-    main.appendChild(sub);
-
-    const mid = document.createElement("div");
-    const pill = document.createElement("span");
-    pill.className = "pill-pay";
-    pill.setAttribute("data-method", m || "");
-    pill.textContent = methodLabel;
-    mid.appendChild(pill);
-
-    const right = document.createElement("div");
-    right.className = "ticket-right";
-    const spanTime = document.createElement("div");
-    spanTime.textContent = timeStr;
-    const spanBox = document.createElement("div");
-    spanBox.className = "ticket-box";
-    spanBox.textContent = box;
-    right.appendChild(spanTime);
-    right.appendChild(spanBox);
-
-    row.appendChild(main);
-    row.appendChild(mid);
-    row.appendChild(right);
-
-    list.appendChild(row);
-  });
-}
-
-/**
- * ================================
- * NOUVEL EVENT REÇU
- * ================================
- */
-function handleIncomingEvent(ev){
-  // normaliser
-  if (!ev.merchant) ev.merchant = MERCHANT_TOKEN;
-  if (!ev.type) ev.type = "sale";
-  if (!ev.pay_method) ev.pay_method = "cash";
-  if (!ev.box) ev.box = "POS-1";
-  if (!ev.at) ev.at = new Date().toISOString();
-  if (!ev.id) ev.id = Date.now();
-
-  STATE.events.push(ev);
-
-  // Dernier encaissement
-  document.getElementById("uiLastPay").textContent = formatFCFA(Number(ev.total) || 0);
-  document.getElementById("uiLastMeta").textContent =
-    (ev.pay_method || "").toUpperCase() + " · Box " + (ev.box || "—");
-
-  recomputeStats();
-  renderTickets();
-}
-
-/**
- * ================================
- * CONNECTER AU FLUX PULSE (SSE)
- * ================================
- */
-function connectSSE(){
-  try{
-    const url = PULSE_URL + "/events?m=" + encodeURIComponent(MERCHANT_TOKEN);
-    const es = new EventSource(url);
-
-    es.onopen = () => {
-      updateStatus(true);
-    };
-
-    es.onerror = () => {
-      updateStatus(false);
-      // EventSource va retenter tout seul côté navigateur
-    };
-
-    es.onmessage = (e) => {
-      try{
-        const data = JSON.parse(e.data);
-        handleIncomingEvent(data);
-      }catch(err){
-        console.error("Event SSE invalide:", err);
-      }
-    };
-  }catch(err){
-    console.error("Erreur SSE:", err);
-    updateStatus(false);
-  }
-}
-
-/**
- * ================================
- * FILTRE BOX
- * ================================
- */
-function setupBoxFilters(){
-  const buttons = document.querySelectorAll(".box-filter-btn");
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      buttons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const box = btn.getAttribute("data-box");
-      STATE.activeBox = box;
-      document.getElementById("uiBoxFilterLabel").textContent = "Filtre : " + box;
-      recomputeStats();
-      renderTickets();
-    });
-  });
-}
-
-/**
- * ================================
- * BOUTON SIMULATION
- * ================================
- */
-function setupSimu(){
-  const btn = document.getElementById("btnSimu");
-  btn.addEventListener("click", () => {
-    const modes = ["cash","wave","om","card"];
-    const boxes = ["POS-1","POS-2","DRIVER-1","MARKET-1"];
-    const m = modes[Math.floor(Math.random()*modes.length)];
-    const b = boxes[Math.floor(Math.random()*boxes.length)];
-    const total = [2000,3000,5000,6000,8000,10000,15000][Math.floor(Math.random()*7)];
-    const fake = {
-      merchant: MERCHANT_TOKEN,
-      box: b,
-      type: "sale",
-      total,
-      pay_method: m,
-      items:[{ name:"Produit test", qty:1, price:total }],
-      at: new Date().toISOString()
-    };
-    handleIncomingEvent(fake);
-  });
-}
-
-/**
- * ================================
- * DÉMARRAGE
- * ================================
- */
-window.addEventListener("load", () => {
-  initChart();
-  setupBoxFilters();
-  setupSimu();
-  connectSSE();
-});
-</script>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="logo-icon">∞</div>
+          <span>DIGIY PAY</span>
+        </div>
+        <p class="footer-text">
+          Reprends le contrôle de ton argent. Construis ton avenir financier. 0% de frais cachés, 100% de transparence.
+        </p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Produit</h4>
+        <ul class="footer-links">
+          <li><a href="#">Fonctionnalités</a></li>
+          <li><a href="#">Tarifs</a></li>
+          <li><a href="#">Sécurité</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Ressources</h4>
+        <ul class="footer-links">
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Guides</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Entreprise</h4>
+        <ul class="footer-links">
+          <li><a href="#">À propos</a></li>
+          <li><a href="#">Carrières</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Partenaires</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>© 2024 DIGIY PAY · Une initiative DIGIYLYFE · Dakar, Sénégal 🇸🇳</p>
+    </div>
+  </footer>
 </body>
 </html>
