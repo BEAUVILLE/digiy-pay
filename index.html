@@ -766,7 +766,8 @@ function renderTickets(){
   const filtered = STATE.events
     .filter(ev => ev.type === "sale")
     .filter(ev => filterBox === "ALL" || ev.box === filterBox)
-    .sort((a,b) => (b.id||0) - (a.id||0));
+    // tri par date (at) pour être robuste même si id est une string
+    .sort((a,b) => new Date(b.at || 0) - new Date(a.at || 0));
 
   if (!filtered.length){
     const empty = document.createElement("div");
@@ -784,7 +785,7 @@ function renderTickets(){
     const methodLabel = m === "cash" ? "Cash" :
                         m === "wave" ? "Wave" :
                         m === "om" ? "Orange Money" :
-                        m === "card" ? "Carte" : m.toUpperCase();
+                        m === "card" ? "Carte" : (m || "").toUpperCase();
     const amount = formatFCFA(Number(ev.total) || 0);
 
     const time = ev.at ? new Date(ev.at) : new Date();
@@ -799,7 +800,7 @@ function renderTickets(){
     title.textContent = amount;
     const sub = document.createElement("div");
     sub.className = "ticket-sub";
-    sub.textContent = `Ticket ${ev.id || ""}`.trim();
+    sub.textContent = ev.id ? `Ticket ${ev.id}` : "Ticket";
 
     main.appendChild(title);
     main.appendChild(sub);
@@ -870,6 +871,7 @@ function connectSSE(){
 
     es.onerror = () => {
       updateStatus(false);
+      // EventSource va retenter tout seul côté navigateur
     };
 
     es.onmessage = (e) => {
