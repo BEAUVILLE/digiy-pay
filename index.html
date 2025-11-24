@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>DIGIY PAY PREMIUM — Portefeuille Digital Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Font Awesome pour les icônes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#050814;
+      --bg-soft:#0b1220;
+      --card:#020617;
+      --card-soft:#0f172a;
+      --accent:#facc15;
+      --accent-soft:#fde68a;
+      --accent-dark:#ca8a04;
+      --danger:#ef4444;
+      --ok:#22c55e;
+      --muted:#9ca3af;
+      --ink:#f9fafb;
+      --line:#1f2937;
+      --purple:#a855f7;
+      --blue:#3b82f6;
+      --orange:#f97316;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    }
+
+    body{
+      background:radial-gradient(circle at top, #1f2937 0, #020617 42%, #000 100%);
+      color:var(--ink);
+      min-height:100vh;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    /* Animations premium */
+    @keyframes slideInFromLeft {
+      from { transform: translateX(-30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .app{
+      width:100%;
+      max-width:1600px;
+      margin:12px;
+      border-radius:24px;
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.08), transparent 50%), #020617;
+      box-shadow:0 24px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(250,204,21,0.15);
+      overflow:hidden;
+      display:flex;
+      flex-direction:row;
+      border:1px solid rgba(148,163,184,0.25);
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    /* ========== SIDEBAR PREMIUM ========== */
+    .sidebar{
+      width:280px;
+      padding:20px 18px;
+      background:linear-gradient(180deg, #020617 0%, #020617 45%, #030712 100%);
+      border-right:1px solid rgba(148,163,184,0.18);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      animation: slideInFromLeft 0.5s ease-out;
+    }
+
+    .logo-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding-bottom:12px;
+      border-bottom:1px solid rgba(148,163,184,0.2);
+    }
+    .logo-badge{
+      width:42px;
+      height:42px;
+      border-radius:16px;
+      background:radial-gradient(circle at 20% 0%, #facc15, #eab308 40%, #92400e 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      letter-spacing:1px;
+      color:#111827;
+      font-size:18px;
+      box-shadow:0 0 0 1px rgba(250,204,21,0.4), 0 12px 30px rgba(250,204,21,0.3);
+      position:relative;
+    }
+    .logo-badge::after{
+      content:'';
+      position:absolute;
+      top:-2px;
+      right:-2px;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--ok);
+      border:2px solid #020617;
+      box-shadow:0 0 8px var(--ok);
+    }
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .brand-text span:first-child{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:0.18em;
+      color:var(--muted);
+    }
+    .brand-text span:last-child{
+      font-size:16px;
+      font-weight:700;
+      background:linear-gradient(135deg, var(--accent), var(--accent-soft));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .sidebar-section-title{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.16em;
+      color:var(--muted);
+      margin-top:6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .sidebar-section-title i{
+      color:var(--accent);
+    }
+
+    .merchant-card{
+      margin-top:6px;
+      padding:12px 12px;
+      border-radius:16px;
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.1), rgba(15,23,42,0.95));
+      border:1px solid rgba(250,204,21,0.3);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      transition:all 0.3s ease;
+    }
+    .merchant-card:hover{
+      border-color:rgba(250,204,21,0.5);
+      box-shadow:0 0 20px rgba(250,204,21,0.15);
+    }
+    .merchant-name{
+      font-size:15px;
+      font-weight:700;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .merchant-tag{
+      font-size:10px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(250,204,21,0.2);
+      border:1px solid rgba(250,204,21,0.5);
+      color:var(--accent-soft);
+      font-weight:600;
+      letter-spacing:0.1em;
+    }
+    .merchant-id{
+      font-size:11px;
+      color:var(--muted);
+      letter-spacing:0.08em;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.95);
+      border:1px solid rgba(148,163,184,0.25);
+      font-size:11px;
+      color:var(--muted);
+      transition:all 0.3s ease;
+    }
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e);
+      box-shadow:0 0 0 2px rgba(34,197,94,0.35);
+      animation:pulse 2s ease-in-out infinite;
+    }
+
+    .balance-card{
+      margin-top:10px;
+      padding:14px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(168,85,247,0.15), rgba(59,130,246,0.15));
+      border:1px solid rgba(168,85,247,0.4);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .balance-label{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      color:var(--muted);
+    }
+    .balance-amount{
+      font-size:24px;
+      font-weight:700;
+      background:linear-gradient(135deg, var(--purple), var(--blue));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .box-filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:8px;
+    }
+    .box-filter-btn{
+      flex:0 1 48%;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,0.3);
+      background:rgba(15,23,42,0.95);
+      color:var(--muted);
+      font-size:11px;
+      padding:8px 10px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      transition:all 0.2s ease;
+    }
+    .box-filter-btn:hover{
+      border-color:var(--accent);
+      background:rgba(250,204,21,0.05);
+    }
+    .box-filter-btn span{
+      font-weight:600;
+    }
+    .box-filter-btn small{
+      font-size:10px;
+      opacity:0.8;
+    }
+    .box-filter-btn.active{
+      border-color:var(--accent);
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.25), #0f172a);
+      color:var(--accent-soft);
+      box-shadow:0 0 0 1px rgba(250,204,21,0.7), 0 4px 12px rgba(250,204,21,0.2);
+      transform:scale(1.02);
+    }
+
+    .action-buttons{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:10px;
+    }
+    .action-btn{
+      width:100%;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,0.4);
+      background:rgba(15,23,42,0.95);
+      color:var(--ink);
+      font-size:12px;
+      font-weight:600;
+      padding:10px 12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:all 0.2s ease;
+    }
+    .action-btn i{
+      font-size:14px;
+    }
+    .action-btn:hover{
+      border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(250,204,21,0.5), 0 4px 12px rgba(250,204,21,0.15);
+      transform:translateY(-1px);
+    }
+    .action-btn.primary{
+      background:linear-gradient(135deg, var(--accent-dark), var(--accent));
+      border-color:var(--accent);
+      color:#111827;
+    }
+    .action-btn.primary:hover{
+      box-shadow:0 0 0 1px var(--accent), 0 8px 20px rgba(250,204,21,0.3);
+    }
+
+    /* ========== MAIN PREMIUM ========== */
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      padding:18px 18px 16px 18px;
+      gap:14px;
+      background:radial-gradient(circle at top, rgba(250,204,21,0.08), rgba(15,23,42,1));
+      overflow-y:auto;
+    }
+
+    .main-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      animation:slideUp 0.5s ease-out;
+    }
+    .title-block h1{
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      background:linear-gradient(135deg, var(--ink), var(--accent-soft));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .title-block p{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:3px;
+    }
+
+    .time-range{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .chip{
+      padding:6px 12px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.45);
+      background:rgba(15,23,42,0.95);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .chip i{
+      color:var(--accent);
+    }
+
+    .top-cards{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      animation:slideUp 0.6s ease-out;
+    }
+    .card{
+      border-radius:20px;
+      border:1px solid rgba(148,163,184,0.32);
+      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.95));
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-height:90px;
+      position:relative;
+      overflow:hidden;
+      transition:all 0.3s ease;
+    }
+    .card::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:-100%;
+      width:100%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(250,204,21,0.1), transparent);
+      transition:left 0.5s ease;
+    }
+    .card:hover::before{
+      left:100%;
+    }
+    .card:hover{
+      border-color:var(--accent);
+      box-shadow:0 8px 24px rgba(250,204,21,0.15);
+      transform:translateY(-2px);
+    }
+    .card-icon{
+      font-size:20px;
+      color:var(--accent);
+      margin-bottom:4px;
+    }
+    .card-title{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      color:var(--muted);
+    }
+    .card-value{
+      font-size:22px;
+      font-weight:700;
+      margin-top:6px;
+      background:linear-gradient(135deg, var(--ink), var(--accent-soft));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .card-sub{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    .trend{
+      font-size:11px;
+      margin-top:4px;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:2px 8px;
+      border-radius:999px;
+    }
+    .trend.positive{
+      color:var(--ok);
+      background:rgba(34,197,94,0.15);
+    }
+    .trend.negative{
+      color:var(--danger);
+      background:rgba(239,68,68,0.15);
+    }
+
+    .content-row{
+      display:grid;
+      grid-template-columns: minmax(0,2fr) minmax(0,1fr);
+      gap:12px;
+      min-height:0;
+      flex:1;
+      animation:slideUp 0.7s ease-out;
+    }
+
+    .panel{
+      border-radius:20px;
+      border:1px solid rgba(148,163,184,0.3);
+      background:radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      transition:all 0.3s ease;
+    }
+    .panel:hover{
+      border-color:rgba(250,204,21,0.4);
+    }
+    .panel-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(148,163,184,0.2);
+    }
+    .panel-title{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      color:var(--accent-soft);
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .panel-title i{
+      color:var(--accent);
+    }
+
+    .chart-wrap{
+      flex:1;
+      min-height:240px;
+      position:relative;
+    }
+
+    .tickets-list{
+      margin-top:8px;
+      border-radius:16px;
+      border:1px solid rgba(55,65,81,0.8);
+      background:radial-gradient(circle at top, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      padding:4px 0;
+      flex:1;
+      min-height:0;
+      overflow-y:auto;
+    }
+
+    .ticket-row{
+      display:flex;
+      padding:10px 12px;
+      gap:10px;
+      justify-content:space-between;
+      align-items:flex-start;
+      border-bottom:1px solid rgba(31,41,55,0.9);
+      font-size:12px;
+      transition:all 0.2s ease;
+      animation:slideUp 0.3s ease-out;
+    }
+    .ticket-row:hover{
+      background:rgba(250,204,21,0.05);
+    }
+    .ticket-main{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .ticket-amount{
+      font-weight:700;
+      font-size:14px;
+    }
+    .ticket-sub{
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+    .ticket-right{
+      text-align:right;
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .ticket-box{
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.6);
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      background:rgba(15,23,42,0.9);
+    }
+
+    .pill-pay{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.5);
+      padding:4px 10px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .pill-pay:hover{
+      transform:scale(1.05);
+    }
+
+    .pill-pay[data-method="cash"]{
+      border-color:rgba(163,230,53,0.8);
+      color:#bbf7d0;
+      background:rgba(163,230,53,0.1);
+    }
+    .pill-pay[data-method="wave"]{
+      border-color:rgba(59,130,246,0.8);
+      color:#bfdbfe;
+      background:rgba(59,130,246,0.1);
+    }
+    .pill-pay[data-method="om"]{
+      border-color:rgba(249,115,22,0.9);
+      color:#fed7aa;
+      background:rgba(249,115,22,0.1);
+    }
+    .pill-pay[data-method="card"]{
+      border-color:rgba(248,250,252,0.9);
+      color:#e5e7eb;
+      background:rgba(248,250,252,0.1);
+    }
+
+    .pay-stats-row{
+      display:flex;
+      gap:12px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .pay-stat{
+      flex:1;
+      min-width:100px;
+      padding:8px 12px;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,0.3);
+      background:rgba(15,23,42,0.95);
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      transition:all 0.2s ease;
+    }
+    .pay-stat:hover{
+      border-color:var(--accent);
+      transform:translateY(-2px);
+    }
+    .pay-stat-label{
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      color:var(--muted);
+    }
+    .pay-stat-value{
+      font-size:16px;
+      font-weight:700;
+    }
+
+    .empty-state{
+      padding:20px;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+    }
+    .empty-state i{
+      font-size:40px;
+      color:var(--accent);
+      opacity:0.3;
+    }
+
+    /* ========== TOAST NOTIFICATIONS ========== */
+    .toast-container{
+      position:fixed;
+      top:20px;
+      right:20px;
+      z-index:9999;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-width:350px;
+    }
+    .toast{
+      padding:14px 18px;
+      border-radius:16px;
+      background:rgba(15,23,42,0.98);
+      border:1px solid rgba(148,163,184,0.4);
+      box-shadow:0 8px 24px rgba(0,0,0,0.5);
+      display:flex;
+      align-items:center;
+      gap:12px;
+      animation:slideInFromLeft 0.4s ease-out;
+      backdrop-filter:blur(10px);
+    }
+    .toast-icon{
+      font-size:20px;
+    }
+    .toast.success{
+      border-color:var(--ok);
+    }
+    .toast.success .toast-icon{
+      color:var(--ok);
+    }
+    .toast.info{
+      border-color:var(--blue);
+    }
+    .toast.info .toast-icon{
+      color:var(--blue);
+    }
+    .toast-content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .toast-title{
+      font-size:13px;
+      font-weight:600;
+    }
+    .toast-message{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(5px);
+      z-index:10000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      animation:fadeIn 0.3s ease-out;
+    }
+    .modal-overlay.active{
+      display:flex;
+    }
+    .modal{
+      width:90%;
+      max-width:600px;
+      max-height:80vh;
+      border-radius:24px;
+      background:linear-gradient(135deg, rgba(15,23,42,1), rgba(2,6,23,0.98));
+      border:1px solid rgba(250,204,21,0.3);
+      box-shadow:0 24px 60px rgba(0,0,0,0.8);
+      overflow:hidden;
+      animation:slideUp 0.4s ease-out;
+    }
+    .modal-header{
+      padding:20px 24px;
+      border-bottom:1px solid rgba(148,163,184,0.2);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:radial-gradient(circle at top left, rgba(250,204,21,0.1), transparent);
+    }
+    .modal-title{
+      font-size:18px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .modal-close{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      border:1px solid rgba(148,163,184,0.4);
+      background:rgba(15,23,42,0.95);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+    }
+    .modal-close:hover{
+      border-color:var(--danger);
+      color:var(--danger);
+    }
+    .modal-body{
+      padding:20px 24px;
+      overflow-y:auto;
+      max-height:60vh;
+    }
+
+    .export-options{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+    }
+    .export-btn{
+      padding:16px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,0.4);
+      background:rgba(15,23,42,0.95);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      transition:all 0.2s ease;
+    }
+    .export-btn:hover{
+      border-color:var(--accent);
+      background:rgba(250,204,21,0.1);
+      transform:translateY(-2px);
+    }
+    .export-btn i{
+      font-size:32px;
+      color:var(--accent);
+    }
+    .export-btn-label{
+      font-size:13px;
+      font-weight:600;
+    }
+
+    /* Responsive */
+    @media (max-width:1200px){
+      .content-row{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:1024px){
+      .app{
+        flex-direction:column;
+      }
+      .sidebar{
+        width:100%;
+      }
+      .top-cards{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+      }
+    }
+
+    @media (max-width:768px){
+      .top-cards{
+        grid-template-columns:1fr;
+      }
+      .box-filters{
+        flex-direction:column;
+      }
+      .box-filter-btn{
+        flex:1;
+      }
+    }
+
+    /* Scrollbar custom */
+    ::-webkit-scrollbar{
+      width:8px;
+      height:8px;
+    }
+    ::-webkit-scrollbar-track{
+      background:rgba(15,23,42,0.5);
+    }
+    ::-webkit-scrollbar-thumb{
+      background:rgba(250,204,21,0.3);
+      border-radius:4px;
+    }
+    ::-webkit-scrollbar-thumb:hover{
+      background:rgba(250,204,21,0.5);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+    <div class="logo-row">
+      <div class="logo-badge">∞</div>
+      <div class="brand-text">
+        <span>DIGIY PAY</span>
+        <span>PREMIUM WALLET</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-section-title">
+        <i class="fas fa-store"></i>
+        Commerçant / Portefeuille
+      </div>
+      <div class="merchant-card">
+        <div class="merchant-name">
+          <span id="uiMerchantName">—</span>
+          <span class="merchant-tag">PRO</span>
+        </div>
+        <div class="merchant-id" id="uiMerchantId">ID: —</div>
+        <div style="margin-top:8px;">
+          <span class="pill">
+            <span class="status-dot" id="uiStatusDot"></span>
+            <span id="uiStatusLabel">Connexion…</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="balance-card">
+        <div class="balance-label">
+          <i class="fas fa-wallet"></i> Solde disponible
+        </div>
+        <div class="balance-amount" id="uiBalance">0 FCFA</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">
+          Mise à jour en temps réel
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-section-title">
+        <i class="fas fa-filter"></i>
+        Filtre par point de vente
+      </div>
+      <div class="box-filters">
+        <button class="box-filter-btn active" data-box="ALL">
+          <span>TOUS</span><small>Vue globale</small>
+        </button>
+        <button class="box-filter-btn" data-box="POS-1">
+          <span>POS-1</span><small>Caisse 1</small>
+        </button>
+        <button class="box-filter-btn" data-box="POS-2">
+          <span>POS-2</span><small>Caisse 2</small>
+        </button>
+        <button class="box-filter-btn" data-box="DRIVER-1">
+          <span>DRIVER</span><small>Courses</small>
+        </button>
+        <button class="box-filter-btn" data-box="MARKET-1">
+          <span>MARKET</span><small>E-shop</small>
+        </button>
+        <button class="box-filter-btn" data-box="RESTO-1">
+          <span>RESTO</span><small>Restaurant</small>
+        </button>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-btn primary" id="btnSimu">
+        <i class="fas fa-bolt"></i>
+        <span>Simuler une vente</span>
+      </button>
+      <button class="action-btn" id="btnExport">
+        <i class="fas fa-download"></i>
+        <span>Exporter les données</span>
+      </button>
+      <button class="action-btn" id="btnHistory">
+        <i class="fas fa-history"></i>
+        <span>Historique complet</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main">
+    <header class="main-header">
+      <div class="title-block">
+        <h1>
+          <i class="fas fa-chart-line"></i>
+          DASHBOARD PREMIUM
+        </h1>
+        <p>Portefeuille digital avec analytics temps réel · 0% commission DIGIYLYFE</p>
+      </div>
+      <div class="time-range">
+        <span class="chip">
+          <i class="far fa-calendar"></i>
+          Aujourd'hui
+        </span>
+        <span class="chip" id="uiFilterChip">
+          <i class="fas fa-filter"></i>
+          Tous les points
+        </span>
+      </div>
+    </header>
+
+    <!-- KPI Cards Premium -->
+    <section class="top-cards">
+      <article class="card">
+        <div class="card-icon"><i class="fas fa-coins"></i></div>
+        <div class="card-title">Chiffre d'affaires</div>
+        <div class="card-value" id="uiCA">0 FCFA</div>
+        <div class="card-sub">Tous modes de paiement</div>
+        <div class="trend positive" id="uiCATrend" style="display:none;">
+          <i class="fas fa-arrow-up"></i>
+          <span>+0%</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-icon"><i class="fas fa-receipt"></i></div>
+        <div class="card-title">Tickets</div>
+        <div class="card-value" id="uiTickets">0</div>
+        <div class="card-sub">Transactions réalisées</div>
+      </article>
+
+      <article class="card">
+        <div class="card-icon"><i class="fas fa-shopping-cart"></i></div>
+        <div class="card-title">Panier moyen</div>
+        <div class="card-value" id="uiAvg">0 FCFA</div>
+        <div class="card-sub">CA / nombre de tickets</div>
+      </article>
+
+      <article class="card">
+        <div class="card-icon"><i class="fas fa-clock"></i></div>
+        <div class="card-title">Dernier paiement</div>
+        <div class="card-value" id="uiLastPay">—</div>
+        <div class="card-sub" id="uiLastMeta">En attente…</div>
+      </article>
+    </section>
+
+    <!-- Graphiques & Tickets -->
+    <section class="content-row">
+      <!-- Graphique des modes de paiement -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <i class="fas fa-chart-bar"></i>
+            Répartition par mode de paiement
+          </div>
+          <span style="font-size:11px;color:var(--muted);">
+            <strong id="uiBoxFilterLabel">Filtre : TOUS</strong>
+          </span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="payChart"></canvas>
+        </div>
+        <div class="pay-stats-row">
+          <div class="pay-stat">
+            <div class="pay-stat-label">💵 Cash</div>
+            <div class="pay-stat-value" id="statCash" style="color:#a3e635;">0</div>
+          </div>
+          <div class="pay-stat">
+            <div class="pay-stat-label">🌊 Wave</div>
+            <div class="pay-stat-value" id="statWave" style="color:#60a5fa;">0</div>
+          </div>
+          <div class="pay-stat">
+            <div class="pay-stat-label">🟠 Orange Money</div>
+            <div class="pay-stat-value" id="statOM" style="color:#fb923c;">0</div>
+          </div>
+          <div class="pay-stat">
+            <div class="pay-stat-label">💳 Carte</div>
+            <div class="pay-stat-value" id="statCard" style="color:#e5e7eb;">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Liste des tickets -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <i class="fas fa-list"></i>
+            Flux en temps réel
+          </div>
+          <span style="font-size:11px;color:var(--muted);">
+            Dernières transactions
+          </span>
+        </div>
+        <div class="tickets-list" id="ticketList">
+          <div class="empty-state">
+            <i class="fas fa-receipt"></i>
+            <div>En attente de la première transaction…</div>
+            <div style="font-size:10px;">Lance une vente pour voir le flux PULSE en action</div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Modal Export -->
+<div class="modal-overlay" id="modalExport">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fas fa-download"></i>
+        Exporter les données
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="export-options">
+        <button class="export-btn" onclick="exportData('csv')">
+          <i class="fas fa-file-csv"></i>
+          <div class="export-btn-label">CSV</div>
+          <div style="font-size:10px;color:var(--muted);">Excel compatible</div>
+        </button>
+        <button class="export-btn" onclick="exportData('json')">
+          <i class="fas fa-file-code"></i>
+          <div class="export-btn-label">JSON</div>
+          <div style="font-size:10px;color:var(--muted);">Format API</div>
+        </button>
+        <button class="export-btn" onclick="exportData('pdf')">
+          <i class="fas fa-file-pdf"></i>
+          <div class="export-btn-label">PDF</div>
+          <div style="font-size:10px;color:var(--muted);">Rapport imprimable</div>
+        </button>
+        <button class="export-btn" onclick="exportData('xlsx')">
+          <i class="fas fa-file-excel"></i>
+          <div class="export-btn-label">XLSX</div>
+          <div style="font-size:10px;color:var(--muted);">Excel natif</div>
+        </button>
+      </div>
+      <div style="margin-top:20px;padding:12px;border-radius:12px;background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);">
+        <div style="font-size:11px;color:var(--muted);">
+          <i class="fas fa-info-circle" style="color:var(--accent);"></i>
+          Les exports incluent toutes les transactions du filtre actif avec horodatage, montants et modes de paiement.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * ================================
+ * CONFIG PREMIUM
+ * ================================
+ */
+const PULSE_URL = "http://127.0.0.1:3200";
+const MERCHANT_TOKEN = "DIGIY-PREMIUM-001";
+
+/**
+ * ================================
+ * ÉTAT GLOBAL
+ * ================================
+ */
+const STATE = {
+  events: [],
+  activeBox: "ALL",
+  chart: null,
+  balance: 0
+};
+
+const STATS = {
+  cash: 0,
+  wave: 0,
+  om: 0,
+  card: 0
+};
+
+/**
+ * ================================
+ * INIT UI
+ * ================================
+ */
+document.getElementById("uiMerchantName").textContent = "DIGIY PAY PREMIUM";
+document.getElementById("uiMerchantId").textContent = "ID: " + MERCHANT_TOKEN;
+
+/**
+ * ================================
+ * TOAST NOTIFICATIONS
+ * ================================
+ */
+function showToast(title, message, type = 'info') {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? 'fa-check-circle' : 
+               type === 'info' ? 'fa-info-circle' : 
+               'fa-exclamation-circle';
+  
+  toast.innerHTML = `
+    <div class="toast-icon">
+      <i class="fas ${icon}"></i>
+    </div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+  `;
+  
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'fadeIn 0.3s ease-out reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+/**
+ * ================================
+ * UTILITAIRES
+ * ================================
+ */
+function formatFCFA(amount) {
+  if (!amount) return "0";
+  return amount.toLocaleString("fr-FR");
+}
+
+function updateStatus(online) {
+  const dot = document.getElementById("uiStatusDot");
+  const label = document.getElementById("uiStatusLabel");
+  if (online) {
+    dot.style.background = "radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e)";
+    dot.style.boxShadow = "0 0 0 2px rgba(34,197,94,0.35)";
+    label.textContent = "Connecté · PULSE LIVE";
+  } else {
+    dot.style.background = "radial-gradient(circle at 30% 0%, #fee2e2, #ef4444)";
+    dot.style.boxShadow = "0 0 0 2px rgba(248,113,113,0.5)";
+    label.textContent = "Déconnecté";
+  }
+}
+
+/**
+ * ================================
+ * STATISTIQUES
+ * ================================
+ */
+function recomputeStats() {
+  STATS.cash = STATS.wave = STATS.om = STATS.card = 0;
+  let total = 0;
+  let count = 0;
+
+  const filterBox = STATE.activeBox;
+
+  STATE.events.forEach(ev => {
+    if (ev.type !== "sale") return;
+    if (filterBox !== "ALL" && ev.box !== filterBox) return;
+
+    const t = Number(ev.total) || 0;
+    total += t;
+    count++;
+
+    const m = (ev.pay_method || "").toLowerCase();
+    if (STATS[m] !== undefined) {
+      STATS[m] += t;
+    }
+  });
+
+  // Mise à jour des KPI
+  document.getElementById("uiCA").textContent = formatFCFA(total) + " FCFA";
+  document.getElementById("uiTickets").textContent = count.toString();
+  const avg = count ? Math.round(total / count) : 0;
+  document.getElementById("uiAvg").textContent = formatFCFA(avg) + " FCFA";
+
+  // Solde portefeuille (simulation: CA - 2% frais plateforme)
+  STATE.balance = Math.round(total * 0.98);
+  document.getElementById("uiBalance").textContent = formatFCFA(STATE.balance) + " FCFA";
+
+  // Stats par mode
+  document.getElementById("statCash").textContent = formatFCFA(STATS.cash);
+  document.getElementById("statWave").textContent = formatFCFA(STATS.wave);
+  document.getElementById("statOM").textContent = formatFCFA(STATS.om);
+  document.getElementById("statCard").textContent = formatFCFA(STATS.card);
+
+  updateChart();
+}
+
+/**
+ * ================================
+ * GRAPHIQUE PREMIUM
+ * ================================
+ */
+function initChart() {
+  const ctx = document.getElementById("payChart").getContext("2d");
+  
+  const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient1.addColorStop(0, 'rgba(163,230,53,0.8)');
+  gradient1.addColorStop(1, 'rgba(163,230,53,0.2)');
+  
+  const gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient2.addColorStop(0, 'rgba(59,130,246,0.8)');
+  gradient2.addColorStop(1, 'rgba(59,130,246,0.2)');
+  
+  const gradient3 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient3.addColorStop(0, 'rgba(249,115,22,0.8)');
+  gradient3.addColorStop(1, 'rgba(249,115,22,0.2)');
+  
+  const gradient4 = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient4.addColorStop(0, 'rgba(248,250,252,0.8)');
+  gradient4.addColorStop(1, 'rgba(248,250,252,0.2)');
+
+  STATE.chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["💵 Cash", "🌊 Wave", "🟠 Orange Money", "💳 Carte"],
+      datasets: [{
+        label: "CA (FCFA)",
+        data: [0, 0, 0, 0],
+        backgroundColor: [gradient1, gradient2, gradient3, gradient4],
+        borderColor: ['#a3e635', '#3b82f6', '#f97316', '#f8fafc'],
+        borderWidth: 2,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { color: "rgba(55,65,81,0.3)", drawBorder: false },
+          ticks: { color: "#e5e7eb", font: { size: 12, weight: '600' } }
+        },
+        y: {
+          grid: { color: "rgba(55,65,81,0.3)", drawBorder: false },
+          ticks: { 
+            color: "#9ca3af", 
+            font: { size: 11 },
+            callback: function(value) {
+              return formatFCFA(value);
+            }
+          }
+        }
+      },
+      plugins: {
+        legend: { 
+          labels: { 
+            color: "#e5e7eb", 
+            font: { size: 12, weight: '600' },
+            padding: 15
+          } 
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15,23,42,0.95)',
+          titleColor: '#facc15',
+          bodyColor: '#e5e7eb',
+          borderColor: 'rgba(250,204,21,0.5)',
+          borderWidth: 1,
+          padding: 12,
+          displayColors: true,
+          callbacks: {
+            label: function(context) {
+              return ' ' + formatFCFA(context.parsed.y) + ' FCFA';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateChart() {
+  if (!STATE.chart) return;
+  STATE.chart.data.datasets[0].data = [
+    STATS.cash,
+    STATS.wave,
+    STATS.om,
+    STATS.card
+  ];
+  STATE.chart.update('none'); // Animation fluide
+}
+
+/**
+ * ================================
+ * TICKETS TEMPS RÉEL
+ * ================================
+ */
+function renderTickets() {
+  const list = document.getElementById("ticketList");
+  list.innerHTML = "";
+
+  const filterBox = STATE.activeBox;
+  const filtered = STATE.events
+    .filter(ev => ev.type === "sale")
+    .filter(ev => filterBox === "ALL" || ev.box === filterBox)
+    .sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0))
+    .slice(0, 50); // Limiter à 50 dernières transactions
+
+  if (!filtered.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.innerHTML = `
+      <i class="fas fa-receipt"></i>
+      <div>Aucune transaction pour ce filtre</div>
+      <div style="font-size:10px;">Lance une vente pour voir le flux en action</div>
+    `;
+    list.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(ev => {
+    const row = document.createElement("div");
+    row.className = "ticket-row";
+
+    const m = (ev.pay_method || "").toLowerCase();
+    const methodIcon = m === "cash" ? "💵" :
+                       m === "wave" ? "🌊" :
+                       m === "om" ? "🟠" :
+                       m === "card" ? "💳" : "💰";
+    const methodLabel = m === "cash" ? "Cash" :
+                        m === "wave" ? "Wave" :
+                        m === "om" ? "Orange Money" :
+                        m === "card" ? "Carte" : m.toUpperCase();
+
+    const amount = formatFCFA(Number(ev.total) || 0);
+    const time = ev.at ? new Date(ev.at) : new Date();
+    const timeStr = time.toLocaleTimeString("fr-FR", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit" 
+    });
+    const box = ev.box || "—";
+
+    row.innerHTML = `
+      <div class="ticket-main">
+        <div class="ticket-amount">${amount} FCFA</div>
+        <div class="ticket-sub">
+          <i class="fas fa-hashtag" style="font-size:9px;"></i>
+          ${ev.id || "—"}
+        </div>
+      </div>
+      <div>
+        <span class="pill-pay" data-method="${m}">
+          ${methodIcon} ${methodLabel}
+        </span>
+      </div>
+      <div class="ticket-right">
+        <div><i class="far fa-clock"></i> ${timeStr}</div>
+        <div class="ticket-box">${box}</div>
+      </div>
+    `;
+
+    list.appendChild(row);
+  });
+}
+
+/**
+ * ================================
+ * ÉVÉNEMENT REÇU
+ * ================================
+ */
+function handleIncomingEvent(ev) {
+  if (!ev.merchant) ev.merchant = MERCHANT_TOKEN;
+  if (!ev.type) ev.type = "sale";
+  if (!ev.pay_method) ev.pay_method = "cash";
+  if (!ev.box) ev.box = "POS-1";
+  if (!ev.at) ev.at = new Date().toISOString();
+  if (!ev.id) ev.id = "T" + Date.now();
+
+  STATE.events.push(ev);
+
+  // Dernier paiement
+  document.getElementById("uiLastPay").textContent = formatFCFA(Number(ev.total) || 0) + " FCFA";
+  document.getElementById("uiLastMeta").innerHTML = `
+    <i class="fas fa-credit-card"></i> ${(ev.pay_method || "").toUpperCase()} · 
+    <i class="fas fa-store"></i> ${ev.box || "—"}
+  `;
+
+  // Toast notification
+  showToast(
+    "Nouveau paiement reçu !",
+    `${formatFCFA(Number(ev.total) || 0)} FCFA · ${ev.pay_method?.toUpperCase()} · ${ev.box}`,
+    "success"
+  );
+
+  recomputeStats();
+  renderTickets();
+}
+
+/**
+ * ================================
+ * CONNEXION SSE
+ * ================================
+ */
+function connectSSE() {
+  try {
+    const url = PULSE_URL + "/events?m=" + encodeURIComponent(MERCHANT_TOKEN);
+    const es = new EventSource(url);
+
+    es.onopen = () => {
+      updateStatus(true);
+      showToast("Connecté au flux PULSE", "Données en temps réel activées", "success");
+    };
+
+    es.onerror = () => {
+      updateStatus(false);
+      showToast("Connexion perdue", "Tentative de reconnexion...", "info");
+    };
+
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        handleIncomingEvent(data);
+      } catch (err) {
+        console.error("Event SSE invalide:", err);
+      }
+    };
+  } catch (err) {
+    console.error("Erreur SSE:", err);
+    updateStatus(false);
+  }
+}
+
+/**
+ * ================================
+ * FILTRES BOX
+ * ================================
+ */
+function setupBoxFilters() {
+  const buttons = document.querySelectorAll(".box-filter-btn");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const box = btn.getAttribute("data-box");
+      STATE.activeBox = box;
+      
+      const label = box === "ALL" ? "Tous les points" : box;
+      document.getElementById("uiBoxFilterLabel").textContent = "Filtre : " + label;
+      document.getElementById("uiFilterChip").innerHTML = `
+        <i class="fas fa-filter"></i>
+        ${label}
+      `;
+      
+      recomputeStats();
+      renderTickets();
+      
+      showToast("Filtre appliqué", `Affichage des données pour: ${label}`, "info");
+    });
+  });
+}
+
+/**
+ * ================================
+ * SIMULATION
+ * ================================
+ */
+function setupSimu() {
+  const btn = document.getElementById("btnSimu");
+  btn.addEventListener("click", () => {
+    const modes = ["cash", "wave", "om", "card"];
+    const boxes = ["POS-1", "POS-2", "DRIVER-1", "MARKET-1", "RESTO-1"];
+    const m = modes[Math.floor(Math.random() * modes.length)];
+    const b = boxes[Math.floor(Math.random() * boxes.length)];
+    const amounts = [1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, 15000, 20000];
+    const total = amounts[Math.floor(Math.random() * amounts.length)];
+    
+    const fake = {
+      merchant: MERCHANT_TOKEN,
+      box: b,
+      type: "sale",
+      total,
+      pay_method: m,
+      items: [{ name: "Produit test", qty: 1, price: total }],
+      at: new Date().toISOString(),
+      id: "T" + Date.now()
+    };
+    
+    handleIncomingEvent(fake);
+  });
+}
+
+/**
+ * ================================
+ * EXPORT DE DONNÉES
+ * ================================
+ */
+function exportData(format) {
+  const filterBox = STATE.activeBox;
+  const filtered = STATE.events
+    .filter(ev => ev.type === "sale")
+    .filter(ev => filterBox === "ALL" || ev.box === filterBox);
+
+  if (!filtered.length) {
+    showToast("Aucune donnée", "Pas de transactions à exporter", "info");
+    return;
+  }
+
+  if (format === 'csv') {
+    let csv = "ID,Date,Heure,Box,Montant,Mode de paiement\n";
+    filtered.forEach(ev => {
+      const date = new Date(ev.at || Date.now());
+      const dateStr = date.toLocaleDateString("fr-FR");
+      const timeStr = date.toLocaleTimeString("fr-FR");
+      csv += `${ev.id},${dateStr},${timeStr},${ev.box},${ev.total},${ev.pay_method}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `digiy-pay-${Date.now()}.csv`;
+    link.click();
+    
+    showToast("Export réussi", "Fichier CSV téléchargé", "success");
+  } else if (format === 'json') {
+    const json = JSON.stringify(filtered, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `digiy-pay-${Date.now()}.json`;
+    link.click();
+    
+    showToast("Export réussi", "Fichier JSON téléchargé", "success");
+  } else {
+    showToast("Bientôt disponible", `Export ${format.toUpperCase()} en développement`, "info");
+  }
+
+  closeModal();
+}
+
+function closeModal() {
+  document.getElementById("modalExport").classList.remove("active");
+}
+
+/**
+ * ================================
+ * BOUTONS ACTIONS
+ * ================================
+ */
+document.getElementById("btnExport").addEventListener("click", () => {
+  document.getElementById("modalExport").classList.add("active");
+});
+
+document.getElementById("btnHistory").addEventListener("click", () => {
+  showToast("Historique complet", `${STATE.events.length} transactions enregistrées`, "info");
+});
+
+/**
+ * ================================
+ * DÉMARRAGE
+ * ================================
+ */
+window.addEventListener("load", () => {
+  initChart();
+  setupBoxFilters();
+  setupSimu();
+  connectSSE();
+  
+  showToast(
+    "Bienvenue sur DIGIY PAY PREMIUM",
+    "Dashboard en temps réel activé · 0% commission",
+    "success"
+  );
+});
+</script>
+</body>
+</html>
