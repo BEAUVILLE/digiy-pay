@@ -11,20 +11,20 @@
   <!-- Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
- <style>
+  <style>
   :root{
     /* Palette sable / soleil */
-    --bg:#f4ecdd;          /* fond général sable */
-    --bg-soft:#f8f1e4;     /* fond légèrement plus clair */
-    --card:#ffffff;        /* cartes blanches */
-    --card-soft:#fdf7ec;   /* cartes secondaires */
-    --accent:#d59f2a;      /* or chaud */
-    --accent-soft:#f7d58a; /* or clair */
-    --accent-dark:#b07b13; /* or foncé */
+    --bg:#f4ecdd;
+    --bg-soft:#f8f1e4;
+    --card:#ffffff;
+    --card-soft:#fdf7ec;
+    --accent:#d59f2a;
+    --accent-soft:#f7d58a;
+    --accent-dark:#b07b13;
     --danger:#b91c1c;
     --ok:#15803d;
     --muted:#6b7280;
-    --ink:#1f2933;         /* texte principal foncé */
+    --ink:#1f2933;
     --line:#e5d6c2;
     --purple:#8b5cf6;
     --blue:#2563eb;
@@ -46,6 +46,7 @@
     align-items:stretch;
     justify-content:center;
     overflow:hidden;
+    font-size:15px;
   }
 
   /* Animations premium */
@@ -62,11 +63,6 @@
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
   }
 
   @keyframes slideUp {
@@ -86,9 +82,11 @@
     flex-direction:row;
     border:1px solid rgba(214,180,120,0.6);
     animation: fadeIn 0.6s ease-out;
+    position:relative;
+    z-index:1;
   }
 
-  /* ========== SIDEBAR PREMIUM ========== */
+  /* ========== SIDEBAR ========== */
   .sidebar{
     width:280px;
     padding:20px 18px;
@@ -184,8 +182,8 @@
     box-shadow:0 0 18px rgba(213,159,42,0.35);
   }
   .merchant-name{
-    font-size:15px;
-    font-weight:700;
+    font-size:16px;
+    font-weight:800;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -245,8 +243,8 @@
     color:#6b7280;
   }
   .balance-amount{
-    font-size:24px;
-    font-weight:700;
+    font-size:26px;
+    font-weight:800;
     background:linear-gradient(135deg, #1f2933, var(--accent-dark));
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
@@ -428,14 +426,15 @@
     margin-bottom:4px;
   }
   .card-title{
-    font-size:11px;
+    font-size:12px;
     text-transform:uppercase;
     letter-spacing:0.14em;
     color:#6b7280;
+    font-weight:700;
   }
   .card-value{
-    font-size:22px;
-    font-weight:700;
+    font-size:26px;
+    font-weight:800;
     margin-top:6px;
     background:linear-gradient(135deg, #111827, var(--accent));
     -webkit-background-clip:text;
@@ -547,8 +546,8 @@
     gap:2px;
   }
   .ticket-amount{
+    font-size:16px;
     font-weight:700;
-    font-size:14px;
     color:#111827;
   }
   .ticket-sub{
@@ -667,6 +666,35 @@
     opacity:0.4;
   }
 
+  /* DÉPENSES PAR CATÉGORIE */
+  .cat-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+    gap:10px;
+    margin-top:8px;
+  }
+  .cat-card{
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid rgba(214,180,120,0.7);
+    background:#fdf7ec;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .cat-label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:#6b7280;
+  }
+  .cat-value{
+    font-size:18px;
+    font-weight:800;
+    color:#111827;
+  }
+
   /* TOAST */
   .toast-container{
     position:fixed;
@@ -721,7 +749,7 @@
     color:#4b5563;
   }
 
-  /* MODAL */
+  /* MODAL EXPORT */
   .modal-overlay{
     position:fixed;
     top:0;
@@ -730,7 +758,7 @@
     height:100%;
     background:rgba(0,0,0,0.35);
     backdrop-filter:blur(4px);
-    z-index:10000;
+    z-index:9000;
     display:none;
     align-items:center;
     justify-content:center;
@@ -821,6 +849,152 @@
     color:#111827;
   }
 
+  /* LOGIN ADMIN OVERLAY */
+  .login-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.45);
+    backdrop-filter:blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9500;
+    animation:fadeIn 0.3s ease-out;
+  }
+  .login-overlay.hidden{
+    display:none;
+  }
+  .login-card{
+    width:95%;
+    max-width:420px;
+    border-radius:24px;
+    background:linear-gradient(135deg, #ffffff, #fbf1df);
+    border:1px solid rgba(214,180,120,0.9);
+    box-shadow:0 24px 60px rgba(0,0,0,0.35);
+    padding:22px 22px 18px 22px;
+  }
+  .login-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .login-title-icon{
+    width:40px;
+    height:40px;
+    border-radius:14px;
+    background:radial-gradient(circle at 20% 0%, #f7e08a, #d59f2a 50%, #8b5a1c 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#111827;
+    font-size:20px;
+    box-shadow:0 8px 22px rgba(180,126,47,0.45);
+  }
+  .login-title-text{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .login-title-text span:first-child{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    color:#6b7280;
+  }
+  .login-title-text span:last-child{
+    font-size:18px;
+    font-weight:800;
+    color:#111827;
+  }
+  .login-sub{
+    font-size:12px;
+    color:#4b5563;
+    margin-bottom:14px;
+  }
+  .login-sub strong{
+    font-weight:700;
+    color:#b07b13;
+  }
+
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    margin-bottom:10px;
+  }
+  .form-group label{
+    font-size:12px;
+    font-weight:600;
+    color:#4b5563;
+  }
+  .form-group input{
+    border-radius:10px;
+    border:1px solid rgba(209,213,219,0.9);
+    padding:8px 10px;
+    font-size:14px;
+    outline:none;
+    background:#ffffff;
+  }
+  .form-group input:focus{
+    border-color:var(--accent-dark);
+    box-shadow:0 0 0 1px rgba(213,159,42,0.7);
+  }
+
+  .login-actions{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:8px;
+  }
+  .btn-primary{
+    border-radius:999px;
+    padding:9px 12px;
+    border:none;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:700;
+    background:linear-gradient(135deg, var(--accent-dark), var(--accent));
+    color:#111827;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .btn-primary:hover{
+    box-shadow:0 8px 20px rgba(213,159,42,0.35);
+  }
+  .btn-secondary{
+    border-radius:999px;
+    padding:8px 12px;
+    border:1px solid rgba(209,213,219,0.9);
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    background:#fdf7ec;
+    color:#374151;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+  .btn-secondary:hover{
+    border-color:var(--accent-dark);
+  }
+  .login-meta{
+    margin-top:6px;
+    font-size:11px;
+    color:#6b7280;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:4px;
+  }
+  .login-meta span{
+    white-space:nowrap;
+  }
+
   /* Responsive */
   @media (max-width:1200px){
     .content-row{
@@ -867,7 +1041,7 @@
   ::-webkit-scrollbar-thumb:hover{
     background:#cfb48c;
   }
-</style>
+  </style>
 </head>
 <body>
 <div class="app">
@@ -962,7 +1136,7 @@
           <i class="fas fa-chart-line"></i>
           DASHBOARD PREMIUM
         </h1>
-      <p>Portefeuille digital avec analytics temps réel · 0% commission DIGIYLYFE</p>
+        <p>Portefeuille digital avec analytics temps réel · 0% commission DIGIYLYFE</p>
       </div>
       <div class="time-range">
         <span class="chip">
@@ -976,7 +1150,7 @@
       </div>
     </header>
 
-    <!-- KPI Cards Premium -->
+    <!-- KPI Cards -->
     <section class="top-cards">
       <article class="card">
         <div class="card-icon"><i class="fas fa-coins"></i></div>
@@ -1020,7 +1194,7 @@
             <i class="fas fa-chart-bar"></i>
             Répartition par mode de paiement
           </div>
-          <span style="font-size:11px;color:var(--muted);">
+          <span style="font-size:11px;color:#6b7280;">
             <strong id="uiBoxFilterLabel">Filtre : TOUS</strong>
           </span>
         </div>
@@ -1030,19 +1204,19 @@
         <div class="pay-stats-row">
           <div class="pay-stat">
             <div class="pay-stat-label">💵 Cash</div>
-            <div class="pay-stat-value" id="statCash" style="color:#a3e635;">0</div>
+            <div class="pay-stat-value" id="statCash">0</div>
           </div>
           <div class="pay-stat">
             <div class="pay-stat-label">🌊 Wave</div>
-            <div class="pay-stat-value" id="statWave" style="color:#60a5fa;">0</div>
+            <div class="pay-stat-value" id="statWave">0</div>
           </div>
           <div class="pay-stat">
             <div class="pay-stat-label">🟠 Orange Money</div>
-            <div class="pay-stat-value" id="statOM" style="color:#fb923c;">0</div>
+            <div class="pay-stat-value" id="statOM">0</div>
           </div>
           <div class="pay-stat">
             <div class="pay-stat-label">💳 Carte</div>
-            <div class="pay-stat-value" id="statCard" style="color:#e5e7eb;">0</div>
+            <div class="pay-stat-value" id="statCard">0</div>
           </div>
         </div>
       </section>
@@ -1054,18 +1228,50 @@
             <i class="fas fa-list"></i>
             Flux en temps réel
           </div>
-          <span style="font-size:11px;color:var(--muted);">
-            Dernières transactions
-          </span>
         </div>
         <div class="tickets-list" id="ticketList">
           <div class="empty-state">
             <i class="fas fa-receipt"></i>
             <div>En attente de la première transaction…</div>
-            <div style="font-size:10px;">Lance une vente pour voir le flux PULSE en action</div>
+            <div style="font-size:10px;">Lance une vente pour voir le flux en action</div>
           </div>
         </div>
       </section>
+    </section>
+
+    <!-- DÉPENSES PAR CATÉGORIE -->
+    <section class="panel" style="margin-top:12px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <i class="fas fa-pie-chart"></i>
+          Dépenses par catégorie
+        </div>
+        <span style="font-size:11px;color:#6b7280;">
+          Maison · Vêtements · Alimentation · Transport · Autres
+        </span>
+      </div>
+      <div class="cat-grid">
+        <div class="cat-card">
+          <div class="cat-label">🏠 Maison</div>
+          <div class="cat-value" id="catMaison">0 FCFA</div>
+        </div>
+        <div class="cat-card">
+          <div class="cat-label">👕 Vêtements</div>
+          <div class="cat-value" id="catVetements">0 FCFA</div>
+        </div>
+        <div class="cat-card">
+          <div class="cat-label">🍽️ Alimentation</div>
+          <div class="cat-value" id="catAlimentation">0 FCFA</div>
+        </div>
+        <div class="cat-card">
+          <div class="cat-label">🚕 Transport</div>
+          <div class="cat-value" id="catTransport">0 FCFA</div>
+        </div>
+        <div class="cat-card">
+          <div class="cat-label">📦 Autres</div>
+          <div class="cat-value" id="catAutres">0 FCFA</div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
@@ -1090,31 +1296,74 @@
         <button class="export-btn" onclick="exportData('csv')">
           <i class="fas fa-file-csv"></i>
           <div class="export-btn-label">CSV</div>
-          <div style="font-size:10px;color:var(--muted);">Excel compatible</div>
+          <div style="font-size:10px;color:#6b7280;">Excel compatible</div>
         </button>
         <button class="export-btn" onclick="exportData('json')">
           <i class="fas fa-file-code"></i>
           <div class="export-btn-label">JSON</div>
-          <div style="font-size:10px;color:var(--muted);">Format API</div>
+          <div style="font-size:10px;color:#6b7280;">Format API</div>
         </button>
         <button class="export-btn" onclick="exportData('pdf')">
           <i class="fas fa-file-pdf"></i>
           <div class="export-btn-label">PDF</div>
-          <div style="font-size:10px;color:var(--muted);">Rapport imprimable</div>
+          <div style="font-size:10px;color:#6b7280;">Rapport imprimable</div>
         </button>
         <button class="export-btn" onclick="exportData('xlsx')">
           <i class="fas fa-file-excel"></i>
           <div class="export-btn-label">XLSX</div>
-          <div style="font-size:10px;color:var(--muted);">Excel natif</div>
+          <div style="font-size:10px;color:#6b7280;">Excel natif</div>
         </button>
       </div>
       <div style="margin-top:20px;padding:12px;border-radius:12px;background:rgba(250,204,21,0.1);border:1px solid rgba(250,204,21,0.3);">
-        <div style="font-size:11px;color:var(--muted);">
+        <div style="font-size:11px;color:#6b7280;">
           <i class="fas fa-info-circle" style="color:var(--accent);"></i>
-          Les exports incluent toutes les transactions du filtre actif avec horodatage, montants et modes de paiement.
+          Les exports incluent toutes les transactions du filtre actif avec horodatage, montants, modes de paiement et catégories.
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- LOGIN ADMIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-title">
+      <div class="login-title-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <div class="login-title-text">
+        <span>Accès sécurisé</span>
+        <span>DIGIY PAY — ADMIN</span>
+      </div>
+    </div>
+    <div class="login-sub">
+      Accès réservé au <strong>gestionnaire du portefeuille</strong>.  
+      Tes données financières sont protégées. 🔒
+    </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="loginEmail">Email admin</label>
+        <input id="loginEmail" type="email" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Mot de passe</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </div>
+      <div class="login-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-lock-open"></i>
+          Se connecter
+        </button>
+        <button type="button" class="btn-secondary" onclick="startBiometricLogin()">
+          <i class="fas fa-user-shield"></i>
+          Face / Touch (bientôt)
+        </button>
+      </div>
+      <div class="login-meta">
+        <span id="loginTenantLabel">Tenant : —</span>
+        <span style="font-size:10px;">Conseil : ne partage jamais ces identifiants.</span>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -1125,13 +1374,13 @@
  * ================================
  */
 
-// 👉 Backend DIGIY PAY (Node/Express qu’on a posé)
+// Backend DIGIY PAY (Node/Express)
 const PAY_API_URL = "http://127.0.0.1:3200";
 
-// 👉 TenantId = ID multi-tenant (doit matcher /merchants/{tenantId} dans Firebase PAY)
+// TenantId = ID multi-tenant
 const TENANT_ID = "TENANT-SN-ASTOU"; // à adapter
 
-// 👉 Optionnel : lire le tenant depuis l’URL ?tenant=TENANT-SN-XXX
+// Option : lire le tenant depuis l’URL ?tenant=TENANT-XXX
 const urlParams = new URLSearchParams(window.location.search);
 const tenantFromUrl = urlParams.get("tenant");
 const MERCHANT_TOKEN = tenantFromUrl || TENANT_ID;
@@ -1156,6 +1405,20 @@ const STATS = {
   card: 0
 };
 
+const CATS = {
+  maison: 0,
+  vetements: 0,
+  alimentation: 0,
+  transport: 0,
+  autres: 0
+};
+
+// Auth (JWT)
+const AUTH = {
+  token: null,
+  user: null
+};
+
 /**
  * ================================
  * INIT UI
@@ -1163,10 +1426,11 @@ const STATS = {
  */
 document.getElementById("uiMerchantName").textContent = "DIGIY PAY PREMIUM";
 document.getElementById("uiMerchantId").textContent = "ID: " + MERCHANT_TOKEN;
+document.getElementById("loginTenantLabel").textContent = "Tenant : " + MERCHANT_TOKEN;
 
 /**
  * ================================
- * TOAST NOTIFICATIONS
+ * TOAST
  * ================================
  */
 function showToast(title, message, type = 'info') {
@@ -1202,7 +1466,7 @@ function showToast(title, message, type = 'info') {
  * ================================
  */
 function formatFCFA(amount) {
-  if (!amount) return "0";
+  if (!amount && amount !== 0) return "0";
   return Number(amount).toLocaleString("fr-FR");
 }
 
@@ -1227,6 +1491,8 @@ function updateStatus(online) {
  */
 function recomputeStats() {
   STATS.cash = STATS.wave = STATS.om = STATS.card = 0;
+  CATS.maison = CATS.vetements = CATS.alimentation = CATS.transport = CATS.autres = 0;
+
   let total = 0;
   let count = 0;
 
@@ -1244,6 +1510,22 @@ function recomputeStats() {
     if (STATS[m] !== undefined) {
       STATS[m] += t;
     }
+
+    // Catégories
+    let catKey = "autres";
+    const rawCat = (ev.category || (ev.meta && ev.meta.category) || "").toLowerCase();
+
+    if (rawCat.includes("maison") || rawCat.includes("loyer") || rawCat.includes("logement")) {
+      catKey = "maison";
+    } else if (rawCat.includes("vet") || rawCat.includes("habill") || rawCat.includes("habillement")) {
+      catKey = "vetements";
+    } else if (rawCat.includes("alim") || rawCat.includes("resto") || rawCat.includes("food") || rawCat.includes("nouri")) {
+      catKey = "alimentation";
+    } else if (rawCat.includes("transport") || rawCat.includes("taxi") || rawCat.includes("carburant") || rawCat.includes("bus")) {
+      catKey = "transport";
+    }
+
+    CATS[catKey] += t;
   });
 
   // KPI
@@ -1261,12 +1543,19 @@ function recomputeStats() {
   document.getElementById("statOM").textContent = formatFCFA(STATS.om);
   document.getElementById("statCard").textContent = formatFCFA(STATS.card);
 
+  // Stats par catégorie
+  document.getElementById("catMaison").textContent = formatFCFA(CATS.maison) + " FCFA";
+  document.getElementById("catVetements").textContent = formatFCFA(CATS.vetements) + " FCFA";
+  document.getElementById("catAlimentation").textContent = formatFCFA(CATS.alimentation) + " FCFA";
+  document.getElementById("catTransport").textContent = formatFCFA(CATS.transport) + " FCFA";
+  document.getElementById("catAutres").textContent = formatFCFA(CATS.autres) + " FCFA";
+
   updateChart();
 }
 
 /**
  * ================================
- * GRAPHIQUE PREMIUM
+ * CHART
  * ================================
  */
 function initChart() {
@@ -1285,8 +1574,8 @@ function initChart() {
   gradient3.addColorStop(1, 'rgba(249,115,22,0.2)');
   
   const gradient4 = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient4.addColorStop(0, 'rgba(248,250,252,0.8)');
-  gradient4.addColorStop(1, 'rgba(248,250,252,0.2)');
+  gradient4.addColorStop(0, 'rgba(148,163,184,0.8)');
+  gradient4.addColorStop(1, 'rgba(148,163,184,0.2)');
 
   STATE.chart = new Chart(ctx, {
     type: "bar",
@@ -1296,7 +1585,7 @@ function initChart() {
         label: "CA (FCFA)",
         data: [0, 0, 0, 0],
         backgroundColor: [gradient1, gradient2, gradient3, gradient4],
-        borderColor: ['#a3e635', '#3b82f6', '#f97316', '#f8fafc'],
+        borderColor: ['#84cc16', '#2563eb', '#ea580c', '#4b5563'],
         borderWidth: 2,
         borderRadius: 8
       }]
@@ -1306,13 +1595,13 @@ function initChart() {
       maintainAspectRatio: false,
       scales: {
         x: {
-          grid: { color: "rgba(55,65,81,0.3)", drawBorder: false },
-          ticks: { color: "#e5e7eb", font: { size: 12, weight: '600' } }
+          grid: { color: "rgba(229, 216, 194,0.8)", drawBorder: false },
+          ticks: { color: "#4b5563", font: { size: 12, weight: '600' } }
         },
         y: {
-          grid: { color: "rgba(55,65,81,0.3)", drawBorder: false },
+          grid: { color: "rgba(229, 216, 194,0.8)", drawBorder: false },
           ticks: { 
-            color: "#9ca3af", 
+            color: "#6b7280", 
             font: { size: 11 },
             callback: function(value) {
               return formatFCFA(value);
@@ -1323,13 +1612,13 @@ function initChart() {
       plugins: {
         legend: { 
           labels: { 
-            color: "#e5e7eb", 
+            color: "#4b5563", 
             font: { size: 12, weight: '600' },
             padding: 15
           } 
         },
         tooltip: {
-          backgroundColor: 'rgba(15,23,42,0.95)',
+          backgroundColor: '#111827',
           titleColor: '#facc15',
           bodyColor: '#e5e7eb',
           borderColor: 'rgba(250,204,21,0.5)',
@@ -1446,8 +1735,90 @@ function normalizeTxToEvent(txId, tx) {
     pay_method: tx.method,
     box: tx.meta?.box || tx.meta?.source || "POS-1",
     items: tx.meta?.items || [],
+    category: tx.category || (tx.meta && tx.meta.category) || null,
+    meta: tx.meta || {},
     at: tx.createdAt ? new Date(tx.createdAt).toISOString() : new Date().toISOString()
   };
+}
+
+/**
+ * ================================
+ * LOGIN ADMIN / AUTH
+ * ================================
+ */
+function showLoginOverlay() {
+  document.getElementById("loginOverlay").classList.remove("hidden");
+}
+
+function hideLoginOverlay() {
+  document.getElementById("loginOverlay").classList.add("hidden");
+}
+
+function handleUnauthorized() {
+  AUTH.token = null;
+  AUTH.user = null;
+  localStorage.removeItem("digiyPayToken");
+  updateStatus(false);
+  showToast("Session expirée", "Reconnecte-toi pour continuer", "info");
+  showLoginOverlay();
+}
+
+async function loginWithCredentials(email, password) {
+  const res = await fetch(PAY_API_URL + "/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email,
+      password,
+      tenant: MERCHANT_TOKEN
+    })
+  });
+
+  if (!res.ok) {
+    throw new Error("HTTP " + res.status);
+  }
+
+  const data = await res.json();
+  // On suppose { token: "...", user: {...} }
+  AUTH.token = data.token;
+  AUTH.user = data.user || null;
+  localStorage.setItem("digiyPayToken", AUTH.token);
+}
+
+function setupLoginForm() {
+  const form = document.getElementById("loginForm");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    if (!email || !password) return;
+
+    try {
+      await loginWithCredentials(email, password);
+      hideLoginOverlay();
+      showToast(
+        "Connexion réussie",
+        "Bienvenue " + (AUTH.user?.name || "dans ton espace DIGIY PAY"),
+        "success"
+      );
+      await loadHistoryFromBackend();
+    } catch (err) {
+      console.error("Login error:", err);
+      showToast("Connexion refusée", "Email ou mot de passe incorrect", "info");
+    }
+  });
+}
+
+// Stub pour la future biométrie (Face / Touch / Passkeys)
+function startBiometricLogin() {
+  showToast(
+    "Bientôt disponible",
+    "Connexion Face / Touch sera activée avec les passkeys (WebAuthn).",
+    "info"
+  );
 }
 
 /**
@@ -1456,12 +1827,26 @@ function normalizeTxToEvent(txId, tx) {
  * ================================
  */
 async function loadHistoryFromBackend() {
+  if (!AUTH.token) {
+    showToast("Connexion requise", "Connecte-toi pour voir les transactions", "info");
+    return;
+  }
   try {
     updateStatus(false);
-    const res = await fetch(`${PAY_API_URL}/pay/transactions/${encodeURIComponent(MERCHANT_TOKEN)}`);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
+    const res = await fetch(`${PAY_API_URL}/pay/transactions/${encodeURIComponent(MERCHANT_TOKEN)}`, {
+      headers: {
+        "Authorization": "Bearer " + AUTH.token
+      }
+    });
 
+    if (res.status === 401 || res.status === 403) {
+      handleUnauthorized();
+      return;
+    }
+
+    if (!res.ok) throw new Error("HTTP " + res.status);
+
+    const data = await res.json();
     const list = data.transactions || {};
     const events = [];
 
@@ -1487,7 +1872,7 @@ async function loadHistoryFromBackend() {
 
 /**
  * ================================
- * RÉCEPTION D'UN NOUVEL ÉVÉNEMENT (SIMU)
+ * ÉVÉNEMENT LOCAL (SIMU)
  * ================================
  */
 function handleIncomingEvent(ev) {
@@ -1555,8 +1940,16 @@ function setupSimu() {
   btn.addEventListener("click", () => {
     const modes = ["cash", "wave", "om", "card"];
     const boxes = ["POS-1", "POS-2", "DRIVER-1", "MARKET-1", "RESTO-1"];
+    const categories = [
+      "maison",
+      "vetements",
+      "alimentation",
+      "transport",
+      "autres"
+    ];
     const m = modes[Math.floor(Math.random() * modes.length)];
     const b = boxes[Math.floor(Math.random() * boxes.length)];
+    const cat = categories[Math.floor(Math.random() * categories.length)];
     const amounts = [1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, 15000, 20000];
     const total = amounts[Math.floor(Math.random() * amounts.length)];
     
@@ -1566,7 +1959,9 @@ function setupSimu() {
       type: "sale",
       total,
       pay_method: m,
-      items: [{ name: "Produit test", qty: 1, price: total }],
+      category: cat,
+      meta: { category: cat },
+      items: [{ name: "Dépense test " + cat, qty: 1, price: total }],
       at: new Date().toISOString(),
       id: "T" + Date.now()
     };
@@ -1577,7 +1972,7 @@ function setupSimu() {
 
 /**
  * ================================
- * EXPORT DE DONNÉES
+ * EXPORT
  * ================================
  */
 function exportData(format) {
@@ -1592,12 +1987,12 @@ function exportData(format) {
   }
 
   if (format === 'csv') {
-    let csv = "ID,Date,Heure,Box,Montant,Mode de paiement\n";
+    let csv = "ID,Date,Heure,Box,Montant,Mode de paiement,Categorie\n";
     filtered.forEach(ev => {
       const date = new Date(ev.at || Date.now());
       const dateStr = date.toLocaleDateString("fr-FR");
       const timeStr = date.toLocaleTimeString("fr-FR");
-      csv += `${ev.id},${dateStr},${timeStr},${ev.box},${ev.total},${ev.pay_method}\n`;
+      csv += `${ev.id},${dateStr},${timeStr},${ev.box},${ev.total},${ev.pay_method},${ev.category || ""}\n`;
     });
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1629,7 +2024,7 @@ function closeModal() {
 
 /**
  * ================================
- * BOUTONS ACTIONS
+ * BOUTONS TOP
  * ================================
  */
 document.getElementById("btnExport").addEventListener("click", () => {
@@ -1642,13 +2037,26 @@ document.getElementById("btnHistory").addEventListener("click", async () => {
 
 /**
  * ================================
- * DÉMARRAGE
+ * INIT AUTH & DÉMARRAGE
  * ================================
  */
+async function initAuthAndStart() {
+  const stored = localStorage.getItem("digiyPayToken");
+  if (stored) {
+    AUTH.token = stored;
+    hideLoginOverlay();
+    showToast("Session restaurée", "Connexion sécurisée active", "success");
+    await loadHistoryFromBackend();
+  } else {
+    showLoginOverlay();
+  }
+}
+
 window.addEventListener("load", async () => {
   initChart();
   setupBoxFilters();
   setupSimu();
+  setupLoginForm();
   
   showToast(
     "Bienvenue sur DIGIY PAY PREMIUM",
@@ -1656,7 +2064,7 @@ window.addEventListener("load", async () => {
     "success"
   );
 
-  await loadHistoryFromBackend();
+  await initAuthAndStart();
 });
 </script>
 </body>
