@@ -950,7 +950,7 @@
           <i class="fas fa-chart-line"></i>
           DASHBOARD PREMIUM
         </h1>
-        <p>Portefeuille digital avec analytics temps réel · 0% commission DIGIYLYFE</p>
+      <p>Portefeuille digital avec analytics temps réel · 0% commission DIGIYLYFE</p>
       </div>
       <div class="time-range">
         <span class="chip">
@@ -1109,11 +1109,20 @@
 <script>
 /**
  * ================================
- * CONFIG PREMIUM
+ * CONFIG PREMIUM / MULTI-TENANT
  * ================================
  */
-const PULSE_URL = "http://127.0.0.1:3200";
-const MERCHANT_TOKEN = "DIGIY-PREMIUM-001";
+
+// 👉 Backend DIGIY PAY (Node/Express qu’on a posé)
+const PAY_API_URL = "http://127.0.0.1:3200";
+
+// 👉 TenantId = ID multi-tenant (doit matcher /merchants/{tenantId} dans Firebase PAY)
+const TENANT_ID = "TENANT-SN-ASTOU"; // à adapter
+
+// 👉 Optionnel : lire le tenant depuis l’URL ?tenant=TENANT-SN-XXX
+const urlParams = new URLSearchParams(window.location.search);
+const tenantFromUrl = urlParams.get("tenant");
+const MERCHANT_TOKEN = tenantFromUrl || TENANT_ID;
 
 /**
  * ================================
@@ -1124,7 +1133,8 @@ const STATE = {
   events: [],
   activeBox: "ALL",
   chart: null,
-  balance: 0
+  balance: 0,
+  merchant: null
 };
 
 const STATS = {
@@ -1181,7 +1191,7 @@ function showToast(title, message, type = 'info') {
  */
 function formatFCFA(amount) {
   if (!amount) return "0";
-  return amount.toLocaleString("fr-FR");
+  return Number(amount).toLocaleString("fr-FR");
 }
 
 function updateStatus(online) {
@@ -1190,7 +1200,7 @@ function updateStatus(online) {
   if (online) {
     dot.style.background = "radial-gradient(circle at 30% 0%, #bbf7d0, #22c55e)";
     dot.style.boxShadow = "0 0 0 2px rgba(34,197,94,0.35)";
-    label.textContent = "Connecté · PULSE LIVE";
+    label.textContent = "Connecté au backend PAY";
   } else {
     dot.style.background = "radial-gradient(circle at 30% 0%, #fee2e2, #ef4444)";
     dot.style.boxShadow = "0 0 0 2px rgba(248,113,113,0.5)";
@@ -1224,14 +1234,13 @@ function recomputeStats() {
     }
   });
 
-  // Mise à jour des KPI
+  // KPI
   document.getElementById("uiCA").textContent = formatFCFA(total) + " FCFA";
   document.getElementById("uiTickets").textContent = count.toString();
   const avg = count ? Math.round(total / count) : 0;
   document.getElementById("uiAvg").textContent = formatFCFA(avg) + " FCFA";
 
-  // Solde portefeuille (simulation: CA - 2% frais plateforme)
-  STATE.balance = Math.round(total * 0.98);
+  STATE.balance = total;
   document.getElementById("uiBalance").textContent = formatFCFA(STATE.balance) + " FCFA";
 
   // Stats par mode
@@ -1334,12 +1343,12 @@ function updateChart() {
     STATS.om,
     STATS.card
   ];
-  STATE.chart.update('none'); // Animation fluide
+  STATE.chart.update('none');
 }
 
 /**
  * ================================
- * TICKETS TEMPS RÉEL
+ * RENDU DES TICKETS
  * ================================
  */
 function renderTickets() {
@@ -1351,7 +1360,7 @@ function renderTickets() {
     .filter(ev => ev.type === "sale")
     .filter(ev => filterBox === "ALL" || ev.box === filterBox)
     .sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0))
-    .slice(0, 50); // Limiter à 50 dernières transactions
+    .slice(0, 50);
 
   if (!filtered.length) {
     const empty = document.createElement("div");
@@ -1413,7 +1422,60 @@ function renderTickets() {
 
 /**
  * ================================
- * ÉVÉNEMENT REÇU
+ * NORMALISATION D'UNE TRANSACTION
+ * ================================
+ */
+function normalizeTxToEvent(txId, tx) {
+  return {
+    id: txId,
+    merchant: MERCHANT_TOKEN,
+    type: "sale",
+    total: tx.amount,
+    pay_method: tx.method,
+    box: tx.meta?.box || tx.meta?.source || "POS-1",
+    items: tx.meta?.items || [],
+    at: tx.createdAt ? new Date(tx.createdAt).toISOString() : new Date().toISOString()
+  };
+}
+
+/**
+ * ================================
+ * CHARGER HISTORIQUE DEPUIS BACKEND PAY
+ * ================================
+ */
+async function loadHistoryFromBackend() {
+  try {
+    updateStatus(false);
+    const res = await fetch(`${PAY_API_URL}/pay/transactions/${encodeURIComponent(MERCHANT_TOKEN)}`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+
+    const list = data.transactions || {};
+    const events = [];
+
+    Object.keys(list).forEach(txId => {
+      const tx = list[txId];
+      if (tx.status === "paid") {
+        events.push(normalizeTxToEvent(txId, tx));
+      }
+    });
+
+    STATE.events = events;
+    recomputeStats();
+    renderTickets();
+
+    updateStatus(true);
+    showToast("Historique chargé", `${events.length} transactions (paid)`, "success");
+  } catch (err) {
+    console.error("Erreur loadHistoryFromBackend:", err);
+    showToast("Erreur backend PAY", "Impossible de charger l'historique", "info");
+    updateStatus(false);
+  }
+}
+
+/**
+ * ================================
+ * RÉCEPTION D'UN NOUVEL ÉVÉNEMENT (SIMU)
  * ================================
  */
 function handleIncomingEvent(ev) {
@@ -1426,56 +1488,20 @@ function handleIncomingEvent(ev) {
 
   STATE.events.push(ev);
 
-  // Dernier paiement
   document.getElementById("uiLastPay").textContent = formatFCFA(Number(ev.total) || 0) + " FCFA";
   document.getElementById("uiLastMeta").innerHTML = `
     <i class="fas fa-credit-card"></i> ${(ev.pay_method || "").toUpperCase()} · 
     <i class="fas fa-store"></i> ${ev.box || "—"}
   `;
 
-  // Toast notification
   showToast(
-    "Nouveau paiement reçu !",
+    "Nouveau paiement (local)",
     `${formatFCFA(Number(ev.total) || 0)} FCFA · ${ev.pay_method?.toUpperCase()} · ${ev.box}`,
     "success"
   );
 
   recomputeStats();
   renderTickets();
-}
-
-/**
- * ================================
- * CONNEXION SSE
- * ================================
- */
-function connectSSE() {
-  try {
-    const url = PULSE_URL + "/events?m=" + encodeURIComponent(MERCHANT_TOKEN);
-    const es = new EventSource(url);
-
-    es.onopen = () => {
-      updateStatus(true);
-      showToast("Connecté au flux PULSE", "Données en temps réel activées", "success");
-    };
-
-    es.onerror = () => {
-      updateStatus(false);
-      showToast("Connexion perdue", "Tentative de reconnexion...", "info");
-    };
-
-    es.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data);
-        handleIncomingEvent(data);
-      } catch (err) {
-        console.error("Event SSE invalide:", err);
-      }
-    };
-  } catch (err) {
-    console.error("Erreur SSE:", err);
-    updateStatus(false);
-  }
 }
 
 /**
@@ -1509,7 +1535,7 @@ function setupBoxFilters() {
 
 /**
  * ================================
- * SIMULATION
+ * SIMULATION LOCALE
  * ================================
  */
 function setupSimu() {
@@ -1598,8 +1624,8 @@ document.getElementById("btnExport").addEventListener("click", () => {
   document.getElementById("modalExport").classList.add("active");
 });
 
-document.getElementById("btnHistory").addEventListener("click", () => {
-  showToast("Historique complet", `${STATE.events.length} transactions enregistrées`, "info");
+document.getElementById("btnHistory").addEventListener("click", async () => {
+  await loadHistoryFromBackend();
 });
 
 /**
@@ -1607,17 +1633,18 @@ document.getElementById("btnHistory").addEventListener("click", () => {
  * DÉMARRAGE
  * ================================
  */
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   initChart();
   setupBoxFilters();
   setupSimu();
-  connectSSE();
   
   showToast(
     "Bienvenue sur DIGIY PAY PREMIUM",
-    "Dashboard en temps réel activé · 0% commission",
+    "Dashboard connecté au backend PAY multi-tenant",
     "success"
   );
+
+  await loadHistoryFromBackend();
 });
 </script>
 </body>
