@@ -1,691 +1,542 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIGIY PAY - 0% Commission | Paiements Sénégal</title>
-    <meta name="description" content="DIGIY PAY : Le système de paiement révolutionnaire. 0% de commission. Wave, Orange Money, Free Money, Espèces. 100% revient au professionnel.">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --digiy-gold: #FFD700;
-            --digiy-black: #1a1a1a;
-            --digiy-white: #ffffff;
-            --wave-blue: #4285F4;
-            --orange-orange: #FF6B00;
-            --free-green: #00C853;
-            --cash-yellow: #FFC107;
-            --success: #4CAF50;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--digiy-white);
-            color: var(--digiy-black);
-            overflow-x: hidden;
-        }
-
-        /* HEADER */
-        header {
-            background: var(--digiy-black);
-            padding: 1.5rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo .infinity {
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--digiy-gold);
-            line-height: 1;
-        }
-
-        .logo .text h1 {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--digiy-white);
-            letter-spacing: 2px;
-        }
-
-        .logo .text p {
-            font-size: 0.85rem;
-            color: var(--digiy-gold);
-            font-weight: 600;
-        }
-
-        .header-cta {
-            background: var(--digiy-gold);
-            color: var(--digiy-black);
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .header-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        /* HERO SECTION */
-        .hero {
-            background: linear-gradient(135deg, var(--digiy-black) 0%, #2a2a2a 100%);
-            padding: 6rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '∞';
-            position: absolute;
-            font-size: 30rem;
-            color: rgba(255, 215, 0, 0.05);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0;
-        }
-
-        .hero-content {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h2 {
-            font-size: 4rem;
-            font-weight: 900;
-            color: var(--digiy-white);
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero .highlight {
-            color: var(--digiy-gold);
-            font-size: 5rem;
-            display: block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .hero p {
-            font-size: 1.5rem;
-            color: #ccc;
-            margin-bottom: 3rem;
-            font-weight: 500;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            background: var(--digiy-gold);
-            color: var(--digiy-black);
-            padding: 1.2rem 3rem;
-            border: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--digiy-white);
-            padding: 1.2rem 3rem;
-            border: 3px solid var(--digiy-gold);
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: var(--digiy-gold);
-            color: var(--digiy-black);
-        }
-
-        /* STATS BAR */
-        .stats {
-            background: var(--digiy-gold);
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-
-        .stat-item h3 {
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--digiy-black);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-item p {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--digiy-black);
-            opacity: 0.8;
-        }
-
-        /* PAYMENT METHODS */
-        .payment-methods {
-            padding: 6rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: 1rem;
-            color: var(--digiy-black);
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 4rem;
-        }
-
-        .methods-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .method-card {
-            background: white;
-            border-radius: 20px;
-            padding: 2.5rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-        }
-
-        .method-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        }
-
-        .method-card.wave { border-color: var(--wave-blue); }
-        .method-card.orange { border-color: var(--orange-orange); }
-        .method-card.free { border-color: var(--free-green); }
-        .method-card.cash { border-color: var(--cash-yellow); }
-
-        .method-icon {
-            font-size: 5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .method-card h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--digiy-black);
-        }
-
-        .method-card ul {
-            list-style: none;
-            margin-bottom: 1.5rem;
-        }
-
-        .method-card ul li {
-            padding: 0.5rem 0;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .method-card ul li:before {
-            content: '✓';
-            color: var(--success);
-            font-weight: 900;
-            margin-right: 0.5rem;
-        }
-
-        /* HOW IT WORKS */
-        .how-it-works {
-            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-            padding: 6rem 2rem;
-        }
-
-        .how-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-top: 4rem;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 80px;
-            height: 80px;
-            background: var(--digiy-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--digiy-black);
-            margin: 0 auto 1.5rem;
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .step h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--digiy-black);
-        }
-
-        .step p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        /* TESTIMONIAL */
-        .testimonial {
-            padding: 6rem 2rem;
-            background: var(--digiy-black);
-            color: var(--digiy-white);
-            text-align: center;
-        }
-
-        .testimonial-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .testimonial blockquote {
-            font-size: 2rem;
-            font-style: italic;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            color: var(--digiy-gold);
-        }
-
-        .testimonial-author {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .testimonial-role {
-            color: #999;
-            margin-top: 0.5rem;
-        }
-
-        /* CTA SECTION */
-        .cta-section {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, var(--digiy-gold) 0%, #FFA500 100%);
-            text-align: center;
-        }
-
-        .cta-section h2 {
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: var(--digiy-black);
-            margin-bottom: 1.5rem;
-        }
-
-        .cta-section p {
-            font-size: 1.5rem;
-            color: var(--digiy-black);
-            margin-bottom: 3rem;
-            font-weight: 600;
-        }
-
-        /* FOOTER */
-        footer {
-            background: var(--digiy-black);
-            color: var(--digiy-white);
-            padding: 4rem 2rem 2rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-section h3 {
-            color: var(--digiy-gold);
-            margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.8rem;
-        }
-
-        .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            color: var(--digiy-gold);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid #333;
-            color: #999;
-        }
-
-        .footer-bottom .infinity {
-            color: var(--digiy-gold);
-            font-size: 2rem;
-            display: inline-block;
-            margin: 0 0.5rem;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .hero h2 {
-                font-size: 2.5rem;
-            }
-
-            .hero .highlight {
-                font-size: 3rem;
-            }
-
-            .hero p {
-                font-size: 1.2rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>DIGIY PAY — Encaissement</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Interface DIGIY PAY — Encaissement Wave, Orange Money, Free Money, Cash, avec enregistrement Firebase.">
+  <style>
+    :root{
+      --bg:#020617;
+      --bg-soft:#030712;
+      --card:#020617;
+      --accent-main:#facc15;
+      --accent-soft:#fde047;
+      --accent-green:#22c55e;
+      --accent-red:#f97373;
+      --ink:#f9fafb;
+      --muted:#94a3b8;
+      --line:#1f2937;
+      --radius-xl:18px;
+      --shadow-soft:0 20px 50px rgba(15,23,42,0.95);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    body{
+      min-height:100vh;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top,#020617,#000);
+      color:var(--ink);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+    }
+
+    .app-shell{
+      width:100%;
+      max-width:1180px;
+      background:radial-gradient(circle at top,#020617,#020617);
+      border-radius:28px;
+      border:1px solid rgba(148,163,184,0.4);
+      box-shadow:var(--shadow-soft);
+      padding:18px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .app-shell::before{
+      content:"";
+      position:absolute;
+      inset:-120px;
+      background:
+        radial-gradient(circle at top left,rgba(250,204,21,0.13),transparent 55%),
+        radial-gradient(circle at bottom right,rgba(34,197,94,0.18),transparent 55%);
+      opacity:0.85;
+      pointer-events:none;
+    }
+
+    header{
+      position:relative;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .logo{
+      width:34px;
+      height:34px;
+      border-radius:14px;
+      background:radial-gradient(circle at 15% 0,#facc15,#f97316 40%,#92400e 70%,#020617 100%);
+      box-shadow:0 0 0 2px rgba(250,204,21,0.45),0 15px 30px rgba(0,0,0,0.95);
+      position:relative;
+    }
+    .logo::after{
+      content:"DP";
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0.7rem;
+      font-weight:800;
+      letter-spacing:0.06em;
+      color:#020617;
+    }
+
+    .title-main{
+      font-size:1.05rem;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+    }
+
+    .subtitle{
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+
+    .badge-env{
+      padding:4px 9px;
+      border-radius:999px;
+      font-size:0.72rem;
+      border:1px solid rgba(148,163,184,0.6);
+      color:var(--muted);
+      background:rgba(15,23,42,0.9);
+    }
+
+    .badge-env strong{
+      color:var(--accent-soft);
+    }
+
+    main{
+      position:relative;
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+      gap:14px;
+    }
+
+    @media(max-width:900px){
+      main{
+        grid-template-columns:1fr;
+      }
+      header{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+
+    .panel{
+      background:radial-gradient(circle at top,#020617,#020617);
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(51,65,85,0.9);
+      padding:12px 12px;
+      box-shadow:0 14px 35px rgba(0,0,0,0.9);
+      position:relative;
+    }
+
+    .panel-title{
+      font-size:0.86rem;
+      text-transform:uppercase;
+      letter-spacing:0.16em;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .panel-title strong{
+      color:var(--accent-soft);
+    }
+
+    form{
+      display:flex;
+      flex-direction:column;
+      gap:9px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    label{
+      font-size:0.78rem;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    label span.small{
+      font-size:0.68rem;
+      color:var(--muted);
+    }
+
+    input, select, textarea{
+      background:#020617;
+      border-radius:10px;
+      border:1px solid rgba(75,85,99,0.9);
+      padding:7px 9px;
+      font-size:0.86rem;
+      color:var(--ink);
+      outline:none;
+      transition:border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:var(--accent-main);
+      box-shadow:0 0 0 1px rgba(250,204,21,0.4);
+      background:#02081b;
+    }
+
+    textarea{
+      min-height:48px;
+      resize:vertical;
+    }
+
+    .row{
+      display:flex;
+      gap:8px;
+    }
+
+    .row > *{flex:1;}
+
+    .methods{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:4px;
+    }
+
+    .method-chip{
+      flex:1 1 calc(50% - 4px);
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 8px;
+      border-radius:10px;
+      border:1px solid rgba(75,85,99,0.9);
+      font-size:0.8rem;
+      cursor:pointer;
+      background:#020617;
+      transition:border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+
+    .method-chip input{
+      width:14px;
+      height:14px;
+      accent-color:var(--accent-main);
+      cursor:pointer;
+    }
+
+    .method-chip span.label{
+      flex:1;
+    }
+
+    .method-chip span.tag{
+      font-size:0.68rem;
+      color:var(--muted);
+    }
+
+    .method-chip.active{
+      border-color:var(--accent-main);
+      background:radial-gradient(circle at top,#1f2937,#020617);
+      box-shadow:0 0 0 1px rgba(250,204,21,0.4);
+    }
+
+    .btn-pay{
+      margin-top:6px;
+      width:100%;
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:9px 14px;
+      font-size:0.88rem;
+      font-weight:600;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      background:linear-gradient(135deg,#facc15,#f97316);
+      color:#020617;
+      box-shadow:0 18px 36px rgba(0,0,0,0.95);
+    }
+
+    .btn-pay:disabled{
+      opacity:0.55;
+      cursor:wait;
+      box-shadow:none;
+    }
+
+    .helper{
+      margin-top:4px;
+      font-size:0.76rem;
+      color:var(--muted);
+    }
+
+    .helper strong{
+      color:var(--accent-soft);
+    }
+
+    .right-panel{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .qr-wrapper{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .qr-box{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    #qrcode{
+      width:120px;
+      height:120px;
+      border-radius:12px;
+      background:#020617;
+      border:1px solid rgba(55,65,81,0.95);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .qr-info{
+      flex:1;
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+
+    .qr-info strong{
+      color:var(--accent-soft);
+    }
+
+    .pill-status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 9px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.96);
+      border:1px solid rgba(148,163,184,0.6);
+      font-size:0.72rem;
+      color:var(--muted);
+    }
+
+    .pill-status span.dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:var(--accent-green);
+      box-shadow:0 0 0 4px rgba(22,163,74,0.4);
+    }
+
+    .log{
+      font-size:0.75rem;
+      color:var(--muted);
+      max-height:90px;
+      overflow:auto;
+      border-radius:12px;
+      border:1px solid rgba(55,65,81,0.95);
+      background:#020617;
+      padding:7px 8px;
+    }
+
+    .log-line{
+      margin-bottom:2px;
+    }
+
+    .log-line span.time{
+      opacity:0.6;
+    }
+
+    .log-line span.ok{
+      color:var(--accent-green);
+    }
+
+    .log-line span.err{
+      color:var(--accent-red);
+    }
+
+    footer{
+      margin-top:10px;
+      font-size:0.72rem;
+      color:var(--muted);
+      text-align:right;
+      position:relative;
+    }
+
+    .link-back{
+      color:var(--accent-soft);
+      text-decoration:none;
+      font-size:0.75rem;
+    }
+  </style>
 </head>
 <body>
-
-    <!-- HEADER -->
+  <div class="app-shell">
     <header>
-        <div class="header-content">
-            <div class="logo">
-                <div class="infinity">∞</div>
-                <div class="text">
-                    <h1>DIGIY PAY</h1>
-                    <p>0% Commission</p>
-                </div>
-            </div>
-            <button class="header-cta" onclick="scrollToDemo()">Commencer</button>
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title-main">DIGIY PAY — APP</div>
+          <div class="subtitle">Encaissement terrain • Wave • OM • Free • Cash • Enregistrement Firebase</div>
         </div>
+      </div>
+      <div class="badge-env">
+        <strong>En ligne</strong> • Paiement direct au pro • 0% commission
+      </div>
     </header>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-content">
-            <h2>
-                Le Paiement Révolutionnaire
-                <span class="highlight">0% Commission</span>
-            </h2>
-            <p>100% de vos paiements reviennent à votre équipe. Wave, Orange Money, Espèces.</p>
-            <div class="hero-buttons">
-                <button class="btn-primary" onclick="scrollToDemo()">💳 Essayer Maintenant</button>
-                <button class="btn-secondary" onclick="scrollToMethods()">Voir les Méthodes</button>
+    <main>
+      <!-- PANEL GAUCHE : FORMULAIRE -->
+      <section class="panel">
+        <div class="panel-title"><strong>1.</strong> Détails de la transaction</div>
+        <form id="payForm">
+          <div class="field">
+            <label for="amount">
+              Montant <span class="small">Obligatoire</span>
+            </label>
+            <div class="row">
+              <input id="amount" type="number" min="0" step="100" placeholder="Ex : 15000" required>
+              <select id="currency">
+                <option value="XOF">XOF (Franc CFA)</option>
+              </select>
             </div>
-        </div>
-    </section>
+          </div>
 
-    <!-- STATS -->
-    <section class="stats">
-        <div class="stat-item">
-            <h3>0%</h3>
-            <p>Commission</p>
-        </div>
-        <div class="stat-item">
-            <h3>100%</h3>
-            <p>Au Professionnel</p>
-        </div>
-        <div class="stat-item">
-            <h3>4</h3>
-            <p>Méthodes de Paiement</p>
-        </div>
-        <div class="stat-item">
-            <h3>∞</h3>
-            <p>Possibilités</p>
-        </div>
-    </section>
-
-    <!-- PAYMENT METHODS -->
-    <section class="payment-methods" id="methods">
-        <h2 class="section-title">Méthodes de Paiement</h2>
-        <p class="section-subtitle">Adaptées au terrain Sénégal</p>
-
-        <div class="methods-grid">
-            <!-- WAVE -->
-            <div class="method-card wave">
-                <div class="method-icon">🟦</div>
-                <h3>Wave</h3>
-                <ul>
-                    <li>QR Code instantané</li>
-                    <li>Paiement en ligne</li>
-                    <li>Transfert P2P</li>
-                    <li>Confirmation immédiate</li>
-                </ul>
+          <div class="row">
+            <div class="field">
+              <label for="customerName">Client</label>
+              <input id="customerName" type="text" placeholder="Nom client (optionnel)">
             </div>
-
-            <!-- ORANGE MONEY -->
-            <div class="method-card orange">
-                <div class="method-icon">🟧</div>
-                <h3>Orange Money</h3>
-                <ul>
-                    <li>USSD (*144#)</li>
-                    <li>Paiement Web</li>
-                    <li>Lien SMS</li>
-                    <li>Le plus répandu</li>
-                </ul>
+            <div class="field">
+              <label for="reference">Référence</label>
+              <input id="reference" type="text" placeholder="Ex : DRIVER-AIBD-SALY">
             </div>
+          </div>
 
-            <!-- FREE MONEY -->
-            <div class="method-card free">
-                <div class="method-icon">🟩</div>
-                <h3>Free Money</h3>
-                <ul>
-                    <li>Transfert direct</li>
-                    <li>Pour utilisateurs Free</li>
-                    <li>Rapide et simple</li>
-                    <li>Bientôt disponible</li>
-                </ul>
+          <div class="row">
+            <div class="field">
+              <label for="module">Module</label>
+              <select id="module">
+                <option value="driver">Driver</option>
+                <option value="resto">Resto</option>
+                <option value="loc">Loc</option>
+                <option value="market">Market</option>
+                <option value="jobs">Jobs</option>
+              </select>
             </div>
+            <div class="field">
+              <label for="proName">Pro / Commerce</label>
+              <input id="proName" type="text" placeholder="Ex : CHEZ BAPTISTE">
+            </div>
+          </div>
 
-            <!-- ESPÈCES -->
-            <div class="method-card cash">
-                <div class="method-icon">🟨</div>
-                <h3>Espèces</h3>
-                <ul>
-                    <li>Paiement direct</li>
-                    <li>0% commission</li>
-                    <li>Reçu numérique</li>
-                    <li>Toujours accepté</li>
-                </ul>
+          <div class="row">
+            <div class="field">
+              <label for="proId">ID PRO</label>
+              <input id="proId" type="text" placeholder="Ex : PRO-001">
             </div>
+            <div class="field">
+              <label for="note">Note interne</label>
+              <input id="note" type="text" placeholder="Ex : AIBD → Saly 2 pers.">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Méthode de paiement</label>
+            <div class="methods" id="methods">
+              <label class="method-chip">
+                <input type="radio" name="method" value="wave" checked>
+                <span class="label">Wave</span>
+                <span class="tag">QR à scanner</span>
+              </label>
+              <label class="method-chip">
+                <input type="radio" name="method" value="orange">
+                <span class="label">Orange Money</span>
+                <span class="tag">USSD / app OM</span>
+              </label>
+              <label class="method-chip">
+                <input type="radio" name="method" value="free">
+                <span class="label">Free Money</span>
+                <span class="tag">USSD / app Free</span>
+              </label>
+              <label class="method-chip">
+                <input type="radio" name="method" value="cash">
+                <span class="label">Cash</span>
+                <span class="tag">Paiement physique</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-pay" id="btnPay">
+            <span>Générer le paiement</span>
+            <span>➜</span>
+          </button>
+
+          <div class="helper">
+            Le bouton crée une transaction dans <strong>Firebase</strong> (nœud <code>digiyPay/transactions</code>) et met à jour l'affichage (QR / instructions).
+          </div>
+        </form>
+      </section>
+
+      <!-- PANEL DROIT : QR + INFOS -->
+      <section class="right-panel">
+        <div class="panel qr-wrapper">
+          <div class="panel-title"><strong>2.</strong> QR / instructions client</div>
+          <div class="qr-box">
+            <div id="qrcode"></div>
+            <div class="qr-info">
+              <div class="pill-status">
+                <span class="dot"></span>
+                <span id="statusText">En attente de génération…</span>
+              </div>
+              <p id="instructions" style="margin-top:6px;">
+                Remplis le formulaire à gauche, choisis la méthode de paiement, puis clique sur <strong>Générer le paiement</strong>.
+              </p>
+              <p id="transactionIdLabel" style="margin-top:6px;font-size:0.75rem;color:var(--muted);display:none;">
+                ID transaction : <span id="transactionId" style="color:var(--accent-soft);"></span>
+              </p>
+            </div>
+          </div>
         </div>
-    </section>
 
-    <!-- HOW IT WORKS -->
-    <section class="how-it-works">
-        <div class="how-content">
-            <h2 class="section-title">Comment ça marche ?</h2>
-            <p class="section-subtitle">Simple, rapide, transparent</p>
-
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Client choisit</h3>
-                    <p>Le client sélectionne sa méthode de paiement préférée : Wave, Orange Money, ou Espèces.</p>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Paiement sécurisé</h3>
-                    <p>Le paiement est traité en toute sécurité via le provider choisi. Confirmation instantanée.</p>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>100% au Pro</h3>
-                    <p>Le professionnel reçoit 100% du montant. Aucune commission prélevée. Jamais.</p>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h3>Reçu digital</h3>
-                    <p>Reçu numérique envoyé instantanément. Téléchargeable, partageable, traçable.</p>
-                </div>
-            </div>
+        <div class="panel">
+          <div class="panel-title"><strong>3.</strong> Journal DIGIY PAY</div>
+          <div id="log" class="log"></div>
         </div>
-    </section>
+      </section>
+    </main>
 
-    <!-- TESTIMONIAL -->
-    <section class="testimonial">
-        <div class="testimonial-content">
-            <blockquote>
-                "Avant je payais 25% de commission à Uber. Maintenant avec DIGIY PAY, je garde 100% de mes courses. C'est ça la vraie révolution."
-            </blockquote>
-            <p class="testimonial-author">Mamadou Diop</p>
-            <p class="testimonial-role">Chauffeur DIGIY DRIVER, Dakar</p>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta-section" id="demo">
-        <h2>Prêt à rejoindre la révolution ?</h2>
-        <p>Commencez dès aujourd'hui. 0% commission. 100% liberté.</p>
-        <button class="btn-primary" onclick="alert('Redirection vers le HUB DIGIY...')">🚀 Créer mon compte</button>
-    </section>
-
-    <!-- FOOTER -->
     <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>DIGIY PAY</h3>
-                <p>Le système de paiement révolutionnaire. 0% de commission. 100% au professionnel.</p>
-            </div>
-
-            <div class="footer-section">
-                <h3>Modules</h3>
-                <ul>
-                    <li><a href="#">DIGIY DRIVER</a></li>
-                    <li><a href="#">DIGIY RESTO</a></li>
-                    <li><a href="#">DIGIY LOC</a></li>
-                    <li><a href="#">DIGIY MARKET</a></li>
-                    <li><a href="#">DIGIY JOBS</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Support</h3>
-                <ul>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="#">support@digiylyfe.com</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Suivez-nous</h3>
-                <ul>
-                    <li><a href="#">Facebook</a></li>
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">WhatsApp</a></li>
-                    <li><a href="#">LinkedIn</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>© 2024 DIGIY PAY - Tous droits réservés</p>
-            <p><span class="infinity">∞</span> L'Afrique enracinée, connectée au monde <span class="infinity">∞</span></p>
-        </div>
+      <a href="../index.html" class="link-back">← Retour vitrine DIGIY PAY</a>
     </footer>
+  </div>
 
-    <script>
-        function scrollToMethods() {
-            document.getElementById('methods').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function scrollToDemo() {
-            document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
-        }
-    </script>
-
+  <!-- Librairie QRCode (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- App DIGIY PAY -->
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
