@@ -1,14 +1,24 @@
 // app.js — DIGIY PAY + DIGIY CHAT HEADER (Mamadou DIGIY-2024-00001)
 
 // -------------------- 1. Firebase INIT --------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBqEQWoE2iC7_rp-u4riilNVHolcP2o0B0",
+  authDomain: "digiylyfe-ecosystem.firebaseapp.com",
+  databaseURL: "https://digiylyfe-ecosystem-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "digiylyfe-ecosystem",
+  storageBucket: "digiylyfe-ecosystem.firebasestorage.app",
+  messagingSenderId: "1007962643384",
+  appId: "1:1007962643384:web:20d26881e87f0dc37d0d4d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 // 🔐 DIGIYLYFE-PROD — PROD OFFICIEL
 const firebaseConfig = {
   apiKey: "AIzaSyBqEQWoE2iC7_rp-u4riilNVHolcP2o0B0",  authDomain: "sinuous-ally-467909-f6.firebaseapp.com",
