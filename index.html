@@ -132,6 +132,10 @@
         flex-direction:column;
         align-items:flex-start;
       }
+      .panel-user{
+        flex-direction:column;
+        align-items:flex-start;
+      }
     }
 
     .panel{
@@ -154,6 +158,143 @@
     .panel-title strong{
       color:var(--accent-soft);
     }
+
+    /* ============ BLOC 1 : DIGIY CHAT + WALLET ============ */
+
+    .panel-user{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    #digiyChatApp{
+      width:100%;
+    }
+
+    .digiy-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .digiy-header .user-info{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .digiy-header .avatar{
+      width:40px;
+      height:40px;
+      border-radius:999px;
+      border:2px solid rgba(250,204,21,0.7);
+      object-fit:cover;
+      background:#020617;
+    }
+
+    .digiy-header .name{
+      font-size:0.9rem;
+      font-weight:600;
+    }
+
+    .digiy-header .sub{
+      font-size:0.75rem;
+      color:var(--muted);
+    }
+
+    .digiy-header .sub span.badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 7px;
+      border-radius:999px;
+      font-size:0.68rem;
+      margin-left:4px;
+      background:rgba(250,204,21,0.1);
+      border:1px solid rgba(250,204,21,0.5);
+      color:var(--accent-soft);
+    }
+
+    .digiy-header .status{
+      font-size:0.7rem;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .digiy-header .status span.dot{
+      display:inline-block;
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:var(--accent-green);
+      box-shadow:0 0 0 4px rgba(34,197,94,0.4);
+      margin-right:4px;
+    }
+
+    .digiy-header .summary{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      flex-direction:column;
+      justify-content:center;
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.6);
+      background:rgba(15,23,42,0.96);
+      font-size:0.7rem;
+      min-width:120px;
+    }
+
+    .pill .label{
+      color:var(--muted);
+      font-size:0.7rem;
+    }
+
+    .pill .value{
+      font-weight:600;
+      margin-top:1px;
+      color:var(--accent-soft);
+      font-size:0.78rem;
+    }
+
+    .pill-unread{
+      border-color:rgba(56,189,248,0.7);
+    }
+
+    .pill-unread .value{
+      color:#7dd3fc;
+    }
+
+    .dc-btn-open{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:7px 12px;
+      font-size:0.72rem;
+      font-weight:600;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      background:linear-gradient(135deg,#22c55e,#a3e635);
+      color:#020617;
+      box-shadow:0 12px 24px rgba(0,0,0,0.9);
+      white-space:nowrap;
+    }
+
+    .dc-btn-open:hover{
+      filter:brightness(1.05);
+    }
+
+    /* ====================================================== */
 
     form{
       display:flex;
@@ -407,6 +548,39 @@
         <strong>En ligne</strong> • Paiement direct au pro • 0% commission
       </div>
     </header>
+
+    <!-- BLOC 1 : DIGIY CHAT + SOLDE WALLET (Mamadou / DIGIY-2024-00001) -->
+    <section class="panel panel-user">
+      <div id="digiyChatApp">
+        <div class="digiy-header">
+          <div class="user-info">
+            <img id="dc-avatar" class="avatar" alt="Avatar DIGIY">
+            <div>
+              <div id="dc-name" class="name">—</div>
+              <div id="dc-subscription" class="sub">
+                Abonnement — <span class="badge" id="dc-level">—</span>
+              </div>
+              <div id="dc-status" class="status">
+                <span class="dot"></span><span>Statut —</span>
+              </div>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="pill">
+              <div class="label">Wallet DIGIY PAY</div>
+              <div class="value" id="dc-wallet">— XOF</div>
+            </div>
+            <div class="pill pill-unread">
+              <div class="label">Messages non lus</div>
+              <div class="value"><span id="dc-unread">0</span></div>
+            </div>
+            <button type="button" class="dc-btn-open" id="dc-openChat">
+              Ouvrir DIGIY CHAT
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <main>
       <!-- PANEL GAUCHE : FORMULAIRE -->
