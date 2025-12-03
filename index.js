@@ -1,12 +1,17 @@
 // app.js — DIGIY PAY + DIGIY CHAT HEADER (Mamadou DIGIY-2024-00001)
 
-// -------------------- 1. Firebase INIT --------------------
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// -------------------- 1. Firebase INIT (UN SEUL CONFIG) --------------------
+// Import Firebase (version CDN, compatible GitHub Pages / Hostinger)
 
-// Your web app's Firebase configuration
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+// 🔐 DIGIYLYFE — Realtime Database principale
 const firebaseConfig = {
   apiKey: "AIzaSyBqEQWoE2iC7_rp-u4riilNVHolcP2o0B0",
   authDomain: "digiylyfe-ecosystem.firebaseapp.com",
@@ -16,19 +21,6 @@ const firebaseConfig = {
   messagingSenderId: "1007962643384",
   appId: "1:1007962643384:web:20d26881e87f0dc37d0d4d"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// 🔐 DIGIYLYFE-PROD — PROD OFFICIEL
-const firebaseConfig = {
-  apiKey: "AIzaSyBqEQWoE2iC7_rp-u4riilNVHolcP2o0B0",  authDomain: "sinuous-ally-467909-f6.firebaseapp.com",
-  databaseURL: "https://sinuous-ally-467909-f6-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "sinuous-ally-467909-f6",
-  storageBucket: "sinuous-ally-467909-f6.appspot.com",
-  messagingSenderId: « 1007962643384",
-  appId: "1:1007962643384:web:20d26881e87f0dc37d0d4d"
-};
-
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -80,6 +72,11 @@ const btnOpenChat = document.getElementById("dc-openChat");
 
 // Charger les infos abonné (profil + abonnement + chat)
 (function initSubscriberHeader() {
+  if (!db) {
+    addLog("DB non initialisée", "err");
+    return;
+  }
+
   const subRef = ref(db, `subscribers/${DIGIY_ID}`);
 
   onValue(subRef, snapshot => {
@@ -159,7 +156,6 @@ const btnOpenChat = document.getElementById("dc-openChat");
   if (btnOpenChat) {
     btnOpenChat.addEventListener("click", () => {
       addLog("Ouverture DIGIY CHAT PRO pour " + DIGIY_ID, "info");
-      // 👉 adapte l’URL si besoin
       window.open(
         "https://beauville.github.io/digiy-chat-pro/?digiyId=" + DIGIY_ID,
         "_blank"
@@ -189,7 +185,6 @@ if (methodsContainer) {
 // -------------------- 5. QR CODE INIT --------------------
 function ensureQrInstance() {
   if (!qrcodeInstance) {
-    // qrcodejs est chargé via script dans le HTML
     qrcodeInstance = new QRCode(qrcodeContainer, {
       text: "",
       width: 120,
@@ -201,7 +196,6 @@ function ensureQrInstance() {
 // Génère un contenu symbolique pour Wave / OM / etc.
 function buildPaymentPayload({ amount, method, reference, proName }) {
   // Ici tu pourras plus tard mettre un vrai lien Wave / OM.
-  // Pour l’instant : simple payload texte.
   return `DIGIY_PAY|method=${method}|amount=${amount}|ref=${reference || ""}|pro=${proName || ""}`;
 }
 
@@ -246,7 +240,9 @@ if (form) {
     }
 
     btnPay.disabled = true;
-    statusText.textContent = "Création de la transaction en cours…";
+    if (statusText) {
+      statusText.textContent = "Création de la transaction en cours…";
+    }
 
     const now = Date.now();
     const isoNow = new Date(now).toISOString();
@@ -265,9 +261,7 @@ if (form) {
       amount,
       currency,
       sender: {
-        // Ici, on suppose que le client paye
-        name: customerName || "Client DIGIY",
-        // dans ton schéma tu peux rajouter un digiyId client plus tard
+        name: customerName || "Client DIGIY"
       },
       receiver: {
         digiyId: DIGIY_ID,
@@ -284,7 +278,7 @@ if (form) {
         proName: proName || null,
         proId: proId || null,
         note: note || null,
-        chatConversation: null // tu pourras lier une conv plus tard
+        chatConversation: null
       },
       timestamps: {
         created: isoNow
@@ -296,9 +290,10 @@ if (form) {
 
       addLog(`Transaction créée : ${transactionId}`, "ok");
 
-      // Affichage UI
-      transactionIdSpan.textContent = transactionId;
-      transactionIdLabel.style.display = "block";
+      if (transactionIdSpan && transactionIdLabel) {
+        transactionIdSpan.textContent = transactionId;
+        transactionIdLabel.style.display = "block";
+      }
 
       const payloadText = buildPaymentPayload({
         amount,
@@ -321,7 +316,9 @@ if (form) {
         case "orange":
           txt = `Demande au client d’ouvrir Orange Money et de payer ${amount.toLocaleString(
             "fr-FR"
-          )} ${currency} au numéro indiqué. Note la réf : ${reference || transactionId}.`;
+          )} ${currency} au numéro indiqué. Note la réf : ${
+            reference || transactionId
+          }.`;
           break;
         case "free":
           txt = `Demande au client de payer via Free Money pour ${amount.toLocaleString(
@@ -337,14 +334,20 @@ if (form) {
           txt = "Paiement généré. Suis les instructions convenues avec le client.";
       }
 
-      statusText.textContent = "Transaction enregistrée. En attente du paiement client.";
-      instructionsEl.innerHTML = txt;
-
+      if (statusText) {
+        statusText.textContent =
+          "Transaction enregistrée. En attente du paiement client.";
+      }
+      if (instructionsEl) {
+        instructionsEl.innerHTML = txt;
+      }
     } catch (err) {
       console.error(err);
       addLog("Erreur enregistrement transaction : " + err.message, "err");
       alert("Erreur lors de l’enregistrement Firebase.");
-      statusText.textContent = "Erreur lors de la création du paiement.";
+      if (statusText) {
+        statusText.textContent = "Erreur lors de la création du paiement.";
+      }
     } finally {
       btnPay.disabled = false;
     }
