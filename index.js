@@ -1,542 +1,345 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <title>DIGIY PAY — Encaissement</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Interface DIGIY PAY — Encaissement Wave, Orange Money, Free Money, Cash, avec enregistrement Firebase.">
-  <style>
-    :root{
-      --bg:#020617;
-      --bg-soft:#030712;
-      --card:#020617;
-      --accent-main:#facc15;
-      --accent-soft:#fde047;
-      --accent-green:#22c55e;
-      --accent-red:#f97373;
-      --ink:#f9fafb;
-      --muted:#94a3b8;
-      --line:#1f2937;
-      --radius-xl:18px;
-      --shadow-soft:0 20px 50px rgba(15,23,42,0.95);
+// app.js — DIGIY PAY + DIGIY CHAT HEADER (Mamadou DIGIY-2024-00001)
+
+// -------------------- 1. Firebase INIT --------------------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// 🔐 DIGIYLYFE-PROD — PROD OFFICIEL
+const firebaseConfig = {
+  apiKey: "AIzaSyBqEQWoE2iC7_rp-u4riilNVHolcP2o0B0",  authDomain: "sinuous-ally-467909-f6.firebaseapp.com",
+  databaseURL: "https://sinuous-ally-467909-f6-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "sinuous-ally-467909-f6",
+  storageBucket: "sinuous-ally-467909-f6.appspot.com",
+  messagingSenderId: « 1007962643384",
+  appId: "1:1007962643384:web:20d26881e87f0dc37d0d4d"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// DIGIY ID DU PRO (Mamadou chauffeur)
+const DIGIY_ID = "DIGIY-2024-00001";
+
+// -------------------- 2. UTILITAIRES UI --------------------
+const logBox = document.getElementById("log");
+const statusText = document.getElementById("statusText");
+const instructionsEl = document.getElementById("instructions");
+const transactionIdLabel = document.getElementById("transactionIdLabel");
+const transactionIdSpan = document.getElementById("transactionId");
+const btnPay = document.getElementById("btnPay");
+const methodsContainer = document.getElementById("methods");
+
+let qrcodeInstance = null;
+const qrcodeContainer = document.getElementById("qrcode");
+
+function addLog(message, type = "info") {
+  if (!logBox) return;
+  const line = document.createElement("div");
+  line.className = "log-line";
+
+  const time = new Date().toLocaleTimeString("fr-FR", { hour12: false });
+  const spanTime = document.createElement("span");
+  spanTime.className = "time";
+  spanTime.textContent = `[${time}] `;
+
+  const spanMsg = document.createElement("span");
+  spanMsg.textContent = message;
+  if (type === "ok") spanMsg.classList.add("ok");
+  if (type === "err") spanMsg.classList.add("err");
+
+  line.appendChild(spanTime);
+  line.appendChild(spanMsg);
+  logBox.prepend(line);
+}
+
+// -------------------- 3. HEADER DIGIY CHAT + WALLET --------------------
+const avatarEl = document.getElementById("dc-avatar");
+const nameEl = document.getElementById("dc-name");
+const subEl = document.getElementById("dc-subscription");
+const levelSpan = document.getElementById("dc-level");
+const statusEl = document.getElementById("dc-status");
+const walletEl = document.getElementById("dc-wallet");
+const unreadEl = document.getElementById("dc-unread");
+const btnOpenChat = document.getElementById("dc-openChat");
+
+// Charger les infos abonné (profil + abonnement + chat)
+(function initSubscriberHeader() {
+  const subRef = ref(db, `subscribers/${DIGIY_ID}`);
+
+  onValue(subRef, snapshot => {
+    const data = snapshot.val();
+    if (!data) {
+      addLog("Aucun abonné trouvé pour " + DIGIY_ID, "err");
+      return;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0;}
+    const profile = data.profile || {};
+    const subscription = data.subscription || {};
+    const digiyChat = data.digiyChat || {};
+    const unreadCount = digiyChat.unreadCount ?? 0;
 
-    body{
-      min-height:100vh;
-      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background: radial-gradient(circle at top,#020617,#000);
-      color:var(--ink);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:12px;
+    // Avatar
+    if (avatarEl) {
+      avatarEl.src =
+        profile.avatar ||
+        "https://ui-avatars.com/api/?name=" +
+          encodeURIComponent(profile.displayName || "DIGIY PRO");
     }
 
-    .app-shell{
-      width:100%;
-      max-width:1180px;
-      background:radial-gradient(circle at top,#020617,#020617);
-      border-radius:28px;
-      border:1px solid rgba(148,163,184,0.4);
-      box-shadow:var(--shadow-soft);
-      padding:18px 16px;
-      position:relative;
-      overflow:hidden;
+    // Nom
+    if (nameEl) {
+      nameEl.textContent =
+        profile.displayName ||
+        `${profile.prenom || ""} ${profile.nom || ""}`.trim() ||
+        DIGIY_ID;
     }
 
-    .app-shell::before{
-      content:"";
-      position:absolute;
-      inset:-120px;
-      background:
-        radial-gradient(circle at top left,rgba(250,204,21,0.13),transparent 55%),
-        radial-gradient(circle at bottom right,rgba(34,197,94,0.18),transparent 55%);
-      opacity:0.85;
-      pointer-events:none;
+    // Abonnement
+    if (levelSpan) {
+      levelSpan.textContent = subscription.level || "—";
+    }
+    if (subEl) {
+      subEl.innerHTML = `Abonnement <span class="badge" id="dc-level">${subscription.level || "—"}</span>`;
     }
 
-    header{
-      position:relative;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      margin-bottom:14px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .logo{
-      width:34px;
-      height:34px;
-      border-radius:14px;
-      background:radial-gradient(circle at 15% 0,#facc15,#f97316 40%,#92400e 70%,#020617 100%);
-      box-shadow:0 0 0 2px rgba(250,204,21,0.45),0 15px 30px rgba(0,0,0,0.95);
-      position:relative;
-    }
-    .logo::after{
-      content:"DP";
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:0.7rem;
-      font-weight:800;
-      letter-spacing:0.06em;
-      color:#020617;
-    }
-
-    .title-main{
-      font-size:1.05rem;
-      letter-spacing:0.16em;
-      text-transform:uppercase;
-    }
-
-    .subtitle{
-      font-size:0.8rem;
-      color:var(--muted);
-    }
-
-    .badge-env{
-      padding:4px 9px;
-      border-radius:999px;
-      font-size:0.72rem;
-      border:1px solid rgba(148,163,184,0.6);
-      color:var(--muted);
-      background:rgba(15,23,42,0.9);
-    }
-
-    .badge-env strong{
-      color:var(--accent-soft);
-    }
-
-    main{
-      position:relative;
-      display:grid;
-      grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
-      gap:14px;
-    }
-
-    @media(max-width:900px){
-      main{
-        grid-template-columns:1fr;
+    // Statut en ligne
+    if (statusEl) {
+      const online = !!profile.online;
+      const dotSpan = statusEl.querySelector(".dot");
+      const textSpan = statusEl.querySelector("span:last-child");
+      if (dotSpan) {
+        dotSpan.style.background = online ? "#22c55e" : "#6b7280";
+        dotSpan.style.boxShadow = online
+          ? "0 0 0 4px rgba(34,197,94,0.4)"
+          : "0 0 0 0 rgba(0,0,0,0)";
       }
-      header{
-        flex-direction:column;
-        align-items:flex-start;
+      if (textSpan) {
+        textSpan.textContent = online ? "En ligne" : "Hors ligne";
       }
     }
 
-    .panel{
-      background:radial-gradient(circle at top,#020617,#020617);
-      border-radius:var(--radius-xl);
-      border:1px solid rgba(51,65,85,0.9);
-      padding:12px 12px;
-      box-shadow:0 14px 35px rgba(0,0,0,0.9);
-      position:relative;
+    // Unread
+    if (unreadEl) {
+      unreadEl.textContent = unreadCount;
     }
 
-    .panel-title{
-      font-size:0.86rem;
-      text-transform:uppercase;
-      letter-spacing:0.16em;
-      color:var(--muted);
-      margin-bottom:8px;
+    addLog("Header DIGIY CHAT chargé pour " + DIGIY_ID, "ok");
+  });
+
+  // Wallet
+  const walletRef = ref(db, `digiyPay/wallets/${DIGIY_ID}`);
+  onValue(walletRef, snapshot => {
+    const data = snapshot.val();
+    if (!data) return;
+    const balance = data.balance ?? 0;
+    const currency = data.currency || "XOF";
+    if (walletEl) {
+      walletEl.textContent = `${balance.toLocaleString("fr-FR")} ${currency}`;
+    }
+    addLog("Solde wallet mis à jour : " + balance + " " + currency, "ok");
+  });
+
+  // Bouton ouvrir chat (placeholder : URL PRO CHAT)
+  if (btnOpenChat) {
+    btnOpenChat.addEventListener("click", () => {
+      addLog("Ouverture DIGIY CHAT PRO pour " + DIGIY_ID, "info");
+      // 👉 adapte l’URL si besoin
+      window.open(
+        "https://beauville.github.io/digiy-chat-pro/?digiyId=" + DIGIY_ID,
+        "_blank"
+      );
+    });
+  }
+})();
+
+// -------------------- 4. UI méthodes de paiement --------------------
+if (methodsContainer) {
+  const chips = methodsContainer.querySelectorAll(".method-chip");
+  chips.forEach(chip => {
+    const input = chip.querySelector("input[type=radio]");
+    if (!input) return;
+    chip.addEventListener("click", () => {
+      chips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      input.checked = true;
+    });
+    // Active par défaut si déjà checked
+    if (input.checked) {
+      chip.classList.add("active");
+    }
+  });
+}
+
+// -------------------- 5. QR CODE INIT --------------------
+function ensureQrInstance() {
+  if (!qrcodeInstance) {
+    // qrcodejs est chargé via script dans le HTML
+    qrcodeInstance = new QRCode(qrcodeContainer, {
+      text: "",
+      width: 120,
+      height: 120
+    });
+  }
+}
+
+// Génère un contenu symbolique pour Wave / OM / etc.
+function buildPaymentPayload({ amount, method, reference, proName }) {
+  // Ici tu pourras plus tard mettre un vrai lien Wave / OM.
+  // Pour l’instant : simple payload texte.
+  return `DIGIY_PAY|method=${method}|amount=${amount}|ref=${reference || ""}|pro=${proName || ""}`;
+}
+
+// -------------------- 6. GESTION DU FORMULAIRE --------------------
+const form = document.getElementById("payForm");
+
+if (form) {
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!btnPay) return;
+
+    const amountInput = document.getElementById("amount");
+    const currencySelect = document.getElementById("currency");
+    const customerNameInput = document.getElementById("customerName");
+    const referenceInput = document.getElementById("reference");
+    const moduleSelect = document.getElementById("module");
+    const proNameInput = document.getElementById("proName");
+    const proIdInput = document.getElementById("proId");
+    const noteInput = document.getElementById("note");
+
+    const amount = Number(amountInput.value || 0);
+    const currency = currencySelect.value || "XOF";
+    const customerName = customerNameInput.value.trim();
+    const reference = referenceInput.value.trim();
+    const moduleValue = moduleSelect.value;
+    const proName = proNameInput.value.trim();
+    const proId = proIdInput.value.trim();
+    const note = noteInput.value.trim();
+
+    const methodInput = form.querySelector('input[name="method"]:checked');
+    const method = methodInput ? methodInput.value : null;
+
+    if (!amount || amount <= 0) {
+      addLog("Montant invalide", "err");
+      alert("Montant invalide.");
+      return;
+    }
+    if (!method) {
+      addLog("Choisir une méthode de paiement", "err");
+      alert("Choisis une méthode de paiement.");
+      return;
     }
 
-    .panel-title strong{
-      color:var(--accent-soft);
+    btnPay.disabled = true;
+    statusText.textContent = "Création de la transaction en cours…";
+
+    const now = Date.now();
+    const isoNow = new Date(now).toISOString();
+    const transactionId = `TRX-${now}`;
+
+    const transactionRef = ref(db, `digiyPay/transactions/${transactionId}`);
+
+    // Sous-type pour driver / resto / etc.
+    let subType = moduleValue;
+    if (moduleValue === "driver") subType = "ride";
+
+    const payload = {
+      transactionId,
+      type: "service_payment",
+      subType,
+      amount,
+      currency,
+      sender: {
+        // Ici, on suppose que le client paye
+        name: customerName || "Client DIGIY",
+        // dans ton schéma tu peux rajouter un digiyId client plus tard
+      },
+      receiver: {
+        digiyId: DIGIY_ID,
+        name: proName || "PRO DIGIY",
+        proId: proId || null
+      },
+      status: "pending",
+      commission: 0,
+      description: note || reference || "",
+      metadata: {
+        service: moduleValue,
+        reference: reference || null,
+        customerName: customerName || null,
+        proName: proName || null,
+        proId: proId || null,
+        note: note || null,
+        chatConversation: null // tu pourras lier une conv plus tard
+      },
+      timestamps: {
+        created: isoNow
+      }
+    };
+
+    try {
+      await set(transactionRef, payload);
+
+      addLog(`Transaction créée : ${transactionId}`, "ok");
+
+      // Affichage UI
+      transactionIdSpan.textContent = transactionId;
+      transactionIdLabel.style.display = "block";
+
+      const payloadText = buildPaymentPayload({
+        amount,
+        method,
+        reference: reference || transactionId,
+        proName
+      });
+
+      ensureQrInstance();
+      qrcodeInstance.clear();
+      qrcodeInstance.makeCode(payloadText);
+
+      let txt = "";
+      switch (method) {
+        case "wave":
+          txt = `Demande au client de scanner le QR avec son app Wave pour payer ${amount.toLocaleString(
+            "fr-FR"
+          )} ${currency}.`;
+          break;
+        case "orange":
+          txt = `Demande au client d’ouvrir Orange Money et de payer ${amount.toLocaleString(
+            "fr-FR"
+          )} ${currency} au numéro indiqué. Note la réf : ${reference || transactionId}.`;
+          break;
+        case "free":
+          txt = `Demande au client de payer via Free Money pour ${amount.toLocaleString(
+            "fr-FR"
+          )} ${currency}.`;
+          break;
+        case "cash":
+          txt = `Encaissement CASH : le client te donne ${amount.toLocaleString(
+            "fr-FR"
+          )} ${currency} en main propre. Valide ensuite la transaction dans ton back-office.`;
+          break;
+        default:
+          txt = "Paiement généré. Suis les instructions convenues avec le client.";
+      }
+
+      statusText.textContent = "Transaction enregistrée. En attente du paiement client.";
+      instructionsEl.innerHTML = txt;
+
+    } catch (err) {
+      console.error(err);
+      addLog("Erreur enregistrement transaction : " + err.message, "err");
+      alert("Erreur lors de l’enregistrement Firebase.");
+      statusText.textContent = "Erreur lors de la création du paiement.";
+    } finally {
+      btnPay.disabled = false;
     }
+  });
+}
 
-    form{
-      display:flex;
-      flex-direction:column;
-      gap:9px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-
-    label{
-      font-size:0.78rem;
-      text-transform:uppercase;
-      letter-spacing:0.08em;
-      color:var(--muted);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    label span.small{
-      font-size:0.68rem;
-      color:var(--muted);
-    }
-
-    input, select, textarea{
-      background:#020617;
-      border-radius:10px;
-      border:1px solid rgba(75,85,99,0.9);
-      padding:7px 9px;
-      font-size:0.86rem;
-      color:var(--ink);
-      outline:none;
-      transition:border-color 0.15s, box-shadow 0.15s, background 0.15s;
-    }
-
-    input:focus, select:focus, textarea:focus{
-      border-color:var(--accent-main);
-      box-shadow:0 0 0 1px rgba(250,204,21,0.4);
-      background:#02081b;
-    }
-
-    textarea{
-      min-height:48px;
-      resize:vertical;
-    }
-
-    .row{
-      display:flex;
-      gap:8px;
-    }
-
-    .row > *{flex:1;}
-
-    .methods{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-top:4px;
-    }
-
-    .method-chip{
-      flex:1 1 calc(50% - 4px);
-      display:flex;
-      align-items:center;
-      gap:6px;
-      padding:7px 8px;
-      border-radius:10px;
-      border:1px solid rgba(75,85,99,0.9);
-      font-size:0.8rem;
-      cursor:pointer;
-      background:#020617;
-      transition:border-color 0.15s, background 0.15s, box-shadow 0.15s;
-    }
-
-    .method-chip input{
-      width:14px;
-      height:14px;
-      accent-color:var(--accent-main);
-      cursor:pointer;
-    }
-
-    .method-chip span.label{
-      flex:1;
-    }
-
-    .method-chip span.tag{
-      font-size:0.68rem;
-      color:var(--muted);
-    }
-
-    .method-chip.active{
-      border-color:var(--accent-main);
-      background:radial-gradient(circle at top,#1f2937,#020617);
-      box-shadow:0 0 0 1px rgba(250,204,21,0.4);
-    }
-
-    .btn-pay{
-      margin-top:6px;
-      width:100%;
-      border:none;
-      outline:none;
-      cursor:pointer;
-      border-radius:999px;
-      padding:9px 14px;
-      font-size:0.88rem;
-      font-weight:600;
-      letter-spacing:0.12em;
-      text-transform:uppercase;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      background:linear-gradient(135deg,#facc15,#f97316);
-      color:#020617;
-      box-shadow:0 18px 36px rgba(0,0,0,0.95);
-    }
-
-    .btn-pay:disabled{
-      opacity:0.55;
-      cursor:wait;
-      box-shadow:none;
-    }
-
-    .helper{
-      margin-top:4px;
-      font-size:0.76rem;
-      color:var(--muted);
-    }
-
-    .helper strong{
-      color:var(--accent-soft);
-    }
-
-    .right-panel{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
-    .qr-wrapper{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .qr-box{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-
-    #qrcode{
-      width:120px;
-      height:120px;
-      border-radius:12px;
-      background:#020617;
-      border:1px solid rgba(55,65,81,0.95);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-
-    .qr-info{
-      flex:1;
-      font-size:0.8rem;
-      color:var(--muted);
-    }
-
-    .qr-info strong{
-      color:var(--accent-soft);
-    }
-
-    .pill-status{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:4px 9px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.96);
-      border:1px solid rgba(148,163,184,0.6);
-      font-size:0.72rem;
-      color:var(--muted);
-    }
-
-    .pill-status span.dot{
-      width:7px;
-      height:7px;
-      border-radius:999px;
-      background:var(--accent-green);
-      box-shadow:0 0 0 4px rgba(22,163,74,0.4);
-    }
-
-    .log{
-      font-size:0.75rem;
-      color:var(--muted);
-      max-height:90px;
-      overflow:auto;
-      border-radius:12px;
-      border:1px solid rgba(55,65,81,0.95);
-      background:#020617;
-      padding:7px 8px;
-    }
-
-    .log-line{
-      margin-bottom:2px;
-    }
-
-    .log-line span.time{
-      opacity:0.6;
-    }
-
-    .log-line span.ok{
-      color:var(--accent-green);
-    }
-
-    .log-line span.err{
-      color:var(--accent-red);
-    }
-
-    footer{
-      margin-top:10px;
-      font-size:0.72rem;
-      color:var(--muted);
-      text-align:right;
-      position:relative;
-    }
-
-    .link-back{
-      color:var(--accent-soft);
-      text-decoration:none;
-      font-size:0.75rem;
-    }
-  </style>
-</head>
-<body>
-  <div class="app-shell">
-    <header>
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title-main">DIGIY PAY — APP</div>
-          <div class="subtitle">Encaissement terrain • Wave • OM • Free • Cash • Enregistrement Firebase</div>
-        </div>
-      </div>
-      <div class="badge-env">
-        <strong>En ligne</strong> • Paiement direct au pro • 0% commission
-      </div>
-    </header>
-
-    <main>
-      <!-- PANEL GAUCHE : FORMULAIRE -->
-      <section class="panel">
-        <div class="panel-title"><strong>1.</strong> Détails de la transaction</div>
-        <form id="payForm">
-          <div class="field">
-            <label for="amount">
-              Montant <span class="small">Obligatoire</span>
-            </label>
-            <div class="row">
-              <input id="amount" type="number" min="0" step="100" placeholder="Ex : 15000" required>
-              <select id="currency">
-                <option value="XOF">XOF (Franc CFA)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label for="customerName">Client</label>
-              <input id="customerName" type="text" placeholder="Nom client (optionnel)">
-            </div>
-            <div class="field">
-              <label for="reference">Référence</label>
-              <input id="reference" type="text" placeholder="Ex : DRIVER-AIBD-SALY">
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label for="module">Module</label>
-              <select id="module">
-                <option value="driver">Driver</option>
-                <option value="resto">Resto</option>
-                <option value="loc">Loc</option>
-                <option value="market">Market</option>
-                <option value="jobs">Jobs</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="proName">Pro / Commerce</label>
-              <input id="proName" type="text" placeholder="Ex : CHEZ BAPTISTE">
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label for="proId">ID PRO</label>
-              <input id="proId" type="text" placeholder="Ex : PRO-001">
-            </div>
-            <div class="field">
-              <label for="note">Note interne</label>
-              <input id="note" type="text" placeholder="Ex : AIBD → Saly 2 pers.">
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Méthode de paiement</label>
-            <div class="methods" id="methods">
-              <label class="method-chip">
-                <input type="radio" name="method" value="wave" checked>
-                <span class="label">Wave</span>
-                <span class="tag">QR à scanner</span>
-              </label>
-              <label class="method-chip">
-                <input type="radio" name="method" value="orange">
-                <span class="label">Orange Money</span>
-                <span class="tag">USSD / app OM</span>
-              </label>
-              <label class="method-chip">
-                <input type="radio" name="method" value="free">
-                <span class="label">Free Money</span>
-                <span class="tag">USSD / app Free</span>
-              </label>
-              <label class="method-chip">
-                <input type="radio" name="method" value="cash">
-                <span class="label">Cash</span>
-                <span class="tag">Paiement physique</span>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" class="btn-pay" id="btnPay">
-            <span>Générer le paiement</span>
-            <span>➜</span>
-          </button>
-
-          <div class="helper">
-            Le bouton crée une transaction dans <strong>Firebase</strong> (nœud <code>digiyPay/transactions</code>) et met à jour l'affichage (QR / instructions).
-          </div>
-        </form>
-      </section>
-
-      <!-- PANEL DROIT : QR + INFOS -->
-      <section class="right-panel">
-        <div class="panel qr-wrapper">
-          <div class="panel-title"><strong>2.</strong> QR / instructions client</div>
-          <div class="qr-box">
-            <div id="qrcode"></div>
-            <div class="qr-info">
-              <div class="pill-status">
-                <span class="dot"></span>
-                <span id="statusText">En attente de génération…</span>
-              </div>
-              <p id="instructions" style="margin-top:6px;">
-                Remplis le formulaire à gauche, choisis la méthode de paiement, puis clique sur <strong>Générer le paiement</strong>.
-              </p>
-              <p id="transactionIdLabel" style="margin-top:6px;font-size:0.75rem;color:var(--muted);display:none;">
-                ID transaction : <span id="transactionId" style="color:var(--accent-soft);"></span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title"><strong>3.</strong> Journal DIGIY PAY</div>
-          <div id="log" class="log"></div>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <a href="../index.html" class="link-back">← Retour vitrine DIGIY PAY</a>
-    </footer>
-  </div>
-
-  <!-- Librairie QRCode (CDN) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- App DIGIY PAY -->
-  <script type="module" src="./app.js"></script>
-</body>
-</html>
+// Log initial
+addLog("DIGIY PAY prêt. Firebase connecté. DIGIY ID = " + DIGIY_ID, "ok");
