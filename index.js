@@ -1,339 +1,510 @@
-// app.js — DIGIY PAY + DIGIY CHAT HEADER (Mamadou DIGIY-2024-00001)
-
-// -------------------- 1. Firebase INIT (CDN) --------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-
-// 🔐 Config DIGIYLYFE (une seule config, PAS de doublon)
-const firebaseConfig = {
-  apiKey: "AIzaSyBqEQWoE2iC7_rp-u4riilNVHolcP2o0B0",
-  authDomain: "digiylyfe-ecosystem.firebaseapp.com",
-  databaseURL: "https://digiylyfe-ecosystem-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "digiylyfe-ecosystem",
-  storageBucket: "digiylyfe-ecosystem.firebasestorage.app",
-  messagingSenderId: "1007962643384",
-  appId: "1:1007962643384:web:20d26881e87f0dc37d0d4d"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// DIGIY ID DU PRO (Mamadou chauffeur)
-const DIGIY_ID = "DIGIY-2024-00001";
-
-// -------------------- 2. UTILITAIRES UI --------------------
-const logBox = document.getElementById("log");
-const statusText = document.getElementById("statusText");
-const instructionsEl = document.getElementById("instructions");
-const transactionIdLabel = document.getElementById("transactionIdLabel");
-const transactionIdSpan = document.getElementById("transactionId");
-const btnPay = document.getElementById("btnPay");
-const methodsContainer = document.getElementById("methods");
-
-let qrcodeInstance = null;
-const qrcodeContainer = document.getElementById("qrcode");
-
-function addLog(message, type = "info") {
-  if (!logBox) return;
-  const line = document.createElement("div");
-  line.className = "log-line";
-
-  const time = new Date().toLocaleTimeString("fr-FR", { hour12: false });
-  const spanTime = document.createElement("span");
-  spanTime.className = "time";
-  spanTime.textContent = `[${time}] `;
-
-  const spanMsg = document.createElement("span");
-  spanMsg.textContent = message;
-  if (type === "ok") spanMsg.classList.add("ok");
-  if (type === "err") spanMsg.classList.add("err");
-
-  line.appendChild(spanTime);
-  line.appendChild(spanMsg);
-  logBox.prepend(line);
-}
-
-// -------------------- 3. HEADER DIGIY CHAT + WALLET --------------------
-const avatarEl = document.getElementById("dc-avatar");
-const nameEl = document.getElementById("dc-name");
-const subEl = document.getElementById("dc-subscription");
-const levelSpan = document.getElementById("dc-level");
-const statusEl = document.getElementById("dc-status");
-const walletEl = document.getElementById("dc-wallet");
-const unreadEl = document.getElementById("dc-unread");
-const btnOpenChat = document.getElementById("dc-openChat");
-
-// Charger les infos abonné (profil + abonnement + chat)
-(function initSubscriberHeader() {
-  const subRef = ref(db, `subscribers/${DIGIY_ID}`);
-
-  onValue(subRef, snapshot => {
-    const data = snapshot.val();
-    if (!data) {
-      addLog("Aucun abonné trouvé pour " + DIGIY_ID, "err");
-      return;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>DIGIY PAY — Paiement direct, simple, 0% commission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="DIGIY PAY — Encaissez par Wave, Orange Money, Free Money ou Cash. 0% commission, paiement direct au pro.">
+  <style>
+    :root{
+      --bg:#020617;
+      --bg-soft:#030712;
+      --card:#020617;
+      --accent-main:#facc15;
+      --accent-soft:#fde047;
+      --accent-green:#22c55e;
+      --ink:#f9fafb;
+      --muted:#94a3b8;
+      --line:#1f2937;
+      --radius-xl:20px;
+      --shadow-soft:0 25px 60px rgba(15,23,42,0.95);
     }
 
-    const profile = data.profile || {};
-    const subscription = data.subscription || {};
-    const digiyChat = data.digiyChat || {};
-    const unreadCount = digiyChat.unreadCount ?? 0;
+    *{box-sizing:border-box;margin:0;padding:0;}
 
-    // Avatar
-    if (avatarEl) {
-      avatarEl.src =
-        profile.avatar ||
-        "https://ui-avatars.com/api/?name=" +
-          encodeURIComponent(profile.displayName || "DIGIY PRO");
+    body{
+      min-height:100vh;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top,#111827,#020617);
+      color:var(--ink);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
     }
 
-    // Nom
-    if (nameEl) {
-      nameEl.textContent =
-        profile.displayName ||
-        `${profile.prenom || ""} ${profile.nom || ""}`.trim() ||
-        DIGIY_ID;
+    .shell{
+      width:100%;
+      max-width:1100px;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%);
+      border-radius:32px;
+      padding:28px 22px;
+      border:1px solid rgba(148,163,184,0.3);
+      box-shadow:var(--shadow-soft);
+      position:relative;
+      overflow:hidden;
     }
 
-    // Abonnement
-    if (levelSpan) {
-      levelSpan.textContent = subscription.level || "—";
-    }
-    if (subEl) {
-      subEl.innerHTML = `Abonnement <span class="badge" id="dc-level">${subscription.level || "—"}</span>`;
+    .shell::before{
+      content:"";
+      position:absolute;
+      inset:-120px;
+      background:
+        radial-gradient(circle at top left,rgba(250,204,21,0.12),transparent 55%),
+        radial-gradient(circle at bottom right,rgba(34,197,94,0.14),transparent 55%);
+      opacity:0.9;
+      pointer-events:none;
     }
 
-    // Statut en ligne
-    if (statusEl) {
-      const online = !!profile.online;
-      const dotSpan = statusEl.querySelector(".dot");
-      const textSpan = statusEl.querySelector("span:last-child");
-      if (dotSpan) {
-        dotSpan.style.background = online ? "#22c55e" : "#6b7280";
-        dotSpan.style.boxShadow = online
-          ? "0 0 0 4px rgba(34,197,94,0.4)"
-          : "0 0 0 0 rgba(0,0,0,0)";
+    header{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:26px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:16px;
+      background:
+        radial-gradient(circle at 20% 0%,#facc15 0,#f97316 30%,#b45309 70%,#020617 100%);
+      box-shadow:0 0 0 2px rgba(250,204,21,0.35),0 18px 40px rgba(0,0,0,0.85);
+      position:relative;
+    }
+
+    .logo::after{
+      content:"DP";
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      letter-spacing:0.04em;
+      font-size:0.78rem;
+      color:#0b0f19;
+      text-shadow:0 0 10px rgba(0,0,0,0.6);
+    }
+
+    h1{
+      font-size:1.4rem;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      color:var(--ink);
+    }
+
+    .tagline{
+      font-size:0.9rem;
+      color:var(--muted);
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(250,204,21,0.5);
+      background:linear-gradient(to right,rgba(15,23,42,0.6),rgba(24,24,27,0.9));
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--accent-soft);
+    }
+
+    .pill span.dot{
+      width:6px;
+      height:6px;
+      border-radius:999px;
+      background:var(--accent-green);
+      box-shadow:0 0 0 4px rgba(34,197,94,0.25);
+    }
+
+    main{
+      position:relative;
+      display:grid;
+      grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
+      gap:22px;
+    }
+
+    @media (max-width:800px){
+      main{
+        grid-template-columns:1fr;
       }
-      if (textSpan) {
-        textSpan.textContent = online ? "En ligne" : "Hors ligne";
+      header{
+        flex-direction:column;
+        align-items:flex-start;
       }
     }
 
-    // Unread
-    if (unreadEl) {
-      unreadEl.textContent = unreadCount;
+    .left{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
     }
 
-    addLog("Header DIGIY CHAT chargé pour " + DIGIY_ID, "ok");
-  });
-
-  // Wallet
-  const walletRef = ref(db, `digiyPay/wallets/${DIGIY_ID}`);
-  onValue(walletRef, snapshot => {
-    const data = snapshot.val();
-    if (!data) return;
-    const balance = data.balance ?? 0;
-    const currency = data.currency || "XOF";
-    if (walletEl) {
-      walletEl.textContent = `${balance.toLocaleString("fr-FR")} ${currency}`;
-    }
-    addLog("Solde wallet mis à jour : " + balance + " " + currency, "ok");
-  });
-
-  // Bouton ouvrir chat (PRO CHAT)
-  if (btnOpenChat) {
-    btnOpenChat.addEventListener("click", () => {
-      addLog("Ouverture DIGIY CHAT PRO pour " + DIGIY_ID, "info");
-      window.open(
-        "https://beauville.github.io/digiy-chat-pro/?digiyId=" + DIGIY_ID,
-        "_blank"
-      );
-    });
-  }
-})();
-
-// -------------------- 4. UI méthodes de paiement --------------------
-if (methodsContainer) {
-  const chips = methodsContainer.querySelectorAll(".method-chip");
-  chips.forEach(chip => {
-    const input = chip.querySelector("input[type=radio]");
-    if (!input) return;
-    chip.addEventListener("click", () => {
-      chips.forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      input.checked = true;
-    });
-    // Active par défaut si déjà checked
-    if (input.checked) {
-      chip.classList.add("active");
-    }
-  });
-}
-
-// -------------------- 5. QR CODE INIT --------------------
-function ensureQrInstance() {
-  if (!qrcodeInstance) {
-    qrcodeInstance = new QRCode(qrcodeContainer, {
-      text: "",
-      width: 120,
-      height: 120
-    });
-  }
-}
-
-// Génère un contenu symbolique pour Wave / OM / etc.
-function buildPaymentPayload({ amount, method, reference, proName }) {
-  return `DIGIY_PAY|method=${method}|amount=${amount}|ref=${reference || ""}|pro=${proName || ""}`;
-}
-
-// -------------------- 6. GESTION DU FORMULAIRE --------------------
-const form = document.getElementById("payForm");
-
-if (form) {
-  form.addEventListener("submit", async e => {
-    e.preventDefault();
-    if (!btnPay) return;
-
-    const amountInput = document.getElementById("amount");
-    const currencySelect = document.getElementById("currency");
-    const customerNameInput = document.getElementById("customerName");
-    const referenceInput = document.getElementById("reference");
-    const moduleSelect = document.getElementById("module");
-    const proNameInput = document.getElementById("proName");
-    const proIdInput = document.getElementById("proId");
-    const noteInput = document.getElementById("note");
-
-    const amount = Number(amountInput.value || 0);
-    const currency = currencySelect.value || "XOF";
-    const customerName = customerNameInput.value.trim();
-    const reference = referenceInput.value.trim();
-    const moduleValue = moduleSelect.value;
-    const proName = proNameInput.value.trim();
-    const proId = proIdInput.value.trim();
-    const note = noteInput.value.trim();
-
-    const methodInput = form.querySelector('input[name="method"]:checked');
-    const method = methodInput ? methodInput.value : null;
-
-    if (!amount || amount <= 0) {
-      addLog("Montant invalide", "err");
-      alert("Montant invalide.");
-      return;
-    }
-    if (!method) {
-      addLog("Choisir une méthode de paiement", "err");
-      alert("Choisis une méthode de paiement.");
-      return;
+    .hero-title{
+      font-size:1.9rem;
+      line-height:1.2;
     }
 
-    btnPay.disabled = true;
-    statusText.textContent = "Création de la transaction en cours…";
-
-    const now = Date.now();
-    const isoNow = new Date(now).toISOString();
-    const transactionId = `TRX-${now}`;
-
-    const transactionRef = ref(db, `digiyPay/transactions/${transactionId}`);
-
-    // Sous-type pour driver / resto / etc.
-    let subType = moduleValue;
-    if (moduleValue === "driver") subType = "ride";
-
-    const payload = {
-      transactionId,
-      type: "service_payment",
-      subType,
-      amount,
-      currency,
-      sender: {
-        name: customerName || "Client DIGIY"
-      },
-      receiver: {
-        digiyId: DIGIY_ID,
-        name: proName || "PRO DIGIY",
-        proId: proId || null
-      },
-      status: "pending",
-      commission: 0,
-      description: note || reference || "",
-      metadata: {
-        service: moduleValue,
-        reference: reference || null,
-        customerName: customerName || null,
-        proName: proName || null,
-        proId: proId || null,
-        note: note || null,
-        chatConversation: null
-      },
-      timestamps: {
-        created: isoNow
-      }
-    };
-
-    try {
-      await set(transactionRef, payload);
-
-      addLog(`Transaction créée : ${transactionId}`, "ok");
-
-      // Affichage UI
-      transactionIdSpan.textContent = transactionId;
-      transactionIdLabel.style.display = "block";
-
-      const payloadText = buildPaymentPayload({
-        amount,
-        method,
-        reference: reference || transactionId,
-        proName
-      });
-
-      ensureQrInstance();
-      qrcodeInstance.clear();
-      qrcodeInstance.makeCode(payloadText);
-
-      let txt = "";
-      switch (method) {
-        case "wave":
-          txt = `Demande au client de scanner le QR avec son app Wave pour payer ${amount.toLocaleString(
-            "fr-FR"
-          )} ${currency}.`;
-          break;
-        case "orange":
-          txt = `Demande au client d’ouvrir Orange Money et de payer ${amount.toLocaleString(
-            "fr-FR"
-          )} ${currency} au numéro indiqué. Note la réf : ${reference || transactionId}.`;
-          break;
-        case "free":
-          txt = `Demande au client de payer via Free Money pour ${amount.toLocaleString(
-            "fr-FR"
-          )} ${currency}.`;
-          break;
-        case "cash":
-          txt = `Encaissement CASH : le client te donne ${amount.toLocaleString(
-            "fr-FR"
-          )} ${currency} en main propre. Valide ensuite la transaction dans ton back-office.`;
-          break;
-        default:
-          txt = "Paiement généré. Suis les instructions convenues avec le client.";
-      }
-
-      statusText.textContent =
-        "Transaction enregistrée. En attente du paiement client.";
-      instructionsEl.innerHTML = txt;
-    } catch (err) {
-      console.error(err);
-      addLog("Erreur enregistrement transaction : " + err.message, "err");
-      alert("Erreur lors de l’enregistrement Firebase.");
-      statusText.textContent = "Erreur lors de la création du paiement.";
-    } finally {
-      btnPay.disabled = false;
+    .hero-title span.highlight{
+      color:var(--accent-main);
     }
-  });
-}
 
-// Log initial
-addLog("DIGIY PAY prêt. Firebase connecté. DIGIY ID = " + DIGIY_ID, "ok");
+    .hero-sub{
+      font-size:0.98rem;
+      color:var(--muted);
+      max-width:480px;
+    }
+
+    .badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:4px;
+    }
+
+    .badge{
+      font-size:0.76rem;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.5);
+      color:var(--muted);
+      background:rgba(15,23,42,0.8);
+    }
+
+    .badge strong{
+      color:var(--accent-soft);
+    }
+
+    .cta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:10px;
+      align-items:center;
+    }
+
+    .btn-main{
+      appearance:none;
+      border:none;
+      outline:none;
+      cursor:pointer;
+      padding:11px 20px;
+      border-radius:999px;
+      font-weight:600;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+      font-size:0.9rem;
+      background:linear-gradient(135deg,#facc15,#f97316);
+      color:#111827;
+      box-shadow:0 18px 40px rgba(15,23,42,0.9);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+    }
+
+    .btn-main span.icon{
+      font-size:1.1rem;
+    }
+
+    .cta-note{
+      font-size:0.82rem;
+      color:var(--muted);
+    }
+
+    .stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      margin-top:14px;
+    }
+
+    .stat{
+      min-width:120px;
+    }
+
+    .stat-label{
+      font-size:0.76rem;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      color:var(--muted);
+    }
+
+    .stat-value{
+      font-size:1rem;
+      font-weight:600;
+      color:var(--accent-soft);
+    }
+
+    .right{
+      align-self:stretch;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .card-preview{
+      width:100%;
+      max-width:360px;
+      background:radial-gradient(circle at top,#020617,#020617);
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(148,163,184,0.4);
+      padding:16px 14px;
+      box-shadow:0 26px 60px rgba(0,0,0,0.95);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:10px;
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+
+    .badge-live{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(22,163,74,0.12);
+      color:#bbf7d0;
+      font-size:0.72rem;
+    }
+
+    .badge-live span.dot{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 0 4px rgba(22,163,74,0.35);
+    }
+
+    .amount-row{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin:12px 0;
+    }
+
+    .amount-main{
+      font-size:1.7rem;
+      font-weight:700;
+    }
+
+    .amount-main span.currency{
+      font-size:0.95rem;
+      opacity:0.85;
+    }
+
+    .amount-sub{
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+
+    .logos-row{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+
+    .pill-logo{
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.4);
+      font-size:0.72rem;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+    }
+
+    .pill-logo span.dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--accent-main);
+    }
+
+    .qr-box{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px dashed rgba(148,163,184,0.5);
+      background:radial-gradient(circle at top,#020617,#020617);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .qr-square{
+      width:84px;
+      height:84px;
+      border-radius:10px;
+      background:repeating-linear-gradient(45deg,#020617,#020617 6px,#111827 6px,#111827 12px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .qr-square::before,
+    .qr-square::after{
+      content:"";
+      position:absolute;
+      border-radius:4px;
+      border:2px solid #e5e7eb;
+    }
+    .qr-square::before{
+      inset:10px auto auto 10px;
+      width:24px;
+      height:24px;
+    }
+    .qr-square::after{
+      inset:auto 10px 10px auto;
+      width:18px;
+      height:18px;
+    }
+
+    .qr-text{
+      flex:1;
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+
+    .qr-text strong{
+      color:var(--accent-soft);
+    }
+
+    footer{
+      margin-top:18px;
+      font-size:0.75rem;
+      color:var(--muted);
+      text-align:right;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="pill">
+            <span class="dot"></span>
+            <span>Plateforme DIGIYLYFE • Paiement direct</span>
+          </div>
+          <h1>DIGIY PAY</h1>
+          <p class="tagline">
+            Encaissez par Wave, Orange Money, Free ou en cash —
+            <strong>0% commission, paiement direct au pro.</strong>
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="left">
+        <div>
+          <h2 class="hero-title">
+            La passerelle de <span class="highlight">paiement local</span><br>
+            pensée pour le terrain.
+          </h2>
+          <p class="hero-sub">
+            Pour les chauffeurs, restos, boutiques, locations, services… DIGIY PAY
+            centralise tes encaissements et enregistre chaque transaction dans un tableau
+            de bord connecté à DIGIYLYFE.
+          </p>
+        </div>
+
+        <div class="badges">
+          <div class="badge"><strong>0% commission</strong> • paiement direct au pro</div>
+          <div class="badge">Wave • Orange Money • Free • Cash</div>
+          <div class="badge">Conçu pour le Sénégal, prêt pour l'Afrique</div>
+        </div>
+
+        <div class="cta-row">
+          <!-- Bouton qui ouvre directement la page de paiement GitHub -->
+          <a href="https://beauville.github.io/digiy-pay/app/" class="btn-main" target="_blank" rel="noopener noreferrer">
+            <span>Ouvrir DIGIY PAY</span>
+            <span class="icon">➜</span>
+          </a>
+          <div class="cta-note">
+            Interface web légère, fonctionne sur mobile, tablette & PC.<br>
+            Pas d'installation. Juste un lien à partager à tes clients.
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Mode</div>
+            <div class="stat-value">Paiement direct</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Commission DIGIY</div>
+            <div class="stat-value">0% sur les montants</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Modules</div>
+            <div class="stat-value">Driver • Resto • Loc • Market • Jobs</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="card-preview">
+          <div class="card-header">
+            <span>Prévisualisation DIGIY PAY</span>
+            <span class="badge-live">
+              <span class="dot"></span> En ligne
+            </span>
+          </div>
+
+          <div class="amount-row">
+            <div class="amount-main">15 000 <span class="currency">XOF</span></div>
+            <div class="amount-sub">
+              Client: Diarra Ndiaye<br>
+              Module: Driver (AIBD → Saly)
+            </div>
+          </div>
+
+          <div class="logos-row">
+            <span class="pill-logo"><span class="dot"></span> Wave</span>
+            <span class="pill-logo"><span class="dot"></span> Orange Money</span>
+            <span class="pill-logo"><span class="dot"></span> Free Money</span>
+            <span class="pill-logo"><span class="dot"></span> Cash</span>
+          </div>
+
+          <div class="qr-box">
+            <div class="qr-square"></div>
+            <div class="qr-text">
+              <strong>Scan Wave</strong> pour régler <strong>15 000 XOF</strong>.<br>
+              Référence: <strong>DRIVER-AIBD-SALY</strong>.<br>
+              En arrière-plan, DIGIY enregistre la transaction dans ton hub.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      DIGIY PAY fait partie de l’écosystème DIGIYLYFE — Outils digitaux enracinés en Afrique.
+    </footer>
+  </div>
+</body>
+</html>
