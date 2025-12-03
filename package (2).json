@@ -1,0 +1,93 @@
+{
+  "name": "digiy-pay",
+  "version": "1.0.0",
+  "description": "Système de paiement révolutionnaire — 0% commission, 100% au professionnel. Wave, Orange Money, Free Money, Espèces. Terrain Sénégal, vision Afrique.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && firebase deploy",
+    "functions": "cd functions && npm run serve",
+    "lint": "eslint src/**/*.{js,jsx}",
+    "format": "prettier --write src/**/*.{js,jsx,json,css,md}"
+  },
+  "keywords": [
+    "payment-gateway",
+    "mobile-money",
+    "wave",
+    "orange-money",
+    "free-money",
+    "senegal",
+    "africa",
+    "zero-commission",
+    "fintech",
+    "react",
+    "firebase",
+    "payments",
+    "e-commerce",
+    "marketplace",
+    "digital-wallet",
+    "digiylyfe"
+  ],
+  "author": {
+    "name": "DIGIY",
+    "email": "digiylyfe@gmail.com",
+    "url": "https://digiylyfe.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/beauville/digiy-pay#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beauville/digiy-pay.git"
+  },
+  "bugs": {
+    "url": "https://github.com/beauville/digiy-pay/issues",
+    "email": "digiylyfe@gmail.com"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "firebase": "^10.7.1",
+    "axios": "^1.6.2",
+    "date-fns": "^3.0.0",
+    "qrcode.react": "^3.1.0",
+    "react-hot-toast": "^2.4.1",
+    "zustand": "^4.4.7",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "react-scripts": "5.0.1",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/user-event": "^14.5.1",
+    "eslint": "^8.55.0",
+    "eslint-config-react-app": "^7.0.1",
+    "prettier": "^3.1.1",
+    "firebase-tools": "^13.0.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
