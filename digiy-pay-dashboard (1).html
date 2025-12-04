@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIGIY PAY — Wallet & Paiements 0% Commission</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0A0E1A;
+      --bg-soft: #0F1419;
+      --card: #1A1F2E;
+      --accent: #FF6B35;
+      --secondary: #00B4D8;
+      --success: #06D6A0;
+      --warning: #FFB800;
+      --danger: #EF4444;
+      --ink: #FFFFFF;
+      --ink-soft: #E5E7EB;
+      --muted: #9CA3AF;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-soft) 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    header {
+      background: rgba(26, 31, 46, 0.6);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #E85A28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+
+    .brand-text p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.75rem 1.25rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.125rem;
+    }
+
+    .user-details h3 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin-bottom: 0.125rem;
+    }
+
+    .user-details p {
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+
+    /* BALANCE CARD */
+    .balance-section {
+      background: linear-gradient(135deg, rgba(26, 31, 46, 0.8) 0%, rgba(37, 41, 56, 0.6) 100%);
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-section::before {
+      content: '💰';
+      position: absolute;
+      font-size: 12rem;
+      top: -3rem;
+      right: -3rem;
+      opacity: 0.03;
+    }
+
+    .balance-label {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .balance-amount {
+      font-family: 'Outfit', sans-serif;
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.5rem;
+      line-height: 1;
+    }
+
+    .balance-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.875rem 1.75rem;
+      border-radius: 100px;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #E85A28);
+      color: var(--ink);
+      box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--ink-soft);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      background: rgba(255, 107, 53, 0.1);
+    }
+
+    /* PAYMENT METHODS */
+    .payment-methods {
+      background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      color: var(--ink);
+    }
+
+    .methods-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .method-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .method-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .method-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: rgba(26, 31, 46, 0.6);
+      border: 1px solid var(--border);
+    }
+
+    .method-card.wave .method-icon {
+      background: linear-gradient(135deg, #00B4D8, #0077B6);
+    }
+
+    .method-card.orange .method-icon {
+      background: linear-gradient(135deg, #FF6B35, #F97316);
+    }
+
+    .method-card.free .method-icon {
+      background: linear-gradient(135deg, #06D6A0, #059669);
+    }
+
+    .method-card.cash .method-icon {
+      background: linear-gradient(135deg, #FFB800, #F59E0B);
+    }
+
+    .method-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+
+    .method-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .method-badge {
+      display: inline-block;
+      padding: 0.375rem 0.875rem;
+      background: rgba(6, 214, 160, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* TRANSACTIONS */
+    .transactions {
+      background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
+      backdrop-filter: blur(20px);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      padding: 2rem;
+    }
+
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 16px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .transaction-item:hover {
+      background: rgba(15, 23, 42, 0.6);
+      border-color: var(--accent);
+    }
+
+    .transaction-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .transaction-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: rgba(26, 31, 46, 0.8);
+    }
+
+    .transaction-details h4 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--ink);
+    }
+
+    .transaction-details p {
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+
+    .transaction-amount {
+      text-align: right;
+    }
+
+    .transaction-amount .amount {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+
+    .transaction-amount.positive .amount {
+      color: var(--success);
+    }
+
+    .transaction-amount.negative .amount {
+      color: var(--danger);
+    }
+
+    .transaction-amount .date {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(26, 31, 46, 0.95), rgba(15, 23, 42, 0.98));
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.875rem 1.25rem;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--ink);
+      font-size: 0.9375rem;
+      font-family: 'Manrope', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
+    }
+
+    .commission-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(6, 214, 160, 0.1);
+      border: 1px solid var(--success);
+      border-radius: 12px;
+      font-weight: 700;
+      color: var(--success);
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .balance-amount {
+        font-size: 3rem;
+      }
+
+      .methods-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .balance-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <header>
+      <div class="brand">
+        <div class="brand-logo">💳</div>
+        <div class="brand-text">
+          <h1>DIGIY PAY</h1>
+          <p>Wallet & Paiements • 0% Commission</p>
+        </div>
+      </div>
+      <div class="user-info">
+        <div class="user-avatar">JB</div>
+        <div class="user-details">
+          <h3 id="userName">JB BAPT</h3>
+          <p id="userPhone">+221 77 134 28 89</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- BALANCE SECTION -->
+    <section class="balance-section">
+      <div class="balance-label">Solde disponible</div>
+      <div class="balance-amount" id="balance">0 FCFA</div>
+      <div class="balance-actions">
+        <button class="btn btn-primary" onclick="openModal('recharge')">
+          💰 Recharger
+        </button>
+        <button class="btn btn-primary" onclick="openModal('transfer')">
+          💸 Envoyer
+        </button>
+        <button class="btn btn-secondary" onclick="openModal('withdraw')">
+          🏦 Retirer
+        </button>
+        <button class="btn btn-secondary" onclick="viewHistory()">
+          📊 Historique
+        </button>
+      </div>
+      <div class="commission-badge">
+        ✓ 0% de commission sur tous vos paiements
+      </div>
+    </section>
+
+    <!-- PAYMENT METHODS -->
+    <section class="payment-methods">
+      <h2 class="section-title">Méthodes de paiement</h2>
+      <div class="methods-grid">
+        <div class="method-card wave" onclick="selectMethod('wave')">
+          <div class="method-icon">🌊</div>
+          <h3 class="method-name">Wave</h3>
+          <p class="method-desc">QR Code, Transfert direct, API intégrée</p>
+          <span class="method-badge">✓ Priorité #1</span>
+        </div>
+
+        <div class="method-card orange" onclick="selectMethod('orange')">
+          <div class="method-icon">🟧</div>
+          <h3 class="method-name">Orange Money</h3>
+          <p class="method-desc">USSD *144#, API, Transfert mobile</p>
+          <span class="method-badge">✓ Le plus répandu</span>
+        </div>
+
+        <div class="method-card free" onclick="selectMethod('free')">
+          <div class="method-icon">🟩</div>
+          <h3 class="method-name">Free Money</h3>
+          <p class="method-desc">Transfert direct entre utilisateurs Free</p>
+          <span class="method-badge">✓ Disponible</span>
+        </div>
+
+        <div class="method-card cash" onclick="selectMethod('cash')">
+          <div class="method-icon">💵</div>
+          <h3 class="method-name">Espèces</h3>
+          <p class="method-desc">Paiement cash, Reçu digital automatique</p>
+          <span class="method-badge">✓ Terrain</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section class="transactions">
+      <h2 class="section-title">Transactions récentes</h2>
+      <div id="transactionsList">
+        <div class="transaction-item">
+          <div class="transaction-info">
+            <div class="transaction-icon">🚗</div>
+            <div class="transaction-details">
+              <h4>Course DIGIY DRIVER</h4>
+              <p>Dakar → Saly • Wave</p>
+            </div>
+          </div>
+          <div class="transaction-amount positive">
+            <div class="amount">+15,000 FCFA</div>
+            <div class="date">Il y a 2h</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-info">
+            <div class="transaction-icon">🏠</div>
+            <div class="transaction-details">
+              <h4>Réservation DIGIY LOC</h4>
+              <p>Chez Baptiste • Orange Money</p>
+            </div>
+          </div>
+          <div class="transaction-amount positive">
+            <div class="amount">+45,000 FCFA</div>
+            <div class="date">Hier</div>
+          </div>
+        </div>
+
+        <div class="transaction-item">
+          <div class="transaction-info">
+            <div class="transaction-icon">🍽️</div>
+            <div class="transaction-details">
+              <h4>Commande DIGIY RESTO</h4>
+              <p>Le Baobab • Espèces</p>
+            </div>
+          </div>
+          <div class="transaction-amount negative">
+            <div class="amount">-8,500 FCFA</div>
+            <div class="date">Il y a 3j</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL RECHARGE -->
+  <div id="rechargeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">💰 Recharger</h3>
+        <button class="close-btn" onclick="closeModal('recharge')">✕</button>
+      </div>
+      <form onsubmit="processRecharge(event)">
+        <div class="form-group">
+          <label>Montant (FCFA)</label>
+          <input type="number" id="rechargeAmount" placeholder="Ex: 10000" required min="500">
+        </div>
+        <div class="form-group">
+          <label>Méthode de paiement</label>
+          <select id="rechargeMethod" required>
+            <option value="">Choisir...</option>
+            <option value="wave">Wave</option>
+            <option value="orange">Orange Money</option>
+            <option value="free">Free Money</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Numéro de téléphone</label>
+          <input type="tel" id="rechargePhone" placeholder="+221 77 XXX XX XX" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Confirmer la recharge
+        </button>
+        <div class="commission-badge">
+          ✓ Aucun frais • Vous recevez 100%
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL TRANSFER -->
+  <div id="transferModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">💸 Envoyer de l'argent</h3>
+        <button class="close-btn" onclick="closeModal('transfer')">✕</button>
+      </div>
+      <form onsubmit="processTransfer(event)">
+        <div class="form-group">
+          <label>Montant (FCFA)</label>
+          <input type="number" id="transferAmount" placeholder="Ex: 5000" required min="100">
+        </div>
+        <div class="form-group">
+          <label>Destinataire (Téléphone ou ID DIGIY)</label>
+          <input type="text" id="transferRecipient" placeholder="+221 77 XXX XX XX" required>
+        </div>
+        <div class="form-group">
+          <label>Message (optionnel)</label>
+          <input type="text" id="transferMessage" placeholder="Merci pour...">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Envoyer l'argent
+        </button>
+        <div class="commission-badge">
+          ✓ 0% de commission • Transfer instantané
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // STORAGE KEYS
+    const STORAGE_BALANCE = 'digiy_pay_balance';
+    const STORAGE_TRANSACTIONS = 'digiy_pay_transactions';
+    const STORAGE_USER = 'digiy_pay_user';
+
+    // LOAD DATA
+    let balance = parseInt(localStorage.getItem(STORAGE_BALANCE)) || 0;
+    let transactions = JSON.parse(localStorage.getItem(STORAGE_TRANSACTIONS)) || [];
+
+    // UPDATE UI
+    function updateBalance() {
+      document.getElementById('balance').textContent = formatMoney(balance);
+      localStorage.setItem(STORAGE_BALANCE, balance);
+    }
+
+    function formatMoney(amount) {
+      return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
+    }
+
+    function openModal(type) {
+      document.getElementById(type + 'Modal').classList.add('active');
+    }
+
+    function closeModal(type) {
+      document.getElementById(type + 'Modal').classList.remove('active');
+    }
+
+    function selectMethod(method) {
+      alert(`Méthode sélectionnée: ${method}\n\nDans la version complète, cela ouvrira le processus de paiement ${method}.`);
+    }
+
+    function processRecharge(e) {
+      e.preventDefault();
+      const amount = parseInt(document.getElementById('rechargeAmount').value);
+      const method = document.getElementById('rechargeMethod').value;
+      const phone = document.getElementById('rechargePhone').value;
+
+      // Simulate payment
+      balance += amount;
+      updateBalance();
+
+      // Add transaction
+      transactions.unshift({
+        type: 'recharge',
+        amount: amount,
+        method: method,
+        phone: phone,
+        date: new Date().toISOString(),
+        status: 'completed'
+      });
+      localStorage.setItem(STORAGE_TRANSACTIONS, JSON.stringify(transactions));
+
+      alert(`✅ Recharge de ${formatMoney(amount)} réussie!\n\nMéthode: ${method}\nNuméro: ${phone}\n\n💰 Nouveau solde: ${formatMoney(balance)}`);
+      closeModal('recharge');
+      e.target.reset();
+    }
+
+    function processTransfer(e) {
+      e.preventDefault();
+      const amount = parseInt(document.getElementById('transferAmount').value);
+      const recipient = document.getElementById('transferRecipient').value;
+      const message = document.getElementById('transferMessage').value;
+
+      if (amount > balance) {
+        alert('❌ Solde insuffisant!');
+        return;
+      }
+
+      // Process transfer
+      balance -= amount;
+      updateBalance();
+
+      // Add transaction
+      transactions.unshift({
+        type: 'transfer',
+        amount: -amount,
+        recipient: recipient,
+        message: message,
+        date: new Date().toISOString(),
+        status: 'completed'
+      });
+      localStorage.setItem(STORAGE_TRANSACTIONS, JSON.stringify(transactions));
+
+      alert(`✅ Transfer de ${formatMoney(amount)} effectué!\n\nDestinataire: ${recipient}\nMessage: ${message || 'Aucun'}\n\n💰 Nouveau solde: ${formatMoney(balance)}`);
+      closeModal('transfer');
+      e.target.reset();
+    }
+
+    function viewHistory() {
+      if (transactions.length === 0) {
+        alert('Aucune transaction pour le moment.');
+        return;
+      }
+
+      let history = '📊 HISTORIQUE DES TRANSACTIONS\n\n';
+      transactions.slice(0, 10).forEach(tx => {
+        const date = new Date(tx.date).toLocaleDateString('fr-FR');
+        history += `${tx.type === 'recharge' ? '💰' : '💸'} ${tx.type.toUpperCase()}\n`;
+        history += `Montant: ${formatMoney(Math.abs(tx.amount))}\n`;
+        history += `Date: ${date}\n`;
+        if (tx.recipient) history += `Destinataire: ${tx.recipient}\n`;
+        history += '\n';
+      });
+
+      alert(history);
+    }
+
+    // Initialize
+    updateBalance();
+
+    console.log(`
+🔥 DIGIY PAY LOADED! 💎
+
+Pierre par pierre, on construit l'écosystème!
+L'Afrique enracinée, connectée au monde.
+
+∞ 0% Commission • 100% Liberté ∞
+    `);
+  </script>
+</body>
+</html>
