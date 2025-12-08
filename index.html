@@ -207,6 +207,12 @@
             background: rgba(255, 107, 53, 0.1);
         }
 
+        .btn[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* PAYMENT METHODS */
         .payment-methods {
             background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
@@ -565,8 +571,7 @@
 
         <section class="transactions">
             <h2 class="section-title">Transactions récentes</h2>
-            <div id="transactionsList">
-                </div>
+            <div id="transactionsList"></div>
         </section>
     </div>
 
@@ -667,40 +672,35 @@
         </div>
     </div>
 
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-        // --- 🚨 REMPLACEZ CECI PAR VOTRE CONFIGURATION FIREBASE 🚨 ---
+        // --- 🔐 CONFIG FIREBASE (à remplir avec ta vraie config) ---
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_CONFIG", // <--- CHANGE MOI
+            apiKey: "YOUR_FIREBASE_CONFIG", // <--- À remplacer
             authDomain: "digiylyfe-ecosystem.firebaseapp.com",
             projectId: "digiylyfe-ecosystem",
             storageBucket: "digiylyfe-ecosystem.appspot.com",
             messagingSenderId: "1007962643384",
             appId: "1:1007962643384:web:20d26881e87f0dc37d0d4d"
         };
-        // -------------------------------------------------------------
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- VARIABLES GLOBALES ---
         let currentUserId = null;
         let aboRef = null;
         let currentBalance = 0;
         let transactionHistory = [];
 
-        // --- UTILITIES ---
-
         function formatMoney(amount) {
             return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
         }
 
-        // Affiche/Masque les Modals
+        // Modals
         window.openModal = function(type) {
             document.getElementById(type + 'Modal').classList.add('active');
         }
@@ -713,44 +713,61 @@
             alert(`Méthode sélectionnée: ${method.toUpperCase()}.\n\nCeci initiera le processus de paiement externe sécurisé.`);
         }
 
-        // --- CHARGEMENT INITIAL & GARDE-FOU ---
+        // 🔎 Auth & garde-fou sans redirection
         onAuthStateChanged(auth, async (user) => {
+            const nameEl = document.getElementById('userName');
+            const phoneEl = document.getElementById('userPhone');
+            const avatarEl = document.getElementById('userAvatar');
+            const balanceEl = document.getElementById('balance');
+            const buttons = document.querySelectorAll('.balance-actions .btn');
+
             if (!user) {
-                // Renvoie si déconnecté (ajuster l'URL si besoin)
-                window.location.href = "inscription.html"; 
+                // Pas connecté → pas de redirection, juste un mode "verrouillé"
+                nameEl.textContent = "Connexion requise";
+                phoneEl.textContent = "Connecte-toi à ton HUB DIGIY pour utiliser ton wallet.";
+                avatarEl.textContent = "🔒";
+                balanceEl.textContent = "0 FCFA";
+
+                buttons.forEach(btn => { btn.disabled = true; });
+
+                console.warn("DIGIY PAY : aucun utilisateur connecté (mode verrouillé, pas de 404).");
                 return;
             }
 
             currentUserId = user.uid;
             aboRef = doc(db, "abos", currentUserId);
             
-            // Mise à jour de l'UI utilisateur
             const name = user.displayName || 'Abonné DIGIY';
-            document.getElementById('userName').textContent = name;
-            document.getElementById('userPhone').textContent = user.phoneNumber || user.email;
-            document.getElementById('userAvatar').textContent = name[0];
-            
-            await loadWalletData();
+            nameEl.textContent = name;
+            phoneEl.textContent = user.phoneNumber || user.email || '';
+            avatarEl.textContent = name[0];
 
+            buttons.forEach(btn => { btn.disabled = false; });
+
+            await loadWalletData();
             console.log("🔥 DIGIY PAY CONNECTED! Session Firebase active.");
         });
         
-        // --- CHARGEMENT DES DONNÉES DU WALLET ---
         async function loadWalletData() {
+            if (!aboRef) return;
             try {
                 const snap = await getDoc(aboRef);
                 if (snap.exists()) {
                     const data = snap.data();
                     currentBalance = data.wallet?.balance || 0;
-                    // Récupère l'historique et assure que c'est un tableau
                     transactionHistory = data.wallet?.transactions || []; 
                     
+                    updateBalanceUI();
+                    renderTransactions(transactionHistory);
+                } else {
+                    currentBalance = 0;
+                    transactionHistory = [];
                     updateBalanceUI();
                     renderTransactions(transactionHistory);
                 }
             } catch (e) {
                 console.error("Erreur de chargement du wallet:", e);
-                alert("Erreur lors du chargement des données du portefeuille. Veuillez vérifier la console.");
+                alert("Erreur lors du chargement des données du portefeuille.");
             }
         }
 
@@ -758,18 +775,16 @@
             document.getElementById('balance').textContent = formatMoney(currentBalance);
         }
         
-        // --- RENDU DES TRANSACTIONS ---
         function renderTransactions(txs) {
             const listEl = document.getElementById('transactionsList');
             listEl.innerHTML = '';
             
-            if (txs.length === 0) {
+            if (!txs || txs.length === 0) {
                  listEl.innerHTML = '<p style="color:var(--muted); text-align: center; padding: 2rem;">Aucune transaction récente.</p>';
                  return;
             }
             
-            // Tri du plus récent au plus ancien, et affichage des 5 premiers
-            txs.sort((a, b) => b.timestamp - a.timestamp); 
+            txs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); 
             
             txs.slice(0, 5).forEach(tx => {
                 const isPositive = tx.amount > 0;
@@ -781,13 +796,15 @@
 
                 const item = document.createElement('div');
                 item.className = 'transaction-item';
-                const dateDisplay = new Date(tx.timestamp).toLocaleDateString('fr-FR');
-                
+                const dateDisplay = tx.timestamp
+                  ? new Date(tx.timestamp).toLocaleDateString('fr-FR')
+                  : '';
+
                 item.innerHTML = `
                     <div class="transaction-info">
                         <div class="transaction-icon">${icon}</div>
                         <div class="transaction-details">
-                            <h4>${tx.title || tx.type.toUpperCase()}</h4>
+                            <h4>${tx.title || tx.type?.toUpperCase() || 'Transaction'}</h4>
                             <p>${tx.details || (tx.method ? tx.method.toUpperCase() : '')}</p>
                         </div>
                     </div>
@@ -800,14 +817,19 @@
             });
         }
 
-        // --- 1. PROCESSUS DE RECHARGE (CRÉDIT) ---
+        // RECHARGE
         window.processRecharge = async function(e) {
             e.preventDefault();
+            if (!currentUserId || !aboRef) {
+                alert("Connexion requise pour recharger.");
+                return;
+            }
+
             const amount = parseInt(document.getElementById('rechargeAmount').value);
             const method = document.getElementById('rechargeMethod').value;
             const phone = document.getElementById('rechargePhone').value;
 
-            if (!currentUserId || amount <= 0) return;
+            if (isNaN(amount) || amount <= 0) return;
             
             const newTx = {
                 type: 'recharge',
@@ -828,7 +850,6 @@
                     'wallet.transactions': arrayUnion(newTx) 
                 });
 
-                // Mise à jour de l'UI et des variables
                 currentBalance = newBalance;
                 transactionHistory.unshift(newTx);
                 updateBalanceUI();
@@ -844,22 +865,28 @@
             }
         }
 
-        // --- 2. PROCESSUS DE TRANSFERT (DÉBIT) ---
+        // TRANSFERT
         window.processTransfer = async function(e) {
             e.preventDefault();
+            if (!currentUserId || !aboRef) {
+                alert("Connexion requise pour envoyer de l'argent.");
+                return;
+            }
+
             const amount = parseInt(document.getElementById('transferAmount').value);
             const recipient = document.getElementById('transferRecipient').value;
             const message = document.getElementById('transferMessage').value;
+
+            if (isNaN(amount) || amount <= 0) return;
 
             if (amount > currentBalance) {
                 alert('❌ Solde insuffisant!');
                 return;
             }
-            if (!currentUserId || amount <= 0) return;
 
             const newTx = {
                 type: 'transfer',
-                amount: -amount, // Montant NÉGATIF
+                amount: -amount,
                 recipient: recipient,
                 message: message,
                 title: 'Transfert DIGIY PAY',
@@ -876,7 +903,6 @@
                     'wallet.transactions': arrayUnion(newTx)
                 });
                 
-                // Mettre à jour l'UI
                 currentBalance = newBalance;
                 transactionHistory.unshift(newTx);
                 updateBalanceUI();
@@ -892,24 +918,28 @@
             }
         }
         
-        // --- 3. PROCESSUS DE RETRAIT (DÉBIT) ---
+        // RETRAIT
         window.processWithdraw = async function(e) {
             e.preventDefault();
+            if (!currentUserId || !aboRef) {
+                alert("Connexion requise pour retirer.");
+                return;
+            }
+
             const amount = parseInt(document.getElementById('withdrawAmount').value);
             const method = document.getElementById('withdrawMethod').value;
             const phone = document.getElementById('withdrawPhone').value;
+
+            if (isNaN(amount) || amount <= 0) return;
 
             if (amount > currentBalance) {
                 alert('❌ Solde insuffisant pour le retrait!');
                 return;
             }
-            if (!currentUserId || amount <= 0) return;
             
-            // NOTE : Dans le monde réel, tu aurais ici une API Call pour le transfert externe
-            // Ici, nous simulons juste la soustraction du solde
             const newTx = {
                 type: 'withdraw',
-                amount: -amount, // Montant NÉGATIF
+                amount: -amount,
                 method: method,
                 phone: phone,
                 title: 'Demande de Retrait',
@@ -926,7 +956,6 @@
                     'wallet.transactions': arrayUnion(newTx)
                 });
                 
-                // Mettre à jour l'UI
                 currentBalance = newBalance;
                 transactionHistory.unshift(newTx);
                 updateBalanceUI();
@@ -942,9 +971,9 @@
             }
         }
 
-        // --- AFFICHAGE DE L'HISTORIQUE (Fenêtre d'alerte simplifiée) ---
+        // HISTORIQUE (popup simple)
         window.viewHistory = function() {
-            if (transactionHistory.length === 0) {
+            if (!transactionHistory.length) {
                 alert('Aucune transaction enregistrée.');
                 return;
             }
@@ -952,12 +981,13 @@
             let history = '📊 HISTORIQUE DES TRANSACTIONS (5 dernières)\n\n';
             transactionHistory.slice(0, 5).forEach(tx => {
                 const sign = tx.amount >= 0 ? '+' : '-';
-                const color = tx.amount >= 0 ? '💚' : '💔';
-                const date = new Date(tx.timestamp).toLocaleDateString('fr-FR');
-                history += `${color} ${tx.title || tx.type.toUpperCase()}\n`;
-                history += `Montant: ${sign}${formatMoney(Math.abs(tx.amount))}\n`;
-                history += `Date: ${date}\n`;
-                if (tx.recipient) history += `Destinataire: ${tx.recipient}\n`;
+                const date = tx.timestamp
+                  ? new Date(tx.timestamp).toLocaleDateString('fr-FR')
+                  : '';
+                history += `• ${tx.title || tx.type?.toUpperCase() || 'Transaction'}\n`;
+                history += `   Montant: ${sign}${formatMoney(Math.abs(tx.amount))}\n`;
+                if (date) history += `   Date: ${date}\n`;
+                if (tx.recipient) history += `   Destinataire: ${tx.recipient}\n`;
                 history += '\n';
             });
 
