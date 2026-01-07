@@ -10,13 +10,6 @@ node_modules/
 /build
 /dist
 
-# Firebase
-.firebase/
-.firebaserc
-firebase-debug.log
-firestore-debug.log
-ui-debug.log
-
 # Environment variables
 .env
 .env.local
@@ -44,6 +37,7 @@ credentials.json
 serviceAccountKey.json
 *.pem
 *.key
+secrets.json
 
 # Build files
 *.tgz
@@ -53,9 +47,6 @@ serviceAccountKey.json
 
 # Optional eslint cache
 .eslintcache
-
-# Output of 'npm pack'
-*.tgz
 
 # Yarn
 .yarn-integrity
@@ -70,7 +61,6 @@ out
 
 # Nuxt.js
 .nuxt
-dist
 
 # Gatsby
 .cache/
@@ -97,3 +87,11 @@ temp/
 
 # OS
 Thumbs.db
+.DS_Store
+
+# Supabase (si tu utilises le CLI local)
+.supabase/
+
+# Backup files
+*.bak
+*.backup
