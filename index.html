@@ -485,6 +485,21 @@
             margin-top: 1rem;
         }
 
+        /* GUARD STATUS */
+        #guard_status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            z-index: 9999;
+            border: 1px solid var(--border);
+        }
+
         @media (max-width: 768px) {
             body { padding: 1rem; }
             header { flex-direction: column; align-items: flex-start; }
@@ -492,10 +507,35 @@
             .methods-grid { grid-template-columns: 1fr; }
             .balance-actions { flex-direction: column; width: 100%; }
             .btn { width: 100%; justify-content: center; }
+            #guard_status { top: 10px; right: 10px; font-size: 12px; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
+    <!-- GUARD STATUS -->
+    <div id="guard_status">🔐 Vérification...</div>
+
+    <!-- GUARD SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="guard.js"></script>
+    <script>
+        // Vérification au chargement
+        (async () => {
+            const ok = await window.DIGIY.guardOrPay("DIGIY_PAY", "/digiy-pay/login.html");
+            if (!ok) return; // Redirigé
+            
+            // ✅ Accès OK
+            console.log("🦅 DIGIY PAY chargé");
+            document.body.classList.add("access-granted");
+            
+            // Masquer le status après 2 sec
+            setTimeout(() => {
+                const status = document.getElementById('guard_status');
+                if (status) status.style.display = 'none';
+            }, 2000);
+        })();
+    </script>
+
     <div class="container">
         <header>
             <div class="brand">
@@ -673,11 +713,10 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // ========== CONFIG SUPABASE ==========
-        const SUPABASE_URL = 'https://sbldjnfqbqlxfppfjtge.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNibGRqbmZxYnFseGZwcGZqdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MTczOTcsImV4cCI6MjA1MTQ5MzM5N30.KjQyAZPEcB5uRLUxlGLn89I2JiZWxnrXGRZLpNxgPj0';
+        const SUPABASE_URL = 'https://wesqmwjjtsefyjnluosj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -687,7 +726,8 @@
 
         // ========== INIT ==========
         (async () => {
-            currentPhone = localStorage.getItem('digiy_phone');
+            // Récupérer le phone depuis la session Supabase Auth
+            currentPhone = await window.DIGIY.getPhone();
             
             if (!currentPhone) {
                 document.getElementById('userName').textContent = 'Connexion requise';
@@ -700,7 +740,7 @@
 
             document.getElementById('userPhone').textContent = currentPhone;
             document.getElementById('userName').textContent = 'Abonné DIGIY';
-            document.getElementById('userAvatar').textContent = currentPhone[0];
+            document.getElementById('userAvatar').textContent = currentPhone[5] || 'D';
 
             await loadWalletData();
         })();
