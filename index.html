@@ -519,20 +519,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="guard.js"></script>
     <script>
-        // Vérification au chargement
+        // ✅ GUARD CHECK AVEC MODULE PAY_PRO
         (async () => {
-            const ok = await window.DIGIY.guardOrPay("DIGIY_PAY", "/digiy-pay/login.html");
+            const ok = await window.DIGIY.guardOrPay("PAY_PRO", "/digiy-pay/login.html");
             if (!ok) return; // Redirigé
             
             // ✅ Accès OK
-            console.log("🦅 DIGIY PAY chargé");
-            document.body.classList.add("access-granted");
+            console.log("🦅 DIGIY PAY chargé avec succès");
+            document.documentElement.classList.add("access-ok");
             
-            // Masquer le status après 2 sec
+            // Masquer le status après 1.2 sec
             setTimeout(() => {
-                const status = document.getElementById('guard_status');
-                if (status) status.style.display = 'none';
-            }, 2000);
+                const s = document.getElementById("guard_status");
+                if (s) s.style.display = "none";
+            }, 1200);
         })();
     </script>
 
@@ -726,7 +726,7 @@
 
         // ========== INIT ==========
         (async () => {
-            // Récupérer le phone depuis la session Supabase Auth
+            // Récupérer le phone depuis DIGIY (Auth ou localStorage)
             currentPhone = await window.DIGIY.getPhone();
             
             if (!currentPhone) {
@@ -739,7 +739,7 @@
             }
 
             document.getElementById('userPhone').textContent = currentPhone;
-            document.getElementById('userName').textContent = 'Abonné DIGIY';
+            document.getElementById('userName').textContent = 'Abonné DIGIY PAY PRO';
             document.getElementById('userAvatar').textContent = currentPhone[5] || 'D';
 
             await loadWalletData();
