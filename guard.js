@@ -1,114 +1,152 @@
-/* guard.js — DIGIY UNIVERSAL SUBSCRIPTION GUARD */
+/* guard.js — DIGIY UNIVERSAL SUBSCRIPTION GUARD (SAFE + CACHE) */
 (function(){
   "use strict";
-  
+
   // ✅ SUPABASE
   const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-  
-  const supabase = window.__sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  window.__sb = supabase;
-  
-  // ✅ PAIEMENT (universel)
+
+  // ✅ PAIEMENT
   const PAY_URL = "https://beauville.github.io/commencer-a-payer/";
-  
+
   // ✅ base github pages auto
   const path = location.pathname || "/";
   const parts = path.split("/").filter(Boolean);
   const BASE = (parts.length >= 1) ? ("/" + parts[0]) : "";
-  
-  // ============================================
-  // RÉCUPÉRER LE PHONE (AUTH FIRST, PUIS FALLBACK)
-  // ============================================
+
+  function normalizePhone(p){
+    return String(p || "").replace(/[^\d+]/g, "");
+  }
+
+  function nowMs(){ return Date.now(); }
+
+  // Cache court (anti-spam Supabase)
+  function cacheKey(phone, module){ return `digiy_access:${phone}:${module}`; }
+  function cacheGet(phone, module){
+    try{
+      const raw = sessionStorage.getItem(cacheKey(phone,module));
+      if(!raw) return null;
+      const obj = JSON.parse(raw);
+      if(obj?.ok && obj?.exp && obj.exp > nowMs()) return true;
+      return null;
+    }catch(_){ return null; }
+  }
+  function cacheSet(phone, module, seconds){
+    try{
+      sessionStorage.setItem(cacheKey(phone,module), JSON.stringify({
+        ok: true,
+        exp: nowMs() + (seconds*1000)
+      }));
+    }catch(_){}
+  }
+
+  // Supabase client (suppose que supabase-js est déjà chargé dans index.html)
+  if (!window.supabase?.createClient) {
+    console.error("Supabase JS not loaded. Add <script src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'></script> before guard.js");
+    return;
+  }
+
+  const supabase = window.__sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.__sb = supabase;
+
   async function getPhone(){
-    // 1️⃣ Priorité : Session Supabase Auth
+    // 1) Supabase Auth
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.phone) {
-        return session.user.phone;
-      }
-      if (session?.user?.user_metadata?.phone) {
-        return session.user.user_metadata.phone;
-      }
+      const p =
+        session?.user?.phone ||
+        session?.user?.user_metadata?.phone ||
+        session?.user?.user_metadata?.phone_number ||
+        session?.user?.identities?.[0]?.identity_data?.phone ||
+        "";
+      const phone = normalizePhone(p);
+      if (phone) return phone;
     } catch(e) {
       console.warn("getSession error:", e);
     }
-    
-    // 2️⃣ Fallback : sessionStorage (pour DRIVER)
-    const s = sessionStorage.getItem("digiy_driver_phone");
+
+    // 2) sessionStorage
+    const s = normalizePhone(sessionStorage.getItem("digiy_driver_phone"));
     if (s) return s;
-    
-    // 3️⃣ Fallback : localStorage (pour DRIVER)
+
+    // 3) localStorage pin
     try{
       const a = JSON.parse(localStorage.getItem("digiy_driver_access_pin") || "null");
-      if (a?.phone) return a.phone;
+      const p = normalizePhone(a?.phone);
+      if (p) return p;
     }catch(_){}
-    
+
     return null;
   }
-  
-  // ============================================
-  // VÉRIFIER ABONNEMENT (RPC OU QUERY DIRECTE)
-  // ============================================
+
   async function isActive(phone, module){
-    // Option 1 : Si tu as la RPC
+    // Cache (60s)
+    const cached = cacheGet(phone, module);
+    if (cached) return true;
+
+    // 1) RPC si dispo
     try {
       const { data, error } = await supabase.rpc("is_subscription_active", {
         p_phone: phone,
         p_module: module
       });
       if (!error && data !== undefined) {
-        return !!data;
+        const ok = !!data;
+        if (ok) cacheSet(phone, module, 60);
+        return ok;
       }
     } catch(e) {
-      console.warn("RPC is_subscription_active non disponible, fallback query directe");
+      console.warn("RPC is_subscription_active non dispo -> fallback query");
     }
-    
-    // Option 2 : Query directe (fallback)
-    try {
-      const nowIso = new Date().toISOString();
-      const { data, error } = await supabase
-        .from("digiy_subscriptions")
-        .select("id")
-        .eq("phone", phone)
-        .eq("module", module)
-        .eq("status", "active")
-        .gt("current_period_end", nowIso)
-        .limit(1)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return !!data?.id;
-    } catch(e) {
-      console.error("isActive query error:", e);
-      throw e;
-    }
+
+    // 2) Query directe
+    const nowIso = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("digiy_subscriptions")
+      .select("id")
+      .eq("phone", phone)
+      .eq("module", module)
+      .eq("status", "active")
+      .gt("current_period_end", nowIso)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    const ok = !!data?.id;
+    if (ok) cacheSet(phone, module, 60);
+    return ok;
   }
-  
-  // ============================================
-  // API PUBLIQUE
-  // ============================================
+
   window.DIGIY = {
     BASE,
     PAY_URL,
     getPhone,
-    
+
     async guardOrPay(module, loginPath){
       const phone = await getPhone();
-      
+
+      // Pas de phone => login
       if(!phone){
-        console.log("❌ Pas de phone → Redirection login");
-        location.replace(BASE + (loginPath || "/authentification-chauffeur.html"));
+        console.log("❌ Pas de phone → login");
+        // si loginPath est relatif, on le garde; sinon URL absolue
+        const target = loginPath
+          ? (loginPath.startsWith("http") ? loginPath : (BASE + loginPath))
+          : (BASE + "/authentification-chauffeur.html");
+        location.replace(target + (target.includes("?") ? "&" : "?") + "redirect=" + encodeURIComponent(location.href));
         return false;
       }
-      
-      console.log("✅ Phone récupéré:", phone);
-      
+
+      // Expose pour l'app
+      window.DIGIY_ACCESS = { phone, module };
+
+      console.log("✅ Phone:", phone);
+
       try{
         const ok = await isActive(phone, module);
-        
+
         if(!ok){
-          console.log("❌ Pas d'abonnement actif → Redirection paiement");
+          console.log("❌ Pas d'abonnement actif → paiement");
           location.replace(
             PAY_URL
             + "?phone=" + encodeURIComponent(phone)
@@ -117,15 +155,32 @@
           );
           return false;
         }
-        
-        console.log("✅ Abonnement actif pour", module);
+
+        console.log("✅ Abonnement actif:", module);
+        document.documentElement.classList.add("access-ok");
+        window.DIGIY_ACCESS.ok = true;
         return true;
-        
+
       }catch(e){
-        console.warn("guardOrPay error:", e);
-        // Si Supabase bug => on ne bloque pas à tort
-        return true;
+        console.warn("⚠️ Guard check failed (fail-closed):", e);
+        // FAIL CLOSED (pas d'accès si on ne peut pas vérifier)
+        location.replace(PAY_URL + "?from=" + encodeURIComponent(location.href) + "&err=verify");
+        return false;
       }
     }
   };
 })();
+5) Comment l’utiliser dans ton index (propre)
+En haut de <body> :
+
+html
+Copier le code
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="guard.js"></script>
+<script>
+  (async () => {
+    const ok = await window.DIGIY.guardOrPay("DIGIY_PAY", "/login.html");
+    if(!ok) return;
+    // ton app peut démarrer ici si tu veux
+  })();
+</script>
