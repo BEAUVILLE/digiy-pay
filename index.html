@@ -1,812 +1,990 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DIGIY PAY — Wallet & Paiements 0% Commission</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIGIY PAY — Wallet & Paiements 0% Commission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0A0E1A;
+            --bg-soft: #0F1419;
+            --card: #1A1F2E;
+            --accent: #FF6B35;
+            --secondary: #00B4D8;
+            --success: #06D6A0;
+            --warning: #FFB800;
+            --danger: #EF4444;
+            --ink: #FFFFFF;
+            --ink-soft: #E5E7EB;
+            --muted: #9CA3AF;
+            --border: rgba(255, 255, 255, 0.08);
+        }
 
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <!-- ✅ Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-soft) 100%);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 2rem;
+        }
 
-  <!-- ✅ Guard universel (à mettre dans le repo digiy-pay) -->
-  <script src="./guard.js"></script>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-  <style>
-    :root {
-      --bg-dark: #0A0E1A;
-      --bg-soft: #0F1419;
-      --card: #1A1F2E;
-      --accent: #FF6B35;
-      --secondary: #00B4D8;
-      --success: #06D6A0;
-      --warning: #FFB800;
-      --danger: #EF4444;
-      --ink: #FFFFFF;
-      --ink-soft: #E5E7EB;
-      --muted: #9CA3AF;
-      --border: rgba(255, 255, 255, 0.08);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Manrope', sans-serif;
-      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-soft) 100%);
-      color: var(--ink);
-      min-height: 100vh;
-      padding: 2rem;
-    }
-    .container { max-width: 1400px; margin: 0 auto; }
+        /* HEADER */
+        header {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-    header {
-      background: rgba(26, 31, 46, 0.6);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      border: 1px solid var(--border);
-      padding: 1.5rem 2rem;
-      margin-bottom: 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .brand { display: flex; align-items: center; gap: 1rem; }
-    .brand-logo {
-      width: 48px; height: 48px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent), #E85A28);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: 900;
-      box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
-    }
-    .brand-text h1 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.75rem; font-weight: 900;
-      background: linear-gradient(135deg, var(--accent), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 0.25rem;
-    }
-    .brand-text p { font-size: 0.875rem; color: var(--muted); font-weight: 600; }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
-    .user-info {
-      display: flex; align-items: center; gap: 1rem;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 0.75rem 1.25rem;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-    }
-    .user-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--secondary));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1.125rem;
-    }
-    .user-details h3 { font-size: 0.9375rem; font-weight: 700; margin-bottom: 0.125rem; }
-    .user-details p { font-size: 0.8125rem; color: var(--muted); }
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), #E85A28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+        }
 
-    .balance-section {
-      background: linear-gradient(135deg, rgba(26, 31, 46, 0.8) 0%, rgba(37, 41, 56, 0.6) 100%);
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      border: 1px solid var(--border);
-      padding: 2.5rem;
-      margin-bottom: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .balance-section::before {
-      content: '💰';
-      position: absolute;
-      font-size: 12rem;
-      top: -3rem;
-      right: -3rem;
-      opacity: 0.03;
-    }
-    .balance-label {
-      font-size: 0.9375rem;
-      color: var(--muted);
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .balance-amount {
-      font-family: 'Outfit', sans-serif;
-      font-size: 4rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--accent), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 1.5rem;
-      line-height: 1;
-    }
-    .balance-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .brand-text h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
 
-    .btn {
-      padding: 0.875rem 1.75rem;
-      border-radius: 100px;
-      border: none;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.9375rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.3s ease;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #E85A28);
-      color: var(--ink);
-      box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
-    }
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.6);
-      color: var(--ink-soft);
-      border: 1px solid var(--border);
-    }
-    .btn-secondary:hover {
-      border-color: var(--accent);
-      background: rgba(255, 107, 53, 0.1);
-    }
-    .btn[disabled] { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+        .brand-text p {
+            font-size: 0.875rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
 
-    .commission-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      background: rgba(6, 214, 160, 0.1);
-      border: 1px solid var(--success);
-      border-radius: 12px;
-      font-weight: 700;
-      color: var(--success);
-      margin-top: 1rem;
-    }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.75rem 1.25rem;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
 
-    .payment-methods {
-      background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      border: 1px solid var(--border);
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-    .section-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      color: var(--ink);
-    }
-    .methods-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-    .method-card {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 1.75rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .method-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-    .method-icon {
-      width: 56px; height: 56px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      background: rgba(26, 31, 46, 0.6);
-      border: 1px solid var(--border);
-    }
-    .method-card.wave .method-icon { background: linear-gradient(135deg, #00B4D8, #0077B6); }
-    .method-card.orange .method-icon { background: linear-gradient(135deg, #FF6B35, #F97316); }
-    .method-card.free .method-icon { background: linear-gradient(135deg, #06D6A0, #059669); }
-    .method-card.cash .method-icon { background: linear-gradient(135deg, #FFB800, #F59E0B); }
-    .method-name {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      color: var(--ink);
-    }
-    .method-desc {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 1rem;
-    }
-    .method-badge {
-      display: inline-block;
-      padding: 0.375rem 0.875rem;
-      background: rgba(6, 214, 160, 0.1);
-      border: 1px solid var(--success);
-      color: var(--success);
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.125rem;
+        }
 
-    .transactions {
-      background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
-      backdrop-filter: blur(20px);
-      border-radius: 28px;
-      border: 1px solid var(--border);
-      padding: 2rem;
-    }
-    .transaction-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem;
-      background: rgba(15, 23, 42, 0.4);
-      border-radius: 16px;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border);
-      transition: all 0.3s ease;
-    }
-    .transaction-item:hover {
-      background: rgba(15, 23, 42, 0.6);
-      border-color: var(--accent);
-    }
-    .transaction-info { display: flex; align-items: center; gap: 1rem; }
-    .transaction-icon {
-      width: 48px; height: 48px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      background: rgba(26, 31, 46, 0.8);
-    }
-    .transaction-details h4 {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-      color: var(--ink);
-    }
-    .transaction-details p { font-size: 0.8125rem; color: var(--muted); }
-    .transaction-amount { text-align: right; }
-    .transaction-amount .amount {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.125rem;
-      font-weight: 800;
-      margin-bottom: 0.25rem;
-    }
-    .transaction-amount.positive .amount { color: var(--success); }
-    .transaction-amount.negative .amount { color: var(--danger); }
-    .transaction-amount .date { font-size: 0.75rem; color: var(--muted); }
+        .user-details h3 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            margin-bottom: 0.125rem;
+        }
 
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 14, 26, 0.95);
-      backdrop-filter: blur(20px);
-      z-index: 1000;
-      padding: 2rem;
-      overflow-y: auto;
-    }
-    .modal.active { display: flex; align-items: center; justify-content: center; }
-    .modal-content {
-      background: linear-gradient(135deg, rgba(26, 31, 46, 0.95), rgba(15, 23, 42, 0.98));
-      border-radius: 28px;
-      border: 1px solid var(--border);
-      padding: 2.5rem;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    .modal-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.75rem;
-      font-weight: 900;
-      color: var(--ink);
-    }
-    .close-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-    }
-    .close-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--accent);
-    }
-    .form-group { margin-bottom: 1.5rem; }
-    .form-group label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 700;
-      color: var(--ink-soft);
-      margin-bottom: 0.5rem;
-    }
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 0.875rem 1.25rem;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--ink);
-      font-size: 0.9375rem;
-      font-family: 'Manrope', sans-serif;
-      transition: all 0.3s ease;
-    }
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
-    }
+        .user-details p {
+            font-size: 0.8125rem;
+            color: var(--muted);
+        }
 
-    .lockbar{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background: rgba(15,23,42,.45);
-      color: var(--muted);
-      font-weight: 700;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .lockbar b{ color: var(--ink-soft); }
-    .lockbar .mini{
-      font-size: 12px;
-      opacity: .9;
-    }
+        /* BALANCE CARD */
+        .balance-section {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.8) 0%, rgba(37, 41, 56, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-    @media (max-width: 768px) {
-      body { padding: 1rem; }
-      header { flex-direction: column; align-items: flex-start; }
-      .balance-amount { font-size: 3rem; }
-      .methods-grid { grid-template-columns: 1fr; }
-      .balance-actions { flex-direction: column; width: 100%; }
-      .btn { width: 100%; justify-content: center; }
-    }
-  </style>
+        .balance-section::before {
+            content: '💰';
+            position: absolute;
+            font-size: 12rem;
+            top: -3rem;
+            right: -3rem;
+            opacity: 0.03;
+        }
+
+        .balance-label {
+            font-size: 0.9375rem;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .balance-amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1;
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 100px;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #E85A28);
+            color: var(--ink);
+            box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--ink-soft);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .btn[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* PAYMENT METHODS */
+        .payment-methods {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--ink);
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .method-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .method-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid var(--border);
+        }
+
+        .method-card.wave .method-icon { background: linear-gradient(135deg, #00B4D8, #0077B6); }
+        .method-card.orange .method-icon { background: linear-gradient(135deg, #FF6B35, #F97316); }
+        .method-card.free .method-icon { background: linear-gradient(135deg, #06D6A0, #059669); }
+        .method-card.cash .method-icon { background: linear-gradient(135deg, #FFB800, #F59E0B); }
+
+        .method-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--ink);
+        }
+
+        .method-desc {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* TRANSACTIONS */
+        .transactions {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.7), rgba(15, 23, 42, 0.8));
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: var(--accent);
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .transaction-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(26, 31, 46, 0.8);
+        }
+
+        .transaction-details h4 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--ink);
+        }
+
+        .transaction-details p {
+            font-size: 0.8125rem;
+            color: var(--muted);
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-amount .amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .transaction-amount.positive .amount {
+            color: var(--success);
+        }
+
+        .transaction-amount.negative .amount {
+            color: var(--danger);
+        }
+
+        .transaction-amount .date {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.95), rgba(15, 23, 42, 0.98));
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--ink);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--ink);
+            font-size: 0.9375rem;
+            font-family: 'Manrope', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
+        }
+
+        .commission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(6, 214, 160, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            font-weight: 700;
+            color: var(--success);
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            header { flex-direction: column; align-items: flex-start; }
+            .balance-amount { font-size: 3rem; }
+            .methods-grid { grid-template-columns: 1fr; }
+            .balance-actions { flex-direction: column; width: 100%; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <header>
-      <div class="brand">
-        <div class="brand-logo">💳</div>
-        <div class="brand-text">
-          <h1>DIGIY PAY</h1>
-          <p>Wallet & Paiements • 0% Commission</p>
-        </div>
-      </div>
-
-      <div class="user-info">
-        <div class="user-avatar" id="userAvatar">D</div>
-        <div class="user-details">
-          <h3 id="userName">Chargement...</h3>
-          <p id="userPhone">Chargement...</p>
-        </div>
-      </div>
-    </header>
-
-    <section class="balance-section">
-      <div class="balance-label">Solde disponible</div>
-      <div class="balance-amount" id="balance">0 FCFA</div>
-
-      <div class="balance-actions">
-        <button class="btn btn-primary" id="btnRecharge" onclick="openModal('recharge')">💰 Recharger</button>
-        <button class="btn btn-primary" id="btnTransfer" onclick="openModal('transfer')">💸 Envoyer</button>
-        <button class="btn btn-secondary" id="btnWithdraw" onclick="openModal('withdraw')">🏦 Retirer</button>
-        <button class="btn btn-secondary" id="btnHistory" onclick="viewHistory()">📊 Historique</button>
-      </div>
-
-      <div class="commission-badge">✓ 0% de commission sur tous vos paiements DIGIY</div>
-
-      <div class="lockbar" id="lockbar" style="display:none;">
-        <div>🔒 <b>Accès verrouillé</b> — abonnement <b>PAY_PRO</b> requis.</div>
-        <div class="mini">Tu peux payer et revenir automatiquement.</div>
-      </div>
-    </section>
-
-    <section class="payment-methods">
-      <h2 class="section-title">Méthodes de paiement</h2>
-      <div class="methods-grid">
-        <div class="method-card wave" onclick="selectMethod('wave')">
-          <div class="method-icon">🌊</div>
-          <h3 class="method-name">Wave</h3>
-          <p class="method-desc">QR Code, Transfert direct, API intégrée</p>
-          <span class="method-badge">✓ Priorité #1</span>
-        </div>
-
-        <div class="method-card orange" onclick="selectMethod('orange')">
-          <div class="method-icon">🟧</div>
-          <h3 class="method-name">Orange Money</h3>
-          <p class="method-desc">USSD *144#, API, Transfert mobile</p>
-          <span class="method-badge">✓ Le plus répandu</span>
-        </div>
-
-        <div class="method-card free" onclick="selectMethod('free')">
-          <div class="method-icon">🟩</div>
-          <h3 class="method-name">Free Money</h3>
-          <p class="method-desc">Transfert direct entre utilisateurs Free</p>
-          <span class="method-badge">✓ Disponible</span>
-        </div>
-
-        <div class="method-card cash" onclick="selectMethod('cash')">
-          <div class="method-icon">💵</div>
-          <h3 class="method-name">Espèces</h3>
-          <p class="method-desc">Paiement cash, Reçu digital automatique</p>
-          <span class="method-badge">✓ Terrain</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="transactions">
-      <h2 class="section-title">Transactions récentes</h2>
-      <div id="transactionsList"></div>
-    </section>
-  </div>
-
-  <!-- MODALS -->
-  <div id="rechargeModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">💰 Recharger</h3>
-        <button class="close-btn" onclick="closeModal('recharge')">✕</button>
-      </div>
-      <form onsubmit="processRecharge(event)">
-        <div class="form-group">
-          <label>Montant (FCFA)</label>
-          <input type="number" id="rechargeAmount" placeholder="Ex: 10000" required min="500">
-        </div>
-        <div class="form-group">
-          <label>Méthode de paiement</label>
-          <select id="rechargeMethod" required>
-            <option value="">Choisir...</option>
-            <option value="wave">Wave</option>
-            <option value="orange">Orange Money</option>
-            <option value="free">Free Money</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Numéro de téléphone</label>
-          <input type="tel" id="rechargePhone" placeholder="+221 77 XXX XX XX" required>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">Confirmer la recharge</button>
-        <div class="commission-badge">✓ Aucun frais • Vous recevez 100%</div>
-      </form>
-    </div>
-  </div>
-
-  <div id="transferModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">💸 Envoyer de l'argent</h3>
-        <button class="close-btn" onclick="closeModal('transfer')">✕</button>
-      </div>
-      <form onsubmit="processTransfer(event)">
-        <div class="form-group">
-          <label>Montant (FCFA)</label>
-          <input type="number" id="transferAmount" placeholder="Ex: 5000" required min="100">
-        </div>
-        <div class="form-group">
-          <label>Destinataire (Téléphone ou ID DIGIY)</label>
-          <input type="text" id="transferRecipient" placeholder="+221 77 XXX XX XX" required>
-        </div>
-        <div class="form-group">
-          <label>Message (optionnel)</label>
-          <input type="text" id="transferMessage" placeholder="Merci pour...">
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">Envoyer l'argent</button>
-        <div class="commission-badge">✓ 0% de commission • Transfert instantané</div>
-      </form>
-    </div>
-  </div>
-
-  <div id="withdrawModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">🏦 Retirer (Vers Mobile Money)</h3>
-        <button class="close-btn" onclick="closeModal('withdraw')">✕</button>
-      </div>
-      <form onsubmit="processWithdraw(event)">
-        <div class="form-group">
-          <label>Montant à Retirer (FCFA)</label>
-          <input type="number" id="withdrawAmount" placeholder="Ex: 20000" required min="1000">
-        </div>
-        <div class="form-group">
-          <label>Méthode de retrait</label>
-          <select id="withdrawMethod" required>
-            <option value="">Choisir...</option>
-            <option value="wave">Wave</option>
-            <option value="orange">Orange Money</option>
-            <option value="free">Free Money</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Numéro de réception</label>
-          <input type="tel" id="withdrawPhone" placeholder="+221 77 XXX XX XX" required>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%; background: var(--secondary);">Confirmer le retrait</button>
-        <div class="commission-badge" style="border-color: var(--warning); color: var(--warning); background: rgba(255, 184, 0, 0.1);">
-          ⚠️ Frais de retrait externe applicables (Wave/OM)
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    // =========================
-    // ✅ CONFIG DIGIY (verrouillée)
-    // =========================
-    const MODULE_CODE = "PAY_PRO";
-    const PAY_URL = "https://beauville.github.io/commencer-a-payer/";
-
-    // ✅ Supabase déjà posé chez toi (même projet que DRIVER)
-    const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-    const SUPABASE_ANON_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-
-    const supabase = window.__sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    window.__sb = supabase;
-
-    // =========================
-    // UI helpers
-    // =========================
-    const nameEl = document.getElementById('userName');
-    const phoneEl = document.getElementById('userPhone');
-    const avatarEl = document.getElementById('userAvatar');
-    const balanceEl = document.getElementById('balance');
-    const lockbar = document.getElementById('lockbar');
-
-    const buttons = [
-      document.getElementById('btnRecharge'),
-      document.getElementById('btnTransfer'),
-      document.getElementById('btnWithdraw'),
-      document.getElementById('btnHistory'),
-    ];
-
-    function formatMoney(amount){
-      const n = Number(amount || 0);
-      return new Intl.NumberFormat('fr-FR').format(n) + ' FCFA';
-    }
-
-    function setLocked(locked){
-      if(locked){
-        lockbar.style.display = "flex";
-        buttons.forEach(b => b && (b.disabled = true));
-      }else{
-        lockbar.style.display = "none";
-        buttons.forEach(b => b && (b.disabled = false));
-      }
-    }
-
-    // =========================
-    // ✅ MODALS
-    // =========================
-    window.openModal = function(type){ document.getElementById(type + 'Modal').classList.add('active'); }
-    window.closeModal = function(type){ document.getElementById(type + 'Modal').classList.remove('active'); }
-
-    window.selectMethod = function(method){
-      alert(`Méthode sélectionnée: ${method.toUpperCase()}.\n\n(Brancher ici ton flow paiement réel quand tu veux.)`);
-    }
-
-    // =========================
-    // ✅ DATA (wallet simple)
-    // Table conseillée: pay_wallets (phone pk) + pay_transactions (id)
-    // Mais pour l’instant on fait léger: mock + affichage.
-    // =========================
-    let currentPhone = null;
-    let currentBalance = 0;
-    let transactionHistory = [];
-
-    function renderTransactions(txs){
-      const listEl = document.getElementById('transactionsList');
-      listEl.innerHTML = '';
-
-      if(!txs || txs.length === 0){
-        listEl.innerHTML = '<p style="color:var(--muted); text-align:center; padding:2rem;">Aucune transaction récente.</p>';
-        return;
-      }
-
-      txs.slice(0,5).forEach(tx=>{
-        const isPositive = (tx.amount || 0) > 0;
-        const amountClass = isPositive ? 'positive' : 'negative';
-        const icon = tx.type === 'recharge' ? '💰' :
-                     tx.type === 'transfer' ? '💸' :
-                     tx.type === 'withdraw' ? '🏦' : '🔄';
-
-        const dateDisplay = tx.ts ? new Date(tx.ts).toLocaleDateString('fr-FR') : '';
-
-        const item = document.createElement('div');
-        item.className = 'transaction-item';
-        item.innerHTML = `
-          <div class="transaction-info">
-            <div class="transaction-icon">${icon}</div>
-            <div class="transaction-details">
-              <h4>${tx.title || 'Transaction'}</h4>
-              <p>${tx.details || ''}</p>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="brand-logo">💳</div>
+                <div class="brand-text">
+                    <h1>DIGIY PAY</h1>
+                    <p>Wallet & Paiements • 0% Commission</p>
+                </div>
             </div>
-          </div>
-          <div class="transaction-amount ${amountClass}">
-            <div class="amount">${isPositive ? '+' : ''}${formatMoney(tx.amount)}</div>
-            <div class="date">${dateDisplay}</div>
-          </div>
-        `;
-        listEl.appendChild(item);
-      });
-    }
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">D</div>
+                <div class="user-details">
+                    <h3 id="userName">Chargement...</h3>
+                    <p id="userPhone">Chargement...</p>
+                </div>
+            </div>
+        </header>
 
-    function updateBalanceUI(){
-      balanceEl.textContent = formatMoney(currentBalance);
-    }
+        <section class="balance-section">
+            <div class="balance-label">Solde disponible</div>
+            <div class="balance-amount" id="balance">0 FCFA</div>
+            <div class="balance-actions">
+                <button class="btn btn-primary" onclick="openModal('recharge')">
+                    💰 Recharger
+                </button>
+                <button class="btn btn-primary" onclick="openModal('transfer')">
+                    💸 Envoyer
+                </button>
+                <button class="btn btn-secondary" onclick="openModal('withdraw')">
+                    🏦 Retirer
+                </button>
+                <button class="btn btn-secondary" onclick="viewHistory()">
+                    📊 Historique
+                </button>
+            </div>
+            <div class="commission-badge">
+                ✓ 0% de commission sur tous vos paiements DIGIY
+            </div>
+        </section>
 
-    // =========================
-    // ✅ ACTIONS (demo locale)
-    // Quand tu brancheras le vrai wallet Supabase, tu remplaces juste ces 3 fonctions.
-    // =========================
-    window.processRecharge = async function(e){
-      e.preventDefault();
-      const amount = parseInt(document.getElementById('rechargeAmount').value, 10);
-      const method = document.getElementById('rechargeMethod').value;
-      const phone = document.getElementById('rechargePhone').value;
+        <section class="payment-methods">
+            <h2 class="section-title">Méthodes de paiement</h2>
+            <div class="methods-grid">
+                <div class="method-card wave" onclick="selectMethod('wave')">
+                    <div class="method-icon">🌊</div>
+                    <h3 class="method-name">Wave</h3>
+                    <p class="method-desc">QR Code, Transfert direct, API intégrée</p>
+                    <span class="method-badge">✓ Priorité #1</span>
+                </div>
 
-      if(!amount || amount <= 0) return;
+                <div class="method-card orange" onclick="selectMethod('orange')">
+                    <div class="method-icon">🟧</div>
+                    <h3 class="method-name">Orange Money</h3>
+                    <p class="method-desc">USSD *144#, API, Transfert mobile</p>
+                    <span class="method-badge">✓ Le plus répandu</span>
+                </div>
 
-      const tx = {
-        type:'recharge',
-        amount: amount,
-        title: 'Recharge Portefeuille',
-        details: `Via ${String(method||'').toUpperCase()} • ${phone}`,
-        ts: Date.now()
-      };
+                <div class="method-card free" onclick="selectMethod('free')">
+                    <div class="method-icon">🟩</div>
+                    <h3 class="method-name">Free Money</h3>
+                    <p class="method-desc">Transfert direct entre utilisateurs Free</p>
+                    <span class="method-badge">✓ Disponible</span>
+                </div>
 
-      currentBalance += amount;
-      transactionHistory.unshift(tx);
-      updateBalanceUI();
-      renderTransactions(transactionHistory);
+                <div class="method-card cash" onclick="selectMethod('cash')">
+                    <div class="method-icon">💵</div>
+                    <h3 class="method-name">Espèces</h3>
+                    <p class="method-desc">Paiement cash, Reçu digital automatique</p>
+                    <span class="method-badge">✓ Terrain</span>
+                </div>
+            </div>
+        </section>
 
-      alert(`✅ Recharge OK: ${formatMoney(amount)}\nNouveau solde: ${formatMoney(currentBalance)}`);
-      closeModal('recharge');
-      e.target.reset();
-    }
+        <section class="transactions">
+            <h2 class="section-title">Transactions récentes</h2>
+            <div id="transactionsList"></div>
+        </section>
+    </div>
 
-    window.processTransfer = async function(e){
-      e.preventDefault();
-      const amount = parseInt(document.getElementById('transferAmount').value, 10);
-      const recipient = document.getElementById('transferRecipient').value;
-      const message = document.getElementById('transferMessage').value;
+    <!-- MODALS -->
+    <div id="rechargeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">💰 Recharger</h3>
+                <button class="close-btn" onclick="closeModal('recharge')">✕</button>
+            </div>
+            <form onsubmit="processRecharge(event)">
+                <div class="form-group">
+                    <label>Montant (FCFA)</label>
+                    <input type="number" id="rechargeAmount" placeholder="Ex: 10000" required min="500">
+                </div>
+                <div class="form-group">
+                    <label>Méthode de paiement</label>
+                    <select id="rechargeMethod" required>
+                        <option value="">Choisir...</option>
+                        <option value="wave">Wave</option>
+                        <option value="orange">Orange Money</option>
+                        <option value="free">Free Money</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Numéro de téléphone</label>
+                    <input type="tel" id="rechargePhone" placeholder="+221 77 XXX XX XX" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Confirmer la recharge
+                </button>
+                <div class="commission-badge">
+                    ✓ Aucun frais • Vous recevez 100%
+                </div>
+            </form>
+        </div>
+    </div>
 
-      if(!amount || amount <= 0) return;
-      if(amount > currentBalance){ alert('❌ Solde insuffisant!'); return; }
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">💸 Envoyer de l'argent</h3>
+                <button class="close-btn" onclick="closeModal('transfer')">✕</button>
+            </div>
+            <form onsubmit="processTransfer(event)">
+                <div class="form-group">
+                    <label>Montant (FCFA)</label>
+                    <input type="number" id="transferAmount" placeholder="Ex: 5000" required min="100">
+                </div>
+                <div class="form-group">
+                    <label>Destinataire (Téléphone ou ID DIGIY)</label>
+                    <input type="text" id="transferRecipient" placeholder="+221 77 XXX XX XX" required>
+                </div>
+                <div class="form-group">
+                    <label>Message (optionnel)</label>
+                    <input type="text" id="transferMessage" placeholder="Merci pour...">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Envoyer l'argent
+                </button>
+                <div class="commission-badge">
+                    ✓ 0% de commission • Transfer instantané
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🏦 Retirer (Vers Mobile Money)</h3>
+                <button class="close-btn" onclick="closeModal('withdraw')">✕</button>
+            </div>
+            <form onsubmit="processWithdraw(event)">
+                <div class="form-group">
+                    <label>Montant à Retirer (FCFA)</label>
+                    <input type="number" id="withdrawAmount" placeholder="Ex: 20000" required min="1000">
+                </div>
+                <div class="form-group">
+                    <label>Méthode de retrait</label>
+                    <select id="withdrawMethod" required>
+                        <option value="">Choisir...</option>
+                        <option value="wave">Wave</option>
+                        <option value="orange">Orange Money</option>
+                        <option value="free">Free Money</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Numéro de réception</label>
+                    <input type="tel" id="withdrawPhone" placeholder="+221 77 XXX XX XX" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--secondary);">
+                    Confirmer le retrait
+                </button>
+                <div class="commission-badge" style="border-color: var(--warning); color: var(--warning); background: rgba(255, 184, 0, 0.1);">
+                    ⚠️ Frais de retrait externe applicables (Wave/OM)
+                </div>
+            </form>
+        </div>
+    </div>
 
-      const tx = {
-        type:'transfer',
-        amount: -amount,
-        title: 'Transfert DIGIY PAY',
-        details: `Vers ${recipient}${message ? ' • ' + message : ''}`,
-        ts: Date.now()
-      };
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ========== CONFIG SUPABASE ==========
+        const SUPABASE_URL = 'https://sbldjnfqbqlxfppfjtge.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNibGRqbmZxYnFseGZwcGZqdGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MTczOTcsImV4cCI6MjA1MTQ5MzM5N30.KjQyAZPEcB5uRLUxlGLn89I2JiZWxnrXGRZLpNxgPj0';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      currentBalance -= amount;
-      transactionHistory.unshift(tx);
-      updateBalanceUI();
-      renderTransactions(transactionHistory);
+        let currentPhone = null;
+        let currentBalance = 0;
+        let transactionHistory = [];
 
-      alert(`✅ Transfert OK: ${formatMoney(amount)}\nNouveau solde: ${formatMoney(currentBalance)}`);
-      closeModal('transfer');
-      e.target.reset();
-    }
+        // ========== INIT ==========
+        (async () => {
+            currentPhone = localStorage.getItem('digiy_phone');
+            
+            if (!currentPhone) {
+                document.getElementById('userName').textContent = 'Connexion requise';
+                document.getElementById('userPhone').textContent = 'Connecte-toi d\'abord';
+                document.getElementById('userAvatar').textContent = '🔒';
+                document.querySelectorAll('.balance-actions .btn').forEach(btn => btn.disabled = true);
+                console.warn('DIGIY PAY: Aucun téléphone trouvé');
+                return;
+            }
 
-    window.processWithdraw = async function(e){
-      e.preventDefault();
-      const amount = parseInt(document.getElementById('withdrawAmount').value, 10);
-      const method = document.getElementById('withdrawMethod').value;
-      const phone = document.getElementById('withdrawPhone').value;
+            document.getElementById('userPhone').textContent = currentPhone;
+            document.getElementById('userName').textContent = 'Abonné DIGIY';
+            document.getElementById('userAvatar').textContent = currentPhone[0];
 
-      if(!amount || amount <= 0) return;
-      if(amount > currentBalance){ alert('❌ Solde insuffisant pour retrait!'); return; }
+            await loadWalletData();
+        })();
 
-      const tx = {
-        type:'withdraw',
-        amount: -amount,
-        title: 'Demande de Retrait',
-        details: `Vers ${String(method||'').toUpperCase()} • ${phone}`,
-        ts: Date.now()
-      };
+        // ========== LOAD WALLET ==========
+        async function loadWalletData() {
+            try {
+                const { data, error } = await supabase
+                    .from('digiy_wallets')
+                    .select('*')
+                    .eq('phone_number', currentPhone)
+                    .single();
 
-      currentBalance -= amount;
-      transactionHistory.unshift(tx);
-      updateBalanceUI();
-      renderTransactions(transactionHistory);
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Erreur Supabase:', error);
+                    return;
+                }
 
-      alert(`✅ Retrait soumis: ${formatMoney(amount)}\nNouveau solde: ${formatMoney(currentBalance)}`);
-      closeModal('withdraw');
-      e.target.reset();
-    }
+                if (data) {
+                    currentBalance = data.balance || 0;
+                    transactionHistory = data.transactions || [];
+                } else {
+                    // Créer le wallet s'il n'existe pas
+                    await supabase.from('digiy_wallets').insert({
+                        phone_number: currentPhone,
+                        balance: 0,
+                        transactions: []
+                    });
+                    currentBalance = 0;
+                    transactionHistory = [];
+                }
 
-    window.viewHistory = function(){
-      if(!transactionHistory.length){ alert('Aucune transaction enregistrée.'); return; }
-      let s = '📊 HISTORIQUE (5 dernières)\n\n';
-      transactionHistory.slice(0,5).forEach(tx=>{
-        const sign = (tx.amount||0) >= 0 ? '+' : '-';
-        const date = tx.ts ? new Date(tx.ts).toLocaleDateString('fr-FR') : '';
-        s += `• ${tx.title}\n`;
-        s += `  Montant: ${sign}${formatMoney(Math.abs(tx.amount))}\n`;
-        if(date) s += `  Date: ${date}\n`;
-        if(tx.details) s += `  ${tx.details}\n`;
-        s += `\n`;
-      });
-      alert(s);
-    }
+                updateBalanceUI();
+                renderTransactions(transactionHistory);
+            } catch (e) {
+                console.error('Erreur chargement wallet:', e);
+            }
+        }
 
-    // =========================
-    // ✅ BOOT: login + abonnement universel PAY_PRO
-    // =========================
-    (async function boot(){
-      // 1) récup phone (même logique que tes modules)
-      const phone = (window.DIGIY && typeof DIGIY.getPhone === 'function') ? DIGIY.getPhone() : null;
-      currentPhone = phone;
+        // ========== UI ==========
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
+        }
 
-      if(!phone){
-        // pas de 404 ni redirection sauvage: on verrouille
-        nameEl.textContent = "Connexion requise";
-        phoneEl.textContent = "Connecte-toi via ton module (HUB / DRIVER / LOC) puis reviens ici.";
-        avatarEl.textContent = "🔒";
-        updateBalanceUI();
-        renderTransactions([]);
-        setLocked(true);
-        return;
-      }
+        function updateBalanceUI() {
+            document.getElementById('balance').textContent = formatMoney(currentBalance);
+        }
 
-      // UI user
-      nameEl.textContent = "Abonné DIGIY";
-      phoneEl.textContent = phone;
-      avatarEl.textContent = (phone.replace(/\s+/g,'').slice(-2) || 'D').toUpperCase();
+        function renderTransactions(txs) {
+            const listEl = document.getElementById('transactionsList');
+            listEl.innerHTML = '';
+            
+            if (!txs || txs.length === 0) {
+                listEl.innerHTML = '<p style="color:var(--muted); text-align: center; padding: 2rem;">Aucune transaction récente.</p>';
+                return;
+            }
+            
+            txs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); 
+            
+            txs.slice(0, 5).forEach(tx => {
+                const isPositive = tx.amount > 0;
+                const amountClass = isPositive ? 'positive' : 'negative';
+                const icon = tx.type === 'recharge' ? '💰' : 
+                             tx.type === 'transfer' ? '💸' : 
+                             tx.type === 'withdraw' ? '🏦' : '🔄';
 
-      // 2) Guard universel: PAY_PRO
-      // -> si pas actif => redirection paiement (commencer-a-payer) avec from + phone + module
-      const ok = await DIGIY.guardOrPay(MODULE_CODE, "/");
-      if(!ok) return;
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                const dateDisplay = new Date(tx.created_at).toLocaleDateString('fr-FR');
 
-      // 3) Actif => on déverrouille
-      setLocked(false);
+                item.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-icon">${icon}</div>
+                        <div class="transaction-details">
+                            <h4>${tx.title || tx.type?.toUpperCase() || 'Transaction'}</h4>
+                            <p>${tx.details || ''}</p>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        <div class="amount">${isPositive ? '+' : ''}${formatMoney(Math.abs(tx.amount))}</div>
+                        <div class="date">${dateDisplay}</div>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
 
-      // 4) charge (pour l’instant mock local)
-      currentBalance = 0;
-      transactionHistory = [];
-      updateBalanceUI();
-      renderTransactions(transactionHistory);
-    })();
-  </script>
+        // ========== MODALS ==========
+        window.openModal = function(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
+        }
+
+        window.closeModal = function(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+        }
+
+        window.selectMethod = function(method) {
+            alert(`Méthode sélectionnée: ${method.toUpperCase()}.\n\nCeci initiera le processus de paiement externe sécurisé.`);
+        }
+
+        // ========== RECHARGE ==========
+        window.processRecharge = async function(e) {
+            e.preventDefault();
+            if (!currentPhone) {
+                alert('Connexion requise');
+                return;
+            }
+
+            const amount = parseInt(document.getElementById('rechargeAmount').value);
+            const method = document.getElementById('rechargeMethod').value;
+            const phone = document.getElementById('rechargePhone').value;
+
+            if (isNaN(amount) || amount <= 0) return;
+
+            try {
+                const newBalance = currentBalance + amount;
+                const newTx = {
+                    type: 'recharge',
+                    amount: amount,
+                    method: method,
+                    phone: phone,
+                    title: 'Recharge Portefeuille',
+                    details: `Via ${method.toUpperCase()} par ${phone}`,
+                    created_at: new Date().toISOString()
+                };
+
+                const updatedTransactions = [newTx, ...transactionHistory];
+
+                const { error } = await supabase
+                    .from('digiy_wallets')
+                    .update({
+                        balance: newBalance,
+                        transactions: updatedTransactions
+                    })
+                    .eq('phone_number', currentPhone);
+
+                if (error) throw error;
+
+                currentBalance = newBalance;
+                transactionHistory = updatedTransactions;
+                updateBalanceUI();
+                renderTransactions(transactionHistory);
+
+                alert(`✅ Recharge de ${formatMoney(amount)} réussie!\nNouveau solde: ${formatMoney(currentBalance)}`);
+                closeModal('recharge');
+                e.target.reset();
+            } catch (error) {
+                console.error('Erreur recharge:', error);
+                alert('❌ Échec de la recharge');
+            }
+        }
+
+        // ========== TRANSFERT ==========
+        window.processTransfer = async function(e) {
+            e.preventDefault();
+            if (!currentPhone) {
+                alert('Connexion requise');
+                return;
+            }
+
+            const amount = parseInt(document.getElementById('transferAmount').value);
+            const recipient = document.getElementById('transferRecipient').value;
+            const message = document.getElementById('transferMessage').value;
+
+            if (isNaN(amount) || amount <= 0) return;
+            if (amount > currentBalance) {
+                alert('❌ Solde insuffisant!');
+                return;
+            }
+
+            try {
+                const newBalance = currentBalance - amount;
+                const newTx = {
+                    type: 'transfer',
+                    amount: -amount,
+                    recipient: recipient,
+                    message: message,
+                    title: 'Transfert DIGIY PAY',
+                    details: `Vers ${recipient}`,
+                    created_at: new Date().toISOString()
+                };
+
+                const updatedTransactions = [newTx, ...transactionHistory];
+
+                const { error } = await supabase
+                    .from('digiy_wallets')
+                    .update({
+                        balance: newBalance,
+                        transactions: updatedTransactions
+                    })
+                    .eq('phone_number', currentPhone);
+
+                if (error) throw error;
+
+                currentBalance = newBalance;
+                transactionHistory = updatedTransactions;
+                updateBalanceUI();
+                renderTransactions(transactionHistory);
+
+                alert(`✅ Transfert de ${formatMoney(amount)} effectué!\nNouveau solde: ${formatMoney(currentBalance)}`);
+                closeModal('transfer');
+                e.target.reset();
+            } catch (error) {
+                console.error('Erreur transfert:', error);
+                alert('❌ Échec du transfert');
+            }
+        }
+
+        // ========== RETRAIT ==========
+        window.processWithdraw = async function(e) {
+            e.preventDefault();
+            if (!currentPhone) {
+                alert('Connexion requise');
+                return;
+            }
+
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
+            const phone = document.getElementById('withdrawPhone').value;
+
+            if (isNaN(amount) || amount <= 0) return;
+            if (amount > currentBalance) {
+                alert('❌ Solde insuffisant!');
+                return;
+            }
+
+            try {
+                const newBalance = currentBalance - amount;
+                const newTx = {
+                    type: 'withdraw',
+                    amount: -amount,
+                    method: method,
+                    phone: phone,
+                    title: 'Demande de Retrait',
+                    details: `Vers ${method.toUpperCase()} (${phone})`,
+                    created_at: new Date().toISOString()
+                };
+
+                const updatedTransactions = [newTx, ...transactionHistory];
+
+                const { error } = await supabase
+                    .from('digiy_wallets')
+                    .update({
+                        balance: newBalance,
+                        transactions: updatedTransactions
+                    })
+                    .eq('phone_number', currentPhone);
+
+                if (error) throw error;
+
+                currentBalance = newBalance;
+                transactionHistory = updatedTransactions;
+                updateBalanceUI();
+                renderTransactions(transactionHistory);
+
+                alert(`✅ Demande de retrait de ${formatMoney(amount)} soumise!\nLe transfert vers ${method.toUpperCase()} est en cours.\nNouveau solde: ${formatMoney(currentBalance)}`);
+                closeModal('withdraw');
+                e.target.reset();
+            } catch (error) {
+                console.error('Erreur retrait:', error);
+                alert('❌ Échec du retrait');
+            }
+        }
+
+        // ========== HISTORIQUE ==========
+        window.viewHistory = function() {
+            if (!transactionHistory.length) {
+                alert('Aucune transaction enregistrée.');
+                return;
+            }
+
+            let history = '📊 HISTORIQUE DES TRANSACTIONS (5 dernières)\n\n';
+            transactionHistory.slice(0, 5).forEach(tx => {
+                const sign = tx.amount >= 0 ? '+' : '-';
+                const date = new Date(tx.created_at).toLocaleDateString('fr-FR');
+                history += `• ${tx.title || tx.type?.toUpperCase() || 'Transaction'}\n`;
+                history += `   Montant: ${sign}${formatMoney(Math.abs(tx.amount))}\n`;
+                history += `   Date: ${date}\n`;
+                if (tx.recipient) history += `   Destinataire: ${tx.recipient}\n`;
+                history += '\n';
+            });
+
+            alert(history);
+        }
+    </script>
 </body>
 </html>
