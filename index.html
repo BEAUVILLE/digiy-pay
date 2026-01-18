@@ -55,7 +55,6 @@
     background:linear-gradient(135deg,#22c55e,#16a34a);
     color:#022c22;border:none;
   }
-  .btn:disabled{opacity:.45;cursor:not-allowed}
   .foot{margin-top:12px;font-size:12px;color:var(--muted);font-weight:800}
 </style>
 </head>
@@ -84,7 +83,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const proName = document.getElementById("proName");
   const proHint = document.getElementById("proHint");
@@ -135,14 +137,13 @@
     }
 
     proName.textContent = data.business_name || data.business_code;
-    const phone = String(data.wave_phone || "").replace(/\\D/g,"");
+    const phone = String(data.wave_phone || "").replace(/\D/g,"");
 
     if(phone.length < 9){
       proHint.textContent = "Wave non configuré pour ce pro.";
       return;
     }
 
-    // Lien Wave (simple)
     waveBtn.href = "https://wave.com/pay/" + phone;
     waveBtn.style.display = "flex";
     proHint.textContent = "Paiement direct • Code : " + data.business_code;
@@ -158,8 +159,9 @@
     if(e.key === "Enter") document.getElementById("btnLoad").click();
   });
 
-  // boot
-  const code = getCodeFromUrl();
+  // boot (Astou par défaut)
+  let code = getCodeFromUrl();
+  if(!code) code = "CHEZASTOU";
   codeInput.value = code;
   loadPro(code);
 </script>
