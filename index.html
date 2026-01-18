@@ -103,7 +103,6 @@ small{display:block;margin-top:6px;color:var(--muted);font-weight:850;font-size:
 
 <body>
 <div class="card">
-
   <div class="top">
     <h1>DIGIY PAY ♾️</h1>
     <div class="sub">Paiement direct au pro • 0% commission</div>
@@ -132,11 +131,11 @@ small{display:block;margin-top:6px;color:var(--muted);font-weight:850;font-size:
 
   <!-- SAISIE MANUELLE -->
   <div id="manualPanel" class="panel" style="display:none">
-    <h2>Nom + Tel Wave (clean)</h2>
+    <h2>Nom + Tel Wave (manuel)</h2>
     <div class="grid">
       <div>
-        <input id="nameInput" placeholder="Nom du pro (ex: Chez Astou Saly)" autocomplete="off">
-        <small>Affiché en grand pour rassurer le client.</small>
+        <input id="nameInput" placeholder="Nom du pro (ex: Astou Sow)" autocomplete="off">
+        <small>Affiché en grand (rassure le client).</small>
       </div>
       <div>
         <input id="phoneInput" placeholder="Tel Wave (ex: 221778765785)" autocomplete="off">
@@ -175,13 +174,21 @@ small{display:block;margin-top:6px;color:var(--muted);font-weight:850;font-size:
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* =========================
+   FALLBACK OBLIGATOIRE (TERRAIN)
+   - si Supabase ne répond pas / pro introuvable -> on affiche Astou direct
+========================= */
+const FALLBACK_PRO_NAME = "ASTOU SOW";
+const FALLBACK_WAVE_PHONE_DIGITS = "221778765785";
+
+/* 🔐 SUPABASE */
 const SUPABASE_URL="https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
+/* UI */
 const proName=document.getElementById("proName");
 const proHint=document.getElementById("proHint");
-
 const codeInput=document.getElementById("codeInput");
 const btnLoad=document.getElementById("btnLoad");
 const btnManual=document.getElementById("btnManual");
@@ -227,16 +234,15 @@ function showPayCard(name, phoneDigits){
   show(paybox,true);
 }
 
-function openManual(prefillName){
+function openManual(prefillName, prefillPhone){
   show(manualPanel,true);
   setManualErr("");
-  if(prefillName) nameInput.value = prefillName;
-  if(!nameInput.value) nameInput.value = "";
-  phoneInput.value = "";
-  nameInput.focus();
+  nameInput.value = (prefillName||"").trim();
+  phoneInput.value = (prefillPhone||"").trim();
+  (nameInput.value ? phoneInput : nameInput).focus();
 }
 
-btnManual.onclick=()=>openManual("");
+btnManual.onclick=()=>openManual(FALLBACK_PRO_NAME, "+"+FALLBACK_WAVE_PHONE_DIGITS);
 
 btnHide.onclick=()=>{show(manualPanel,false);setManualErr("");};
 
@@ -250,54 +256,59 @@ btnShow.onclick=()=>{
   showPayCard(name, phone);
 };
 
+function fallbackAstou(reason){
+  setAutoErr("");
+  setAutoMsg(reason || "✅ Paiement prêt : pro par défaut (terrain).");
+  showPayCard(FALLBACK_PRO_NAME, FALLBACK_WAVE_PHONE_DIGITS);
+}
+
 async function loadByCode(code){
   setAutoMsg(""); setAutoErr("");
   show(paybox,false);
 
-  if(!code){
-    proName.textContent="DIGIY PAY ♾️";
-    proHint.textContent="Entre un code pro, ou utilise la saisie manuelle.";
-    openManual("");
+  const cleaned = (code||"").trim().toUpperCase();
+
+  // Si pas de code -> Astou direct (obligatoire)
+  if(!cleaned){
+    fallbackAstou("✅ Aucun code : on affiche le pro par défaut (ASTOU).");
     return;
   }
 
   proName.textContent="Chargement…";
-  proHint.textContent="Code : " + code;
+  proHint.textContent="Code : " + cleaned;
 
-  const { data, error } = await sb
-    .from("digiy_pay_pro")
-    .select("business_code,business_name,wave_phone,is_active")
-    .eq("business_code", code)
-    .eq("is_active", true)
-    .maybeSingle();
+  try{
+    const { data, error } = await sb
+      .from("digiy_pay_pro")
+      .select("business_code,business_name,wave_phone,is_active")
+      .eq("business_code", cleaned)
+      .eq("is_active", true)
+      .maybeSingle();
 
-  if(error){
-    proName.textContent="DIGIY PAY ♾️";
-    proHint.textContent="Entre le nom + le tel Wave du pro.";
-    setAutoErr(error.message || "Erreur inconnue");
-    openManual("");
-    return;
+    if(error){
+      fallbackAstou("✅ Supabase indispo : on affiche ASTOU (terrain).");
+      return;
+    }
+
+    if(!data){
+      // pas d'introuvable -> Astou direct (obligatoire)
+      fallbackAstou("✅ Code non reconnu : on affiche ASTOU (paiement possible).");
+      return;
+    }
+
+    const phone=digitsOnly(data.wave_phone);
+    if(phone.length<9){
+      // Wave manquant -> on pré-remplit manuel avec Astou (terrain)
+      setAutoMsg("⚠️ Wave non configuré pour ce code. Ajoute le tel Wave du pro.");
+      openManual(data.business_name || "", "");
+      return;
+    }
+
+    // ✅ OK : pro trouvé
+    showPayCard(data.business_name || data.business_code, phone);
+  }catch(e){
+    fallbackAstou("✅ Erreur réseau : on affiche ASTOU (terrain).");
   }
-
-  if(!data){
-    // ✅ ICI: pas de "introuvable" — on bascule clean en manuel
-    proName.textContent="DIGIY PAY ♾️";
-    proHint.textContent="Entre le nom + le tel Wave du pro, puis clique “Afficher”.";
-    setAutoMsg("✅ Mode manuel : tu saisis Nom + Tel Wave → c’est clean.");
-    openManual("");
-    return;
-  }
-
-  const phone=digitsOnly(data.wave_phone);
-  if(phone.length<9){
-    proName.textContent=data.business_name || data.business_code;
-    proHint.textContent="Ajoute le tel Wave du pro (mode manuel).";
-    setAutoMsg("✅ Clique “Afficher” après avoir saisi le tel Wave.");
-    openManual(data.business_name || "");
-    return;
-  }
-
-  showPayCard(data.business_name || data.business_code, phone);
 }
 
 btnLoad.onclick=()=>{
@@ -307,13 +318,14 @@ btnLoad.onclick=()=>{
   history.replaceState({}, "", url.toString());
   loadByCode(code);
 };
+
 codeInput.onkeydown=e=>{if(e.key==="Enter")btnLoad.click();};
 
 // boot
 const p=new URLSearchParams(location.search);
 const bootCode=(p.get("pro")||p.get("code")||"").trim().toUpperCase();
-codeInput.value=bootCode || "CHEZASTOU";
-loadByCode(codeInput.value);
+codeInput.value = bootCode || "CHEZASTOU";
+loadByCode(bootCode || "CHEZASTOU");
 </script>
 
 </body>
