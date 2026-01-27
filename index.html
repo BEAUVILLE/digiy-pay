@@ -9,10 +9,8 @@
 
   <!-- ✅ DIGIY PAY — ICONS (GitHub Pages SAFE) -->
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
-
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1">
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
-
   <link rel="manifest" href="./site.webmanifest?v=1">
 
   <style>
@@ -45,315 +43,238 @@
       color:var(--text);
       padding:14px;
     }
+
+    .card{
+      width:min(560px,96vw);
+      background:rgba(2,8,24,.96);
+      border:1px solid rgba(19,78,74,.9);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 18px 45px rgba(0,0,0,.45);
+    }
+
+    .top{text-align:center}
+    h1{font-weight:950;color:var(--ok);letter-spacing:.04em}
+    .sub{margin-top:6px;color:#e5e7eb;font-weight:850;line-height:1.45}
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(250,204,21,.55);
+      background:rgba(250,204,21,.10);
+      color:#fde68a;
+      font-weight:950;
+      font-size:13px;
+    }
+
+    .name{
+      margin-top:14px;
+      font-size:22px;
+      font-weight:980;
+      color:var(--gold);
+      text-align:center;
+    }
+
+    .hint{
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:850;
+      font-size:13px;
+      line-height:1.55;
+      text-align:center;
+    }
+
+    .panel{
+      margin-top:14px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(2,6,23,.55);
+    }
+
+    .panel h2{
+      font-size:13px;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:#bbf7d0;
+      font-weight:950;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    @media(max-width:560px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:var(--soft);
+      color:#fff;
+      font-weight:900;
+      outline:none;
+    }
+
+    small{
+      display:block;
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:850;
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .btn{
+      flex:1;
+      padding:12px 14px;
+      border-radius:999px;
+      font-weight:980;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      border:1px solid rgba(34,197,94,.55);
+      background:rgba(34,197,94,.18);
+      color:#bbf7d0;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#022c22;
+      border:none;
+    }
+
+    .btn.ghost{
+      background:rgba(2,6,23,.65);
+      border:1px solid var(--line);
+      color:#e5e7eb;
+    }
+
+    .paybox{
+      margin-top:14px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(34,197,94,.55);
+      background:rgba(34,197,94,.10);
+    }
+
+    .lbl{
+      font-size:12px;
+      color:#bbf7d0;
+      font-weight:950;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+
+    .big{
+      margin-top:8px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+
+    .nm{
+      font-size:20px;
+      font-weight:980;
+      color:var(--gold);
+    }
+
+    code{
+      font-family:ui-monospace,monospace;
+      background:rgba(2,6,23,.55);
+      border:1px solid rgba(148,163,184,.22);
+      padding:6px 10px;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:950;
+      color:#ecfdf5;
+    }
+
+    .msg{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(250,204,21,.35);
+      background:rgba(250,204,21,.08);
+      color:#fde68a;
+      font-weight:950;
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .err{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(248,113,113,.45);
+      background:rgba(248,113,113,.10);
+      color:#fecaca;
+      font-weight:950;
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .foot{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:850;
+      text-align:center;
+    }
   </style>
-</head>
-
-.card{
-  width:min(560px,96vw);
-  background:rgba(2,8,24,.96);
-  border:1px solid rgba(19,78,74,.9);
-  border-radius:22px;
-  padding:18px;
-  box-shadow:0 18px 45px rgba(0,0,0,.45);
-}
-.top{text-align:center}
-h1{font-weight:950;color:var(--ok);letter-spacing:.04em}
-.sub{margin-top:6px;color:#e5e7eb;font-weight:850;line-height:1.45}
-.pill{
-  display:inline-flex;gap:8px;align-items:center;
-  margin-top:10px;padding:7px 12px;border-radius:999px;
-  border:1px solid rgba(250,204,21,.55);
-  background:rgba(250,204,21,.10);color:#fde68a;font-weight:950;font-size:13px;
-}
-.name{margin-top:14px;font-size:22px;font-weight:980;color:var(--gold);text-align:center}
-.hint{margin-top:6px;color:var(--muted);font-weight:850;font-size:13px;line-height:1.55;text-align:center}
-
-.panel{
-  margin-top:14px;
-  padding:14px;border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-}
-.panel h2{font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#bbf7d0;font-weight:950}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-@media(max-width:560px){.grid{grid-template-columns:1fr}}
-input{
-  width:100%;
-  padding:12px 12px;border-radius:14px;
-  border:1px solid var(--line);
-  background:var(--soft);color:#fff;
-  font-weight:900;outline:none;
-}
-small{display:block;margin-top:6px;color:var(--muted);font-weight:850;font-size:12px;line-height:1.4}
-.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-.btn{
-  flex:1;
-  padding:12px 14px;border-radius:999px;
-  font-weight:980;display:flex;justify-content:center;align-items:center;
-  border:1px solid rgba(34,197,94,.55);
-  background:rgba(34,197,94,.18);color:#bbf7d0;
-  cursor:pointer;user-select:none;
-}
-.btn.primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#022c22;border:none}
-.btn.ghost{background:rgba(2,6,23,.65);border:1px solid var(--line);color:#e5e7eb}
-
-.paybox{
-  margin-top:14px;padding:14px;border-radius:18px;
-  border:1px solid rgba(34,197,94,.55);
-  background:rgba(34,197,94,.10);
-}
-.paybox .lbl{font-size:12px;color:#bbf7d0;font-weight:950;letter-spacing:.05em;text-transform:uppercase}
-.paybox .big{margin-top:8px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.paybox .nm{font-size:20px;font-weight:980;color:var(--gold)}
-.paybox code{
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  background:rgba(2,6,23,.55);
-  border:1px solid rgba(148,163,184,.22);
-  padding:6px 10px;border-radius:12px;
-  font-size:16px;font-weight:950;color:#ecfdf5;
-}
-.msg{
-  margin-top:12px;padding:10px 12px;border-radius:16px;
-  border:1px solid rgba(250,204,21,.35);
-  background:rgba(250,204,21,.08);
-  color:#fde68a;font-weight:950;font-size:13px;line-height:1.55;
-}
-.err{
-  margin-top:12px;padding:10px 12px;border-radius:16px;
-  border:1px solid rgba(248,113,113,.45);
-  background:rgba(248,113,113,.10);
-  color:#fecaca;font-weight:950;font-size:13px;line-height:1.55;
-}
-.foot{margin-top:12px;font-size:12px;color:var(--muted);font-weight:850;text-align:center}
-</style>
 </head>
 
 <body>
 <div class="card">
+
   <div class="top">
     <h1>DIGIY PAY ♾️</h1>
     <div class="sub">Paiement direct au pro • 0% commission</div>
     <div class="pill">✅ Simple • Direct • Souverain</div>
   </div>
 
-  <div id="proName" class="name">—</div>
-  <div id="proHint" class="hint">Scanne un QR ou entre un code pro.</div>
+  <div id="proName" class="name">ASTOU SOW</div>
+  <div id="proHint" class="hint">Ouvre Wave → Payer → colle le numéro.</div>
 
-  <!-- CHARGER PAR CODE -->
-  <div class="panel">
-    <h2>Charger (code / QR)</h2>
-    <div class="grid">
-      <div>
-        <input id="codeInput" placeholder="Tester un code (ex: CHEZASTOU)" autocomplete="off">
-        <small>QR attendu : <b>https://pay.digiylyfe.com/?pro=CODE</b></small>
-      </div>
-      <div class="btnrow" style="margin-top:0">
-        <button id="btnLoad" class="btn ghost" type="button">🔎 Charger</button>
-        <button id="btnManual" class="btn" type="button">✍️ Saisie manuelle</button>
-      </div>
-    </div>
-    <div id="autoMsg" class="msg" style="display:none"></div>
-    <div id="autoErr" class="err" style="display:none"></div>
-  </div>
-
-  <!-- SAISIE MANUELLE -->
-  <div id="manualPanel" class="panel" style="display:none">
-    <h2>Nom + Tel Wave (manuel)</h2>
-    <div class="grid">
-      <div>
-        <input id="nameInput" placeholder="Nom du pro (ex: Astou Sow)" autocomplete="off">
-        <small>Affiché en grand (rassure le client).</small>
-      </div>
-      <div>
-        <input id="phoneInput" placeholder="Tel Wave (ex: 221778765785)" autocomplete="off">
-        <small>Avec ou sans +, ça marche.</small>
-      </div>
-    </div>
-    <div class="btnrow">
-      <button id="btnShow" class="btn primary" type="button">✅ Afficher</button>
-      <button id="btnHide" class="btn ghost" type="button">↩︎ Retour</button>
-    </div>
-    <div id="manualErr" class="err" style="display:none"></div>
-  </div>
-
-  <!-- CARTE PAIEMENT -->
-  <div id="paybox" class="paybox" style="display:none">
+  <div class="paybox">
     <div class="lbl">Paiement Wave</div>
     <div class="big">
       <div>
         <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Nom</div>
-        <div id="payName" class="nm">—</div>
+        <div class="nm">ASTOU SOW</div>
       </div>
       <div>
         <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Téléphone</div>
-        <code id="payPhone">—</code>
+        <code>+221778765785</code>
       </div>
     </div>
-    <div class="btnrow">
-      <button id="btnCopy" class="btn" type="button">📋 Copier le numéro</button>
-      <a id="btnCall" class="btn ghost" href="#" style="text-decoration:none">📞 Appeler</a>
-    </div>
-    <div id="howto" class="msg" style="display:none"></div>
   </div>
 
-  <div class="foot">Ouvre Wave → Payer → colle le numéro affiché.</div>
+  <div class="foot">
+    ✅ Fichier clean • GitHub Pages OK • PWA prête
+  </div>
+
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* =========================
-   FALLBACK OBLIGATOIRE (TERRAIN)
-   - si Supabase ne répond pas / pro introuvable -> on affiche Astou direct
-========================= */
-const FALLBACK_PRO_NAME = "ASTOU SOW";
-const FALLBACK_WAVE_PHONE_DIGITS = "221778765785";
-
-/* 🔐 SUPABASE */
-const SUPABASE_URL="https://wesqmwjjtsefyjnluosj.supabase.co";
-const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-
-/* UI */
-const proName=document.getElementById("proName");
-const proHint=document.getElementById("proHint");
-const codeInput=document.getElementById("codeInput");
-const btnLoad=document.getElementById("btnLoad");
-const btnManual=document.getElementById("btnManual");
-const autoMsg=document.getElementById("autoMsg");
-const autoErr=document.getElementById("autoErr");
-
-const manualPanel=document.getElementById("manualPanel");
-const nameInput=document.getElementById("nameInput");
-const phoneInput=document.getElementById("phoneInput");
-const btnShow=document.getElementById("btnShow");
-const btnHide=document.getElementById("btnHide");
-const manualErr=document.getElementById("manualErr");
-
-const paybox=document.getElementById("paybox");
-const payName=document.getElementById("payName");
-const payPhone=document.getElementById("payPhone");
-const btnCopy=document.getElementById("btnCopy");
-const btnCall=document.getElementById("btnCall");
-const howto=document.getElementById("howto");
-
-function show(el,on=true){el.style.display=on?"":"none";}
-function setAutoMsg(t){autoMsg.textContent=t;show(autoMsg,!!t);}
-function setAutoErr(t){autoErr.textContent=t;show(autoErr,!!t);}
-function setManualErr(t){manualErr.textContent=t;show(manualErr,!!t);}
-function digitsOnly(v){return String(v||"").replace(/\D/g,"");}
-
-function showPayCard(name, phoneDigits){
-  const phone = "+" + phoneDigits;
-  proName.textContent = name || "Paiement Wave";
-  proHint.textContent = "Paiement direct au pro • 0% commission";
-  payName.textContent = name || "—";
-  payPhone.textContent = phone;
-  btnCall.href = "tel:" + phone;
-
-  btnCopy.onclick = async ()=>{
-    try{ await navigator.clipboard.writeText(phone);
-      proHint.textContent="✅ Numéro copié : " + phone;
-    }catch(e){ window.prompt("Copie le numéro Wave :", phone); }
-  };
-
-  howto.innerHTML="👉 Ouvre <b>Wave</b> → <b>Payer</b> → colle <b>"+phone+"</b>";
-  show(howto,true);
-  show(paybox,true);
-}
-
-function openManual(prefillName, prefillPhone){
-  show(manualPanel,true);
-  setManualErr("");
-  nameInput.value = (prefillName||"").trim();
-  phoneInput.value = (prefillPhone||"").trim();
-  (nameInput.value ? phoneInput : nameInput).focus();
-}
-
-btnManual.onclick=()=>openManual(FALLBACK_PRO_NAME, "+"+FALLBACK_WAVE_PHONE_DIGITS);
-
-btnHide.onclick=()=>{show(manualPanel,false);setManualErr("");};
-
-btnShow.onclick=()=>{
-  setManualErr("");
-  const name=(nameInput.value||"").trim();
-  const phone=digitsOnly(phoneInput.value);
-  if(!name) return setManualErr("Entre le NOM du pro.");
-  if(phone.length<9) return setManualErr("Entre un TEL Wave valide (ex: 221778765785).");
-  show(manualPanel,false);
-  showPayCard(name, phone);
-};
-
-function fallbackAstou(reason){
-  setAutoErr("");
-  setAutoMsg(reason || "✅ Paiement prêt : pro par défaut (terrain).");
-  showPayCard(FALLBACK_PRO_NAME, FALLBACK_WAVE_PHONE_DIGITS);
-}
-
-async function loadByCode(code){
-  setAutoMsg(""); setAutoErr("");
-  show(paybox,false);
-
-  const cleaned = (code||"").trim().toUpperCase();
-
-  // Si pas de code -> Astou direct (obligatoire)
-  if(!cleaned){
-    fallbackAstou("✅ Aucun code : on affiche le pro par défaut (ASTOU).");
-    return;
-  }
-
-  proName.textContent="Chargement…";
-  proHint.textContent="Code : " + cleaned;
-
-  try{
-    const { data, error } = await sb
-      .from("digiy_pay_pro")
-      .select("business_code,business_name,wave_phone,is_active")
-      .eq("business_code", cleaned)
-      .eq("is_active", true)
-      .maybeSingle();
-
-    if(error){
-      fallbackAstou("✅ Supabase indispo : on affiche ASTOU (terrain).");
-      return;
-    }
-
-    if(!data){
-      // pas d'introuvable -> Astou direct (obligatoire)
-      fallbackAstou("✅ Code non reconnu : on affiche ASTOU (paiement possible).");
-      return;
-    }
-
-    const phone=digitsOnly(data.wave_phone);
-    if(phone.length<9){
-      // Wave manquant -> on pré-remplit manuel avec Astou (terrain)
-      setAutoMsg("⚠️ Wave non configuré pour ce code. Ajoute le tel Wave du pro.");
-      openManual(data.business_name || "", "");
-      return;
-    }
-
-    // ✅ OK : pro trouvé
-    showPayCard(data.business_name || data.business_code, phone);
-  }catch(e){
-    fallbackAstou("✅ Erreur réseau : on affiche ASTOU (terrain).");
-  }
-}
-
-btnLoad.onclick=()=>{
-  const code=(codeInput.value||"").trim().toUpperCase();
-  const url=new URL(location.href);
-  if(code) url.searchParams.set("pro",code);
-  history.replaceState({}, "", url.toString());
-  loadByCode(code);
-};
-
-codeInput.onkeydown=e=>{if(e.key==="Enter")btnLoad.click();};
-
-// boot
-const p=new URLSearchParams(location.search);
-const bootCode=(p.get("pro")||p.get("code")||"").trim().toUpperCase();
-codeInput.value = bootCode || "CHEZASTOU";
-loadByCode(bootCode || "CHEZASTOU");
-</script>
-
 </body>
 </html>
