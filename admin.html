@@ -12,6 +12,7 @@
   <link rel="manifest" href="./site.webmanifest?v=1">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 
   <style>
     :root{
@@ -34,6 +35,7 @@
         linear-gradient(135deg,var(--bg),#064e3b);
       color:var(--text);
     }
+    body.modalOpen{overflow:hidden}
     .wrap{
       width:min(1100px,100%);
       margin:0 auto;
@@ -161,6 +163,10 @@
       user-select:none;
       text-decoration:none;
     }
+    .btn[disabled]{
+      opacity:.6;
+      cursor:not-allowed;
+    }
     .btn.primary{
       background:linear-gradient(135deg,#22c55e,#16a34a);
       color:#022c22;
@@ -269,6 +275,7 @@
       padding:12px;
       overflow:auto;
       background:rgba(255,255,255,.02);
+      min-height:260px;
     }
     #cardCanvas{
       width:min(100%,420px);
@@ -276,6 +283,66 @@
       border-radius:18px;
       box-shadow:0 16px 40px rgba(0,0,0,.35);
       background:#fff;
+    }
+
+    .previewModal{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      background:rgba(2,6,23,.92);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+    }
+    .previewModal.open{display:flex}
+    .previewBox{
+      width:min(100%,560px);
+      max-height:100%;
+      background:#03140f;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:24px;
+      padding:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.55);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .previewTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .previewTitle{
+      font-weight:950;
+      color:#dcfce7;
+      letter-spacing:.02em;
+    }
+    .previewHint{
+      font-size:12px;
+      color:#cbd5f5;
+      line-height:1.5;
+    }
+    .previewBody{
+      overflow:auto;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      padding:10px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      min-height:220px;
+    }
+    .previewBody img{
+      width:min(100%,460px);
+      height:auto;
+      display:block;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
     }
   </style>
 </head>
@@ -396,7 +463,8 @@
 
         <div class="cardMaker">
           <div class="mini" style="margin-top:0;">
-            Remplis tes infos, sauvegarde, puis clique sur <b>Télécharger ma carte</b>.
+            La carte PNG est régénérée à chaque clic, en chassant l’ancienne image.
+            QR forcé sur <b>JBBEAUVILLE</b> • Wave forcé sur <b>221771342889</b>.
           </div>
 
           <div class="canvasWrap">
@@ -404,10 +472,26 @@
           </div>
 
           <div class="btnrow">
-            <button id="btnDownloadCard" class="btn primary" type="button">📥 Télécharger ma carte</button>
+            <button id="btnOpenCard" class="btn primary" type="button">🖼️ Ouvrir ma carte</button>
+            <button id="btnDownloadCard" class="btn primary" type="button">📥 Télécharger PNG</button>
             <button id="btnRenderCard" class="btn ghost" type="button">🎨 Actualiser la carte</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cardPreviewModal" class="previewModal" aria-hidden="true">
+    <div class="previewBox">
+      <div class="previewTop">
+        <div>
+          <div class="previewTitle">Ma carte est prête</div>
+          <div class="previewHint">Sur téléphone, tu peux l’ouvrir en grand puis faire ta capture immédiatement.</div>
+        </div>
+        <button id="btnClosePreview" class="btn ghost" type="button" style="flex:0 0 auto;min-width:auto;">✕ Fermer</button>
+      </div>
+      <div class="previewBody">
+        <img id="cardPreviewImage" alt="Carte MON ARGENT">
       </div>
     </div>
   </div>
@@ -428,6 +512,11 @@
       const LS_SLUG = "digiy_slug";
       const LS_MODULE_SLUGS = "digiy_module_slugs";
       const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
+
+      // ✅ Force actuelle demandée
+      const CARD_FORCE_CODE = "JBBEAUVILLE";
+      const CARD_FORCE_WAVE = "221771342889";
+      const FORCE_CARD_VALUES = true;
 
       const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
@@ -463,6 +552,7 @@
       const btnCopyLink = $("btnCopyLink");
       const btnLogout = $("btnLogout");
       const btnSupport = $("btnSupport");
+      const btnOpenCard = $("btnOpenCard");
       const btnDownloadCard = $("btnDownloadCard");
       const btnRenderCard = $("btnRenderCard");
 
@@ -473,11 +563,19 @@
       const cardCanvas = $("cardCanvas");
       const cardCtx = cardCanvas.getContext("2d");
 
+      const cardPreviewModal = $("cardPreviewModal");
+      const cardPreviewImage = $("cardPreviewImage");
+      const btnClosePreview = $("btnClosePreview");
+
       const qs = new URLSearchParams(location.search);
 
       let currentPhone = "";
       let currentSlug = "";
       let loadedProfile = null;
+
+      let renderToken = 0;
+      let lastRenderFingerprint = "";
+      let lastCardDataUrl = "";
 
       function normPhone(v) {
         let s = String(v || "").trim();
@@ -590,10 +688,22 @@
         return u.toString();
       }
 
+      function getEffectiveCardCode() {
+        return FORCE_CARD_VALUES ? CARD_FORCE_CODE : makeCode(walletCode.value || "");
+      }
+
+      function getEffectiveCardWave() {
+        return FORCE_CARD_VALUES ? CARD_FORCE_WAVE : digitsOnly(walletPhone.value || "");
+      }
+
+      function getEffectiveCardUrl() {
+        return buildPublicUrl(getEffectiveCardCode());
+      }
+
       function updatePreview() {
-        const code = makeCode(walletCode.value || "");
-        const wave = digitsOnly(walletPhone.value || "");
-        const url = buildPublicUrl(code);
+        const code = getEffectiveCardCode();
+        const wave = getEffectiveCardWave();
+        const url = getEffectiveCardUrl();
 
         sessionPhone.textContent = currentPhone ? digitsOnly(currentPhone) : "—";
         sessionSlug.textContent = currentSlug || "—";
@@ -603,7 +713,7 @@
         publicStatus.textContent = walletActive.checked ? "Actif" : "Inactif";
         btnOpenPublic.href = code ? url : PUBLIC_BASE_URL;
 
-        renderCard();
+        void renderCard();
       }
 
       async function ensureWallet(phoneDigits) {
@@ -649,9 +759,9 @@
       }
 
       function fillForm(profile) {
-        walletName.value = profile?.business_name || "";
-        walletCode.value = profile?.business_code || "";
-        walletPhone.value = digitsOnly(profile?.wave_phone || currentPhone || "");
+        walletName.value = profile?.business_name || "JB BEAUVILLE";
+        walletCode.value = makeCode(profile?.business_code || CARD_FORCE_CODE);
+        walletPhone.value = digitsOnly(profile?.wave_phone || CARD_FORCE_WAVE || currentPhone || "");
         walletSlug.value = currentSlug || "";
         walletActive.checked = profile?.is_active !== false;
         loadedProfile = profile || null;
@@ -694,6 +804,10 @@
 
         if (!profile && qs.get("pro")) {
           profile = await fetchByBusinessCode(qs.get("pro"));
+        }
+
+        if (!profile) {
+          profile = await fetchByBusinessCode(CARD_FORCE_CODE);
         }
 
         fillForm(profile);
@@ -784,14 +898,7 @@
       }
 
       function copyPublicLink() {
-        const code = makeCode(walletCode.value || "");
-        const url = buildPublicUrl(code);
-
-        if (!code) {
-          setError("Code pro manquant pour construire le lien public.");
-          return;
-        }
-
+        const url = getEffectiveCardUrl();
         navigator.clipboard?.writeText(url).then(
           () => setOk("Lien public copié."),
           () => setInfo(url)
@@ -824,27 +931,61 @@
         ctx.closePath();
       }
 
+      function wipeCardState() {
+        renderToken += 1;
+        lastRenderFingerprint = "";
+        lastCardDataUrl = "";
+        cardPreviewImage.removeAttribute("src");
+        cardCtx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
+      }
+
       function loadImage(src) {
         return new Promise((resolve, reject) => {
           const img = new Image();
-          img.crossOrigin = "anonymous";
           img.onload = () => resolve(img);
           img.onerror = reject;
           img.src = src;
         });
       }
 
-      async function renderCard() {
+      function generateQrDataUrl(text) {
+        return QRCode.toDataURL(text, {
+          errorCorrectionLevel: "H",
+          type: "image/png",
+          margin: 1,
+          width: 420,
+          color: {
+            dark: "#0f172a",
+            light: "#ffffff"
+          }
+        });
+      }
+
+      function currentCardFingerprint() {
+        const name = String(walletName.value || "MON ARGENT").trim() || "MON ARGENT";
+        const code = getEffectiveCardCode();
+        const wave = getEffectiveCardWave();
+        const active = walletActive.checked ? "1" : "0";
+        return [name, code, wave, active].join("|");
+      }
+
+      async function renderCard(force = false) {
+        const fingerprint = currentCardFingerprint();
+        if (!force && fingerprint === lastRenderFingerprint && lastCardDataUrl) {
+          return lastCardDataUrl;
+        }
+
+        const myToken = ++renderToken;
         const ctx = cardCtx;
         const W = cardCanvas.width;
         const H = cardCanvas.height;
 
         const name = String(walletName.value || "MON ARGENT").trim() || "MON ARGENT";
-        const code = makeCode(walletCode.value || "");
-        const wave = digitsOnly(walletPhone.value || "");
-        const publicUrl = buildPublicUrl(code || "");
-        const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(code ? publicUrl : PUBLIC_BASE_URL);
+        const code = getEffectiveCardCode();
+        const wave = getEffectiveCardWave();
+        const publicUrl = getEffectiveCardUrl();
 
+        cardPreviewImage.removeAttribute("src");
         ctx.clearRect(0, 0, W, H);
 
         const bg = ctx.createLinearGradient(0, 0, W, H);
@@ -891,6 +1032,14 @@
         ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText("Paiement direct via Wave • 0% commission", 90, 200);
 
+        ctx.fillStyle = "rgba(255,255,255,.16)";
+        roundedRect(ctx, 640, 92, 170, 42, 16);
+        ctx.fill();
+
+        ctx.fillStyle = "#fde68a";
+        ctx.font = "900 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("QR ACTIF FINAL", 668, 120);
+
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 42px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText(name.slice(0, 28), 90, 360);
@@ -916,12 +1065,26 @@
         ctx.fillText("Scanne le QR ou utilise le code pro", 90, 700);
 
         try {
-          const qrImg = await loadImage(qrUrl);
+          const qrDataUrl = await generateQrDataUrl(publicUrl);
+
+          if (myToken !== renderToken) return "";
+
+          const qrImg = await loadImage(qrDataUrl);
+
+          if (myToken !== renderToken) return "";
+
           ctx.fillStyle = "#f9fafb";
           roundedRect(ctx, 560, 420, 260, 260, 24);
           ctx.fill();
+
           ctx.drawImage(qrImg, 590, 450, 200, 200);
+
+          ctx.fillStyle = "#4b5563";
+          ctx.font = "800 14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          ctx.fillText("QR forcé sur JBBEAUVILLE", 575, 695);
         } catch (_) {
+          if (myToken !== renderToken) return "";
+
           ctx.fillStyle = "#e5e7eb";
           roundedRect(ctx, 560, 420, 260, 260, 24);
           ctx.fill();
@@ -952,7 +1115,7 @@
 
         ctx.fillStyle = "#6b7280";
         ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("Lien public : " + (code ? publicUrl : PUBLIC_BASE_URL), 90, 1185);
+        ctx.fillText("Lien public : " + publicUrl, 90, 1185);
 
         ctx.fillStyle = "#16a34a";
         ctx.font = "900 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
@@ -961,30 +1124,118 @@
         ctx.fillStyle = "#6b7280";
         ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText("Carte générée depuis MON ARGENT PRO", 90, 1300);
+
+        if (myToken !== renderToken) return "";
+
+        lastRenderFingerprint = fingerprint;
+        lastCardDataUrl = cardCanvas.toDataURL("image/png");
+        return lastCardDataUrl;
       }
 
-      function downloadCard() {
-        const code = makeCode(walletCode.value || "");
+      function canvasToBlob(canvas) {
+        return new Promise((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error("PNG introuvable"));
+          }, "image/png");
+        });
+      }
+
+      function buildCardFilename() {
+        const code = getEffectiveCardCode();
         const fallback = "ma-carte-mon-argent";
-        const filename = (code ? ("mon-argent-" + code.toLowerCase()) : fallback) + ".png";
+        return (code ? ("mon-argent-" + code.toLowerCase()) : fallback) + ".png";
+      }
+
+      async function ensureFreshCard() {
+        wipeCardState();
+        return renderCard(true);
+      }
+
+      function openPreviewWithDataUrl(dataUrl) {
+        if (!dataUrl) return;
+        cardPreviewImage.src = dataUrl;
+        cardPreviewModal.classList.add("open");
+        cardPreviewModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modalOpen");
+      }
+
+      function closePreview() {
+        cardPreviewModal.classList.remove("open");
+        cardPreviewModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modalOpen");
+      }
+
+      async function openCardPreview() {
+        resetBoxes();
+        btnOpenCard.disabled = true;
 
         try {
-          const dataUrl = cardCanvas.toDataURL("image/png");
+          const dataUrl = await ensureFreshCard();
+          if (!dataUrl) throw new Error("Carte vide");
+          openPreviewWithDataUrl(dataUrl);
+          setOk("Carte ouverte en grand.");
+        } catch (e) {
+          setError("Impossible d’ouvrir la carte. " + String(e.message || e));
+        } finally {
+          btnOpenCard.disabled = false;
+        }
+      }
+
+      async function downloadCard() {
+        resetBoxes();
+        btnDownloadCard.disabled = true;
+
+        try {
+          await ensureFreshCard();
+
+          const blob = await canvasToBlob(cardCanvas);
+          const filename = buildCardFilename();
+          const file = new File([blob], filename, { type: "image/png" });
+
+          const canShareFiles =
+            typeof navigator !== "undefined" &&
+            typeof navigator.canShare === "function" &&
+            navigator.canShare({ files: [file] });
+
+          if (canShareFiles) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: "Ma carte MON ARGENT",
+                text: "Carte MON ARGENT PNG"
+              });
+              setOk("Carte prête à être enregistrée ou partagée.");
+              return;
+            } catch (shareErr) {
+              if (shareErr && shareErr.name === "AbortError") {
+                setInfo("Partage annulé.");
+                return;
+              }
+            }
+          }
+
+          const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
-          a.href = dataUrl;
+          a.href = url;
           a.download = filename;
           document.body.appendChild(a);
           a.click();
           a.remove();
-          setOk("Carte téléchargée.");
+
+          setTimeout(() => URL.revokeObjectURL(url), 1500);
+          setOk("PNG téléchargé.");
         } catch (_) {
           try {
-            const url = cardCanvas.toDataURL("image/png");
-            window.open(url, "_blank", "noopener");
-            setInfo("Image ouverte. Enregistre-la depuis ton navigateur.");
+            const dataUrl = lastCardDataUrl || await renderCard(true);
+            if (!dataUrl) throw new Error("Carte non générée");
+            openPreviewWithDataUrl(dataUrl);
+            setInfo("Téléchargement direct indisponible ici. Carte ouverte pour capture immédiate.");
           } catch (e) {
             setError("Impossible de télécharger la carte.");
           }
+        } finally {
+          btnDownloadCard.disabled = false;
         }
       }
 
@@ -992,7 +1243,19 @@
       btnSave.addEventListener("click", saveProfile);
       btnCopyLink.addEventListener("click", copyPublicLink);
       btnSupport.addEventListener("click", openSupport);
-      btnRenderCard.addEventListener("click", renderCard);
+      btnRenderCard.addEventListener("click", async () => {
+        resetBoxes();
+        btnRenderCard.disabled = true;
+        try {
+          await ensureFreshCard();
+          setOk("Carte régénérée proprement.");
+        } catch (e) {
+          setError("Impossible de régénérer la carte. " + String(e.message || e));
+        } finally {
+          btnRenderCard.disabled = false;
+        }
+      });
+      btnOpenCard.addEventListener("click", openCardPreview);
       btnDownloadCard.addEventListener("click", downloadCard);
 
       btnLogout.addEventListener("click", () => {
@@ -1000,21 +1263,35 @@
         location.href = PIN_URL;
       });
 
+      btnClosePreview.addEventListener("click", closePreview);
+      cardPreviewModal.addEventListener("click", (e) => {
+        if (e.target === cardPreviewModal) closePreview();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && cardPreviewModal.classList.contains("open")) {
+          closePreview();
+        }
+      });
+
       walletName.addEventListener("blur", () => {
         autoCodeFromName();
-        renderCard();
+        void renderCard(true);
       });
+
       walletCode.addEventListener("input", () => {
         walletCode.value = makeCode(walletCode.value);
         updatePreview();
       });
+
       walletPhone.addEventListener("input", () => {
         walletPhone.value = digitsOnly(walletPhone.value);
         updatePreview();
       });
+
       walletActive.addEventListener("change", updatePreview);
 
-      loadProfile();
+      void loadProfile();
     })();
   </script>
 </body>
