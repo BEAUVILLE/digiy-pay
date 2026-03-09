@@ -269,8 +269,6 @@
 
       const MODULE_CODE = "PAY";
       const ADMIN_URL = "https://pay.digiylyfe.com/admin.html";
-      const PUBLIC_URL = "https://pay.digiylyfe.com/";
-      const INSTALL_URL = "https://commencer-a-payer.digiylyfe.com/?module=PAY";
       const SUPPORT_WA = "+221771342889";
 
       const LS_PHONE = "digiy_phone";
@@ -438,11 +436,25 @@
       }
 
       async function tryPinRpc(phone, pin) {
+        const phoneDigits = digitsOnly(phone);
+
         const attempts = [
-          { name: "pay_pin_login", params: { p_phone: phone, p_pin: pin } },
-          { name: "digiy_pay_pin_login", params: { p_phone: phone, p_pin: pin } },
-          { name: "wallet_pin_login", params: { p_phone: phone, p_pin: pin } },
-          { name: "digiy_pin_login", params: { p_phone: phone, p_pin: pin, p_module: MODULE_CODE } }
+          {
+            name: "verify_access_pin_phone",
+            params: { p_phone: phoneDigits, p_pin: pin, p_module: "PAY" }
+          },
+          {
+            name: "verify_access_pin",
+            params: { p_phone: phoneDigits, p_pin: pin, p_module: "PAY" }
+          },
+          {
+            name: "digiy_verify_pin",
+            params: { p_phone: phoneDigits, p_module: "PAY", p_pin: pin }
+          },
+          {
+            name: "check_pin",
+            params: { p_phone: phoneDigits, p_pin: pin }
+          }
         ];
 
         let lastError = null;
@@ -458,7 +470,7 @@
 
           if (
             msg.includes("does not exist") ||
-            msg.includes("function") && msg.includes("exist") ||
+            (msg.includes("function") && msg.includes("exist")) ||
             msg.includes("42883")
           ) {
             lastError = error;
@@ -468,30 +480,39 @@
           return { ok: false, rpc: attempt.name, error };
         }
 
-        return { ok: false, rpc: "", error: lastError || new Error("Aucune RPC PIN trouvée.") };
+        return {
+          ok: false,
+          rpc: "",
+          error: lastError || new Error("Aucune RPC PIN compatible trouvée.")
+        };
       }
 
       function extractLoginResult(raw, fallbackPhone, fallbackSlug) {
+        const row = Array.isArray(raw) ? raw[0] : raw;
+
         const phone = normPhone(
-          raw?.phone ||
-          raw?.p_phone ||
-          raw?.user_phone ||
+          row?.phone ||
+          row?.p_phone ||
+          row?.user_phone ||
           fallbackPhone ||
           ""
         );
 
         const slug = normSlug(
-          raw?.slug ||
-          raw?.subscription_slug ||
-          raw?.public_slug ||
+          row?.slug ||
+          row?.subscription_slug ||
+          row?.public_slug ||
           fallbackSlug ||
           ""
         );
 
         const ok =
           raw === true ||
-          raw?.ok === true ||
-          (!!phone && (raw?.ok !== false));
+          row === true ||
+          row?.ok === true ||
+          row?.valid === true ||
+          row?.success === true ||
+          (!!phone && row && typeof row === "object" && row.ok !== false);
 
         return { ok, phone, slug };
       }
@@ -566,7 +587,7 @@
         if (!phoneQ && saved?.phone) phoneQ = saved.phone;
         if (!slugQ && saved?.slug) slugQ = saved.slug;
 
-        if (phoneQ) phoneInput.value = phoneQ;
+        if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
 
         if (slugQ) {
           screenName.textContent = "Accès wallet détecté";
