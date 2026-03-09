@@ -259,388 +259,364 @@
     </div>
   </div>
 
-  <script>
-    (function () {
-      "use strict";
+<script>
+(function () {
+  "use strict";
 
-      const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+  const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 
-      const MODULE_CODE = "PAY";
-      const ADMIN_URL = "https://pay.digiylyfe.com/admin.html";
-      const SUPPORT_WA = "+221771342889";
+  const MODULE_CODE = "PAY";
+  const ADMIN_URL = "https://pay.digiylyfe.com/admin.html";
+  const SUPPORT_WA = "+221771342889";
 
-      const LS_PHONE = "digiy_phone";
-      const LS_SLUG = "digiy_slug";
-      const LS_MODULE_SLUGS = "digiy_module_slugs";
-      const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
+  const LS_PHONE = "digiy_phone";
+  const LS_SLUG = "digiy_slug";
+  const LS_MODULE_SLUGS = "digiy_module_slugs";
+  const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
 
-      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          storage: {
-            getItem: () => null,
-            setItem: () => {},
-            removeItem: () => {}
-          }
-        }
-      });
-
-      const $ = (id) => document.getElementById(id);
-
-      const phoneInput = $("phoneInput");
-      const pinInput = $("pinInput");
-      const btnLogin = $("btnLogin");
-      const btnSession = $("btnSession");
-      const btnSupport = $("btnSupport");
-      const infoBox = $("infoBox");
-      const errorBox = $("errorBox");
-      const okBox = $("okBox");
-      const slugHint = $("slugHint");
-      const screenName = $("screenName");
-      const screenHint = $("screenHint");
-
-      const qs = new URLSearchParams(location.search);
-      let phoneQ = normPhone(qs.get("phone") || "");
-      let slugQ = normSlug(qs.get("slug") || "");
-
-      function normPhone(v) {
-        let s = String(v || "").trim();
-        s = s.replace(/[^\d+]/g, "");
-        if (!s) return "";
-        if (!s.startsWith("+") && s.startsWith("221")) s = "+" + s;
-        return s;
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      storage: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {}
       }
-
-      function digitsOnly(v) {
-        return String(v || "").replace(/\D/g, "");
-      }
-
-      function normSlug(v) {
-        return String(v || "")
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "")
-          .replace(/-+/g, "-")
-          .replace(/^-|-$/g, "");
-      }
-
-      function show(el, on = true) {
-        el.style.display = on ? "" : "none";
-      }
-
-      function resetBoxes() {
-        show(infoBox, false);
-        show(errorBox, false);
-        show(okBox, false);
-      }
-
-      function setInfo(msg) {
-        infoBox.textContent = msg;
-        show(infoBox, true);
-      }
-
-      function setError(msg) {
-        errorBox.textContent = msg;
-        show(errorBox, true);
-      }
-
-      function setOk(msg) {
-        okBox.textContent = msg;
-        show(okBox, true);
-      }
-
-      function readModuleSlugs() {
-        try {
-          const raw = localStorage.getItem(LS_MODULE_SLUGS);
-          const parsed = raw ? JSON.parse(raw) : {};
-          return parsed && typeof parsed === "object" ? parsed : {};
-        } catch (_) {
-          return {};
-        }
-      }
-
-      function saveSession({ phone, slug }) {
-        const cleanPhone = normPhone(phone || "");
-        const cleanSlug = normSlug(slug || "");
-
-        try {
-          if (cleanPhone) localStorage.setItem(LS_PHONE, cleanPhone);
-          if (cleanSlug) localStorage.setItem(LS_SLUG, cleanSlug);
-
-          const map = readModuleSlugs();
-          if (cleanSlug) {
-            map[MODULE_CODE] = cleanSlug;
-            localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
-          }
-
-          localStorage.setItem(SESSION_KEY, JSON.stringify({
-            phone: cleanPhone,
-            slug: cleanSlug,
-            module: MODULE_CODE,
-            ts: Date.now()
-          }));
-        } catch (_) {}
-      }
-
-      function readSavedSession() {
-        try {
-          const raw = localStorage.getItem(SESSION_KEY);
-          const data = raw ? JSON.parse(raw) : null;
-          if (!data || typeof data !== "object") return null;
-          return {
-            phone: normPhone(data.phone || ""),
-            slug: normSlug(data.slug || "")
-          };
-        } catch (_) {
-          return null;
-        }
-      }
-
-      function buildAdminUrl(phone, slug) {
-        const u = new URL(ADMIN_URL);
-        const p = normPhone(phone || "");
-        const s = normSlug(slug || "");
-        if (p) u.searchParams.set("phone", p);
-        if (s) u.searchParams.set("slug", s);
-        return u.toString();
-      }
-
-      function goAdmin(phone, slug) {
-        saveSession({ phone, slug });
-        location.href = buildAdminUrl(phone, slug);
-      }
-
-      async function resolvePhoneFromSlug(slug) {
-        const s = normSlug(slug);
-        if (!s) return "";
-
-        const url =
-          `${SUPABASE_URL}/rest/v1/digiy_subscriptions_public` +
-          `?select=phone,slug,module&slug=eq.${encodeURIComponent(s)}&limit=1`;
-
-        const r = await fetch(url, {
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-
-        const arr = await r.json().catch(() => []);
-        if (!r.ok || !Array.isArray(arr) || !arr[0]?.phone) return "";
-        return normPhone(arr[0].phone);
-      }
-
-      async function tryPinRpc(phone, pin) {
-        const phoneDigits = digitsOnly(phone);
-
-        const attempts = [
-          {
-            name: "verify_access_pin_phone",
-            params: { p_phone: phoneDigits, p_pin: pin, p_module: "PAY" }
-          },
-          {
-            name: "verify_access_pin",
-            params: { p_phone: phoneDigits, p_pin: pin, p_module: "PAY" }
-          },
-          {
-            name: "digiy_verify_pin",
-            params: { p_phone: phoneDigits, p_module: "PAY", p_pin: pin }
-          },
-          {
-            name: "check_pin",
-            params: { p_phone: phoneDigits, p_pin: pin }
-          }
-        ];
-
-        let lastError = null;
-
-        for (const attempt of attempts) {
-          const { data, error } = await sb.rpc(attempt.name, attempt.params);
-
-          if (!error) {
-            return { ok: true, rpc: attempt.name, data };
-          }
-
-          const msg = String(error.message || error.details || error.hint || "").toLowerCase();
-
-          if (
-            msg.includes("does not exist") ||
-            (msg.includes("function") && msg.includes("exist")) ||
-            msg.includes("42883")
-          ) {
-            lastError = error;
-            continue;
-          }
-
-          return { ok: false, rpc: attempt.name, error };
-        }
-
-        return {
-          ok: false,
-          rpc: "",
-          error: lastError || new Error("Aucune RPC PIN compatible trouvée.")
-        };
-      }
-
-      function extractLoginResult(raw, fallbackPhone, fallbackSlug) {
-        const row = Array.isArray(raw) ? raw[0] : raw;
-
-        const phone = normPhone(
-          row?.phone ||
-          row?.p_phone ||
-          row?.user_phone ||
-          fallbackPhone ||
-          ""
-        );
-
-        const slug = normSlug(
-          row?.slug ||
-          row?.subscription_slug ||
-          row?.public_slug ||
-          fallbackSlug ||
-          ""
-        );
-
-        const ok =
-          raw === true ||
-          row === true ||
-          row?.ok === true ||
-          row?.valid === true ||
-          row?.success === true ||
-          (!!phone && row && typeof row === "object" && row.ok !== false);
-
-        return { ok, phone, slug };
-      }
-
-      async function login() {
-        resetBoxes();
-
-        let phone = normPhone(phoneInput.value || phoneQ || "");
-        const pin = digitsOnly(pinInput.value || "");
-        const slug = normSlug(slugQ || "");
-
-        if (!phone && slug) {
-          setInfo("Résolution du téléphone à partir du slug…");
-          phone = await resolvePhoneFromSlug(slug);
-          if (phone) phoneInput.value = phone;
-        }
-
-        if (!phone) {
-          setError("Téléphone obligatoire pour ouvrir MON ARGENT PRO.");
-          phoneInput.focus();
-          return;
-        }
-
-        if (pin.length < 4) {
-          setError("PIN invalide. Entre au moins 4 chiffres.");
-          pinInput.focus();
-          return;
-        }
-
-        setInfo("Vérification sécurisée en cours…");
-        btnLogin.disabled = true;
-
-        try {
-          async function tryPinRpc(phone, pin) {
-  const phoneDigits = digitsOnly(phone);
-
-  const attempts = [
-    {
-      name: "digiy_verify_pin",
-      params: { p_phone: phoneDigits, p_module: "PAY", p_pin: pin }
-    },
-    {
-      name: "check_pin",
-      params: { p_phone: phoneDigits, p_pin: pin }
     }
-  ];
+  });
 
-  let lastError = null;
+  const $ = (id) => document.getElementById(id);
 
-  for (const attempt of attempts) {
-    const { data, error } = await sb.rpc(attempt.name, attempt.params);
+  const phoneInput = $("phoneInput");
+  const pinInput = $("pinInput");
+  const btnLogin = $("btnLogin");
+  const btnSession = $("btnSession");
+  const btnSupport = $("btnSupport");
+  const infoBox = $("infoBox");
+  const errorBox = $("errorBox");
+  const okBox = $("okBox");
+  const slugHint = $("slugHint");
+  const screenName = $("screenName");
+  const screenHint = $("screenHint");
 
-    if (!error) {
-      return { ok: true, rpc: attempt.name, data };
-    }
+  const qs = new URLSearchParams(location.search);
+  let phoneQ = normPhone(qs.get("phone") || "");
+  let slugQ = normSlug(qs.get("slug") || "");
 
-    lastError = error;
+  function normPhone(v) {
+    let s = String(v || "").trim();
+    s = s.replace(/[^\d+]/g, "");
+    if (!s) return "";
+    if (!s.startsWith("+") && s.startsWith("221")) s = "+" + s;
+    return s;
   }
 
-  return {
-    ok: false,
-    rpc: "",
-    error: lastError || new Error("Aucune RPC PIN compatible trouvée.")
-  };
-}
+  function digitsOnly(v) {
+    return String(v || "").replace(/\D/g, "");
+  }
 
-      function supportMessage() {
-        const p = normPhone(phoneInput.value || phoneQ || "");
-        let msg = "DIGIY — MON ARGENT PRO\n\n";
-        if (p) msg += "Téléphone: " + p + "\n";
-        if (slugQ) msg += "Slug: " + slugQ + "\n";
-        msg += "J'ai besoin d'aide pour accéder à MON ARGENT PRO.";
-        return msg;
+  function normSlug(v) {
+    return String(v || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function show(el, on = true) {
+    if (!el) return;
+    el.style.display = on ? "" : "none";
+  }
+
+  function resetBoxes() {
+    show(infoBox, false);
+    show(errorBox, false);
+    show(okBox, false);
+  }
+
+  function setInfo(msg) {
+    infoBox.textContent = msg;
+    show(infoBox, true);
+  }
+
+  function setError(msg) {
+    errorBox.textContent = msg;
+    show(errorBox, true);
+  }
+
+  function setOk(msg) {
+    okBox.textContent = msg;
+    show(okBox, true);
+  }
+
+  function readModuleSlugs() {
+    try {
+      const raw = localStorage.getItem(LS_MODULE_SLUGS);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveSession({ phone, slug }) {
+    const cleanPhone = normPhone(phone || "");
+    const cleanSlug = normSlug(slug || "");
+
+    try {
+      if (cleanPhone) localStorage.setItem(LS_PHONE, cleanPhone);
+      if (cleanSlug) localStorage.setItem(LS_SLUG, cleanSlug);
+
+      const map = readModuleSlugs();
+      if (cleanSlug) {
+        map[MODULE_CODE] = cleanSlug;
+        localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
       }
 
-      function openSupport() {
-        const num = SUPPORT_WA.replace(/\+/g, "");
-        location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(supportMessage());
+      localStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify({
+          phone: cleanPhone,
+          slug: cleanSlug,
+          module: MODULE_CODE,
+          ts: Date.now()
+        })
+      );
+    } catch (_) {}
+  }
+
+  function readSavedSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      const data = raw ? JSON.parse(raw) : null;
+      if (!data || typeof data !== "object") return null;
+      return {
+        phone: normPhone(data.phone || ""),
+        slug: normSlug(data.slug || "")
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function buildAdminUrl(phone, slug) {
+    const u = new URL(ADMIN_URL);
+    const p = digitsOnly(phone || "");
+    const s = normSlug(slug || "");
+    if (p) u.searchParams.set("phone", p);
+    if (s) u.searchParams.set("slug", s);
+    return u.toString();
+  }
+
+  function goAdmin(phone, slug) {
+    saveSession({ phone, slug });
+    location.href = buildAdminUrl(phone, slug);
+  }
+
+  async function resolvePhoneFromSlug(slug) {
+    const s = normSlug(slug);
+    if (!s) return "";
+
+    const url =
+      `${SUPABASE_URL}/rest/v1/digiy_subscriptions_public` +
+      `?select=phone,slug,module&slug=eq.${encodeURIComponent(s)}&limit=1`;
+
+    const r = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    const arr = await r.json().catch(() => []);
+    if (!r.ok || !Array.isArray(arr) || !arr[0]?.phone) return "";
+    return normPhone(arr[0].phone);
+  }
+
+  async function tryPinRpc(phone, pin) {
+    const phoneDigits = digitsOnly(phone);
+
+    const attempts = [
+      {
+        name: "digiy_verify_pin",
+        params: { p_phone: phoneDigits, p_module: "PAY", p_pin: pin }
+      },
+      {
+        name: "check_pin",
+        params: { p_phone: phoneDigits, p_pin: pin }
+      }
+    ];
+
+    let lastError = null;
+
+    for (const attempt of attempts) {
+      const { data, error } = await sb.rpc(attempt.name, attempt.params);
+
+      if (!error) {
+        return { ok: true, rpc: attempt.name, data };
       }
 
-      function fillInitialState() {
-        const saved = readSavedSession();
+      lastError = error;
+    }
 
-        if (!phoneQ && saved?.phone) phoneQ = saved.phone;
-        if (!slugQ && saved?.slug) slugQ = saved.slug;
+    return {
+      ok: false,
+      rpc: "",
+      error: lastError || new Error("Aucune RPC PIN compatible trouvée.")
+    };
+  }
 
-        if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
+  function extractLoginResult(raw, fallbackPhone, fallbackSlug) {
+    const row = Array.isArray(raw) ? raw[0] : raw;
 
-        if (slugQ) {
-          screenName.textContent = "Accès wallet détecté";
-          screenHint.textContent = "Un slug wallet a été transmis. Il sera utilisé pour retrouver ton accès.";
-          slugHint.textContent = "Slug détecté : " + slugQ;
-        } else {
-          slugHint.textContent = "Aucun slug transmis. Le téléphone + PIN suffisent.";
-        }
+    const phone = normPhone(
+      row?.phone ||
+      row?.p_phone ||
+      row?.user_phone ||
+      fallbackPhone ||
+      ""
+    );
+
+    const slug = normSlug(
+      row?.slug ||
+      row?.subscription_slug ||
+      row?.public_slug ||
+      fallbackSlug ||
+      ""
+    );
+
+    const ok =
+      raw === true ||
+      row === true ||
+      row?.ok === true ||
+      row?.valid === true ||
+      row?.success === true;
+
+    return { ok, phone, slug };
+  }
+
+  async function login() {
+    resetBoxes();
+
+    let phone = normPhone(phoneInput.value || phoneQ || "");
+    const pin = digitsOnly(pinInput.value || "");
+    const slug = normSlug(slugQ || "");
+
+    if (!phone && slug) {
+      setInfo("Résolution du téléphone à partir du slug…");
+      phone = await resolvePhoneFromSlug(slug);
+      if (phone) phoneInput.value = digitsOnly(phone);
+    }
+
+    if (!phone) {
+      setError("Téléphone obligatoire pour ouvrir MON ARGENT PRO.");
+      phoneInput.focus();
+      return;
+    }
+
+    if (pin.length < 4) {
+      setError("PIN invalide. Entre au moins 4 chiffres.");
+      pinInput.focus();
+      return;
+    }
+
+    setInfo("Vérification sécurisée en cours…");
+    btnLogin.disabled = true;
+
+    try {
+      const res = await tryPinRpc(phone, pin);
+
+      if (!res.ok) {
+        throw res.error || new Error("Connexion impossible.");
       }
 
-      btnLogin.addEventListener("click", login);
+      const parsed = extractLoginResult(res.data, phone, slug);
 
-      pinInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          login();
-        }
-      });
+      if (!parsed.ok) {
+        throw new Error("PIN refusé ou accès wallet non trouvé.");
+      }
 
-      phoneInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          pinInput.focus();
-        }
-      });
+      setOk("Accès validé. Redirection vers MON ARGENT PRO…");
+      setTimeout(() => {
+        goAdmin(parsed.phone || phone, parsed.slug || slug);
+      }, 300);
+    } catch (e) {
+      setError(String(e.message || e || "Connexion impossible."));
+    } finally {
+      btnLogin.disabled = false;
+    }
+  }
 
-      btnSession.addEventListener("click", () => {
-        resetBoxes();
-        const saved = readSavedSession();
-        if (!saved?.phone) {
-          setError("Aucune session wallet trouvée.");
-          return;
-        }
-        setOk("Session trouvée. Redirection…");
-        setTimeout(() => goAdmin(saved.phone, saved.slug), 250);
-      });
+  function supportMessage() {
+    const p = normPhone(phoneInput.value || phoneQ || "");
+    let msg = "DIGIY — MON ARGENT PRO\n\n";
+    if (p) msg += "Téléphone: " + p + "\n";
+    if (slugQ) msg += "Slug: " + slugQ + "\n";
+    msg += "J'ai besoin d'aide pour accéder à MON ARGENT PRO.";
+    return msg;
+  }
 
-      btnSupport.addEventListener("click", openSupport);
+  function openSupport() {
+    const num = SUPPORT_WA.replace(/\+/g, "");
+    location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(supportMessage());
+  }
 
-      fillInitialState();
-    })();
-  </script>
+  function fillInitialState() {
+    const saved = readSavedSession();
+
+    if (!phoneQ && saved?.phone) phoneQ = saved.phone;
+    if (!slugQ && saved?.slug) slugQ = saved.slug;
+
+    if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
+
+    if (slugQ) {
+      screenName.textContent = "Accès wallet détecté";
+      screenHint.textContent = "Un slug wallet a été transmis. Il sera utilisé pour retrouver ton accès.";
+      slugHint.textContent = "Slug détecté : " + slugQ;
+    } else {
+      slugHint.textContent = "Aucun slug transmis. Le téléphone + PIN suffisent.";
+    }
+  }
+
+  btnLogin.addEventListener("click", login);
+
+  pinInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      login();
+    }
+  });
+
+  phoneInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      pinInput.focus();
+    }
+  });
+
+  btnSession.addEventListener("click", () => {
+    resetBoxes();
+    const saved = readSavedSession();
+    if (!saved?.phone) {
+      setError("Aucune session wallet trouvée.");
+      return;
+    }
+    setOk("Session trouvée. Redirection…");
+    setTimeout(() => {
+      goAdmin(saved.phone, saved.slug);
+    }, 250);
+  });
+
+  btnSupport.addEventListener("click", openSupport);
+
+  fillInitialState();
+})();
+</script>
 </body>
 </html>
