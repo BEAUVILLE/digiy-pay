@@ -546,26 +546,38 @@
         btnLogin.disabled = true;
 
         try {
-          const res = await tryPinRpc(phone, pin);
+          async function tryPinRpc(phone, pin) {
+  const phoneDigits = digitsOnly(phone);
 
-          if (!res.ok) {
-            throw res.error || new Error("Connexion impossible.");
-          }
+  const attempts = [
+    {
+      name: "digiy_verify_pin",
+      params: { p_phone: phoneDigits, p_module: "PAY", p_pin: pin }
+    },
+    {
+      name: "check_pin",
+      params: { p_phone: phoneDigits, p_pin: pin }
+    }
+  ];
 
-          const parsed = extractLoginResult(res.data, phone, slug);
+  let lastError = null;
 
-          if (!parsed.ok) {
-            throw new Error("PIN refusé ou accès wallet non trouvé.");
-          }
+  for (const attempt of attempts) {
+    const { data, error } = await sb.rpc(attempt.name, attempt.params);
 
-          setOk("Accès validé. Redirection vers MON ARGENT PRO…");
-          setTimeout(() => goAdmin(parsed.phone || phone, parsed.slug || slug), 300);
-        } catch (e) {
-          setError(String(e.message || e || "Connexion impossible."));
-        } finally {
-          btnLogin.disabled = false;
-        }
-      }
+    if (!error) {
+      return { ok: true, rpc: attempt.name, data };
+    }
+
+    lastError = error;
+  }
+
+  return {
+    ok: false,
+    rpc: "",
+    error: lastError || new Error("Aucune RPC PIN compatible trouvée.")
+  };
+}
 
       function supportMessage() {
         const p = normPhone(phoneInput.value || phoneQ || "");
