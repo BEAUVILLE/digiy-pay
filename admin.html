@@ -35,7 +35,7 @@
       color:var(--text);
     }
     .wrap{
-      width:min(980px,100%);
+      width:min(1100px,100%);
       margin:0 auto;
     }
     .card{
@@ -81,10 +81,10 @@
     }
     .grid{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
+      grid-template-columns:1.05fr .95fr;
       gap:14px;
     }
-    @media(max-width:860px){
+    @media(max-width:920px){
       .grid{grid-template-columns:1fr}
     }
     .panel{
@@ -227,25 +227,6 @@
       font-weight:950;
       word-break:break-word;
     }
-    .qrBox{
-      margin-top:12px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      border-radius:18px;
-      padding:14px;
-      text-align:center;
-    }
-    .qrImg{
-      width:min(240px,100%);
-      aspect-ratio:1/1;
-      object-fit:contain;
-      border-radius:16px;
-      background:#fff;
-      padding:10px;
-    }
-    .mono{
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-    }
     .switch{
       display:flex;
       align-items:center;
@@ -266,6 +247,35 @@
       font-size:12px;
       color:var(--muted);
       line-height:1.45;
+    }
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+
+    .cardMaker{
+      margin-top:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+    .canvasWrap{
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:12px;
+      overflow:auto;
+      background:rgba(255,255,255,.02);
+    }
+    #cardCanvas{
+      width:min(100%,420px);
+      height:auto;
+      border-radius:18px;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+      background:#fff;
     }
   </style>
 </head>
@@ -367,12 +377,6 @@
             </div>
           </div>
 
-          <div class="qrBox">
-            <div style="font-size:12px;color:#bbf7d0;font-weight:950;text-transform:uppercase;letter-spacing:.05em;">QR rapide</div>
-            <img id="qrImg" class="qrImg" alt="QR wallet">
-            <div class="mini">Imprime ce QR pour renvoyer vers le wallet public du commerçant.</div>
-          </div>
-
           <div class="btnrow">
             <a id="btnOpenPublic" class="btn" href="https://pay.digiylyfe.com/" target="_blank" rel="noopener">🌍 Ouvrir public</a>
             <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
@@ -381,6 +385,27 @@
           <div class="mini" style="margin-top:14px;">
             DIGIY n’est pas une banque.  
             Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le commerçant.
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="panel">
+        <h2>Ma carte de paiement</h2>
+
+        <div class="cardMaker">
+          <div class="mini" style="margin-top:0;">
+            Remplis tes infos, sauvegarde, puis clique sur <b>Télécharger ma carte</b>.
+          </div>
+
+          <div class="canvasWrap">
+            <canvas id="cardCanvas" width="900" height="1400"></canvas>
+          </div>
+
+          <div class="btnrow">
+            <button id="btnDownloadCard" class="btn primary" type="button">📥 Télécharger ma carte</button>
+            <button id="btnRenderCard" class="btn ghost" type="button">🎨 Actualiser la carte</button>
           </div>
         </div>
       </div>
@@ -431,7 +456,6 @@
       const publicLink = $("publicLink");
       const publicCode = $("publicCode");
       const publicStatus = $("publicStatus");
-      const qrImg = $("qrImg");
       const btnOpenPublic = $("btnOpenPublic");
 
       const btnSave = $("btnSave");
@@ -439,10 +463,15 @@
       const btnCopyLink = $("btnCopyLink");
       const btnLogout = $("btnLogout");
       const btnSupport = $("btnSupport");
+      const btnDownloadCard = $("btnDownloadCard");
+      const btnRenderCard = $("btnRenderCard");
 
       const infoBox = $("infoBox");
       const errorBox = $("errorBox");
       const okBox = $("okBox");
+
+      const cardCanvas = $("cardCanvas");
+      const cardCtx = cardCanvas.getContext("2d");
 
       const qs = new URLSearchParams(location.search);
 
@@ -574,8 +603,7 @@
         publicStatus.textContent = walletActive.checked ? "Actif" : "Inactif";
         btnOpenPublic.href = code ? url : PUBLIC_BASE_URL;
 
-        const qrTarget = code ? url : PUBLIC_BASE_URL;
-        qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(qrTarget);
+        renderCard();
       }
 
       async function ensureWallet(phoneDigits) {
@@ -660,7 +688,6 @@
         setInfo("Chargement du wallet…");
 
         const phoneDigits = digitsOnly(currentPhone);
-
         await ensureWallet(phoneDigits);
 
         let profile = await fetchByWavePhone(phoneDigits);
@@ -749,7 +776,6 @@
         } catch (e) {
           setError(
             "Sauvegarde refusée ou bloquée par la base. " +
-            "La coque admin est posée, et on branchera la RPC save dédiée si besoin. " +
             "Détail: " + String(e.message || e)
           );
         } finally {
@@ -784,17 +810,200 @@
         location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
       }
 
+      function roundedRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      async function renderCard() {
+        const ctx = cardCtx;
+        const W = cardCanvas.width;
+        const H = cardCanvas.height;
+
+        const name = String(walletName.value || "MON ARGENT").trim() || "MON ARGENT";
+        const code = makeCode(walletCode.value || "");
+        const wave = digitsOnly(walletPhone.value || "");
+        const publicUrl = buildPublicUrl(code || "");
+        const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(code ? publicUrl : PUBLIC_BASE_URL);
+
+        ctx.clearRect(0, 0, W, H);
+
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, "#03150f");
+        bg.addColorStop(0.5, "#064e3b");
+        bg.addColorStop(1, "#02110b");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = "rgba(250,204,21,0.08)";
+        ctx.beginPath();
+        ctx.arc(120, 140, 180, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(34,197,94,0.10)";
+        ctx.beginPath();
+        ctx.arc(760, 1160, 220, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        roundedRect(ctx, 36, 36, W - 72, H - 72, 38);
+        ctx.fill();
+
+        const headerGrad = ctx.createLinearGradient(0, 80, W, 280);
+        headerGrad.addColorStop(0, "#0b2f22");
+        headerGrad.addColorStop(1, "#0c5f3e");
+
+        ctx.save();
+        roundedRect(ctx, 60, 60, W - 120, 230, 28);
+        ctx.clip();
+        ctx.fillStyle = headerGrad;
+        ctx.fillRect(60, 60, W - 120, 230);
+        ctx.restore();
+
+        ctx.fillStyle = "#22c55e";
+        ctx.font = "900 30px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("MON ARGENT by DIGIY", 90, 120);
+
+        ctx.fillStyle = "#fef3c7";
+        ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Carte de paiement • Wave", 90, 162);
+
+        ctx.fillStyle = "#dbeafe";
+        ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Paiement direct via Wave • 0% commission", 90, 200);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 42px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(name.slice(0, 28), 90, 360);
+
+        ctx.fillStyle = "#4b5563";
+        ctx.font = "800 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Code pro", 90, 430);
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "900 34px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(code || "À RENSEIGNER", 90, 472);
+
+        ctx.fillStyle = "#4b5563";
+        ctx.font = "800 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Numéro Wave", 90, 560);
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "900 38px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(wave ? "+" + wave : "À RENSEIGNER", 90, 606);
+
+        ctx.fillStyle = "#4b5563";
+        ctx.font = "800 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Scanne le QR ou utilise le code pro", 90, 700);
+
+        try {
+          const qrImg = await loadImage(qrUrl);
+          ctx.fillStyle = "#f9fafb";
+          roundedRect(ctx, 560, 420, 260, 260, 24);
+          ctx.fill();
+          ctx.drawImage(qrImg, 590, 450, 200, 200);
+        } catch (_) {
+          ctx.fillStyle = "#e5e7eb";
+          roundedRect(ctx, 560, 420, 260, 260, 24);
+          ctx.fill();
+          ctx.fillStyle = "#111827";
+          ctx.font = "700 24px system-ui, sans-serif";
+          ctx.fillText("QR indisponible", 605, 555);
+        }
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "800 24px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Comment payer ?", 90, 820);
+
+        ctx.fillStyle = "#374151";
+        ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("1. Ouvre Wave", 90, 868);
+        ctx.fillText("2. Choisis Payer", 90, 906);
+        ctx.fillText("3. Colle le numéro ou scanne le QR", 90, 944);
+
+        ctx.fillStyle = "#facc15";
+        roundedRect(ctx, 90, 1010, W - 180, 92, 22);
+        ctx.fill();
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "900 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("DIGIY n’est pas une banque", 120, 1060);
+        ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Le paiement affiché ici passe actuellement par Wave.", 120, 1092);
+
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Lien public : " + (code ? publicUrl : PUBLIC_BASE_URL), 90, 1185);
+
+        ctx.fillStyle = "#16a34a";
+        ctx.font = "900 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("MON ARGENT ELECTRONIQUE BY DIGIY", 90, 1260);
+
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Carte générée depuis MON ARGENT PRO", 90, 1300);
+      }
+
+      function downloadCard() {
+        const code = makeCode(walletCode.value || "");
+        const fallback = "ma-carte-mon-argent";
+        const filename = (code ? ("mon-argent-" + code.toLowerCase()) : fallback) + ".png";
+
+        try {
+          const dataUrl = cardCanvas.toDataURL("image/png");
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setOk("Carte téléchargée.");
+        } catch (_) {
+          try {
+            const url = cardCanvas.toDataURL("image/png");
+            window.open(url, "_blank", "noopener");
+            setInfo("Image ouverte. Enregistre-la depuis ton navigateur.");
+          } catch (e) {
+            setError("Impossible de télécharger la carte.");
+          }
+        }
+      }
+
       btnReload.addEventListener("click", loadProfile);
       btnSave.addEventListener("click", saveProfile);
       btnCopyLink.addEventListener("click", copyPublicLink);
       btnSupport.addEventListener("click", openSupport);
+      btnRenderCard.addEventListener("click", renderCard);
+      btnDownloadCard.addEventListener("click", downloadCard);
 
       btnLogout.addEventListener("click", () => {
         clearSession();
         location.href = PIN_URL;
       });
 
-      walletName.addEventListener("blur", autoCodeFromName);
+      walletName.addEventListener("blur", () => {
+        autoCodeFromName();
+        renderCard();
+      });
       walletCode.addEventListener("input", () => {
         walletCode.value = makeCode(walletCode.value);
         updatePreview();
