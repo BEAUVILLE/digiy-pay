@@ -224,7 +224,7 @@ code{
   color:var(--muted);
   font-weight:850;
   text-align:center;
-  line-height:1.45;
+  line-height:1.5;
 }
 </style>
 </head>
@@ -234,12 +234,12 @@ code{
 
   <div class="top">
     <h1>MON ARGENT by DIGIY♾️</h1>
-    <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • 0% commission</div>
+    <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • Paiement direct via Wave • 0% commission</div>
     <div class="pill">✅ Simple • Direct • Souverain</div>
 
     <div class="topActions">
       <button id="btnInstallApp" class="btn ghost" type="button">📲 Installer l’app</button>
-      <a id="btnAdmin" class="btn warn" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">⚙️ Accès admin</a>
+      <a id="btnAdmin" class="btn warn" href="https://pay.digiylyfe.com/pin.html">🔐 Accès admin</a>
     </div>
   </div>
 
@@ -250,7 +250,7 @@ code{
     <h2>Charger (code / QR)</h2>
     <div class="grid">
       <div>
-        <input id="codeInput" placeholder="Entre un code pro (ex: CHEZASTOU)" autocomplete="off">
+        <input id="codeInput" placeholder="Entre un code pro (ex: JBBEAUVILLE)" autocomplete="off">
         <small>QR attendu : <b>...?pro=CODE</b></small>
       </div>
       <div class="btnrow" style="margin-top:0">
@@ -263,13 +263,13 @@ code{
   </div>
 
   <div id="manualPanel" class="panel" style="display:none">
-    <h2>Nom + Tel Wave (manuel)</h2>
+    <h2>Nom + Numéro Wave (manuel)</h2>
     <div class="grid">
       <div>
-        <input id="nameInput" placeholder="Nom du pro" autocomplete="off">
+        <input id="nameInput" placeholder="Nom du commerçant" autocomplete="off">
       </div>
       <div>
-        <input id="phoneInput" placeholder="Tel Wave (22177...)" autocomplete="off">
+        <input id="phoneInput" placeholder="Numéro Wave (22177...)" autocomplete="off">
       </div>
     </div>
     <div class="btnrow">
@@ -280,14 +280,14 @@ code{
   </div>
 
   <div id="paybox" class="paybox" style="display:none">
-    <div class="lbl">Paiement Wave</div>
+    <div class="lbl">Paiement direct via Wave</div>
     <div class="big">
       <div>
         <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Nom</div>
         <div id="payName" class="nm">—</div>
       </div>
       <div>
-        <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Téléphone</div>
+        <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Numéro Wave</div>
         <code id="payPhone">—</code>
       </div>
     </div>
@@ -299,14 +299,15 @@ code{
   </div>
 
   <div class="foot">
-    Ouvre Wave → Payer → colle le numéro affiché.<br>
+    DIGIY n’est pas une banque.<br>
+    Le paiement affiché ici est actuellement un paiement <b>Wave direct au commerçant</b>.<br>
     Pour installer ton espace ou administrer ton wallet, utilise le bouton <b>Accès admin</b>.
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ✅ PAS DE FALLBACK PERSO EN PUBLIC */
+/* ✅ PUBLIC / ADMIN */
 const ADMIN_URL = "https://pay.digiylyfe.com/pin.html";
 
 /* ✅ SUPABASE */
@@ -389,7 +390,7 @@ function showPayCard(name, phoneDigits) {
   const phone = "+" + cleanPhone;
 
   proName.textContent = cleanName;
-  proHint.textContent = "Paiement direct au pro • 0% commission";
+  proHint.textContent = "Paiement direct via Wave • 0% commission";
 
   payName.textContent = cleanName;
   payPhone.textContent = phone;
@@ -403,7 +404,7 @@ function showPayCard(name, phoneDigits) {
     }
   };
 
-  howto.innerHTML = "👉 Wave → Payer → colle <b>" + phone + "</b>";
+  howto.innerHTML = "👉 Ouvre Wave → Payer → colle le numéro <b>" + phone + "</b>";
   show(howto, true);
   show(paybox, true);
 }
@@ -431,13 +432,13 @@ btnShow.onclick = () => {
   show(manualErr, false);
 
   if (!n) {
-    manualErr.textContent = "Entre un nom de pro.";
+    manualErr.textContent = "Entre un nom de commerçant.";
     show(manualErr, true);
     return;
   }
 
   if (p.length < 9) {
-    manualErr.textContent = "Entre un numéro valide.";
+    manualErr.textContent = "Entre un numéro Wave valide.";
     show(manualErr, true);
     return;
   }
@@ -454,14 +455,14 @@ async function loadByCode(code) {
 
   if (!cleaned) {
     setNeutralState();
-    showAutoMsg("Aucun pro chargé pour le moment.");
+    showAutoMsg("Aucun commerçant chargé pour le moment.");
     return;
   }
 
   try {
     const { data, error } = await sb
       .from("digiy_pay_pro")
-      .select("business_name,wave_phone,is_active")
+      .select("business_name,business_code,wave_phone,is_active")
       .eq("business_code", cleaned)
       .eq("is_active", true)
       .maybeSingle();
@@ -469,9 +470,9 @@ async function loadByCode(code) {
     if (error) throw error;
 
     if (!data) {
-      proName.textContent = "Pro introuvable";
+      proName.textContent = "Commerçant introuvable";
       proHint.textContent = "Vérifie le code ou scanne un QR valide.";
-      showAutoError("Aucun pro actif trouvé pour ce code.");
+      showAutoError("Aucun commerçant actif trouvé pour ce code.");
       return;
     }
 
@@ -479,14 +480,14 @@ async function loadByCode(code) {
     if (phone.length < 9) {
       proName.textContent = data.business_name || cleaned;
       proHint.textContent = "Compte incomplet.";
-      showAutoError("Ce pro n’a pas encore de numéro de paiement valide.");
+      showAutoError("Ce commerçant n’a pas encore de numéro Wave valide.");
       return;
     }
 
     showPayCard(data.business_name || cleaned, phone);
   } catch (e) {
     proName.textContent = "Service indisponible";
-    proHint.textContent = "Impossible de charger ce pro pour le moment.";
+    proHint.textContent = "Impossible de charger ce commerçant pour le moment.";
     showAutoError("Erreur de chargement. Réessaie plus tard.");
   }
 }
@@ -509,7 +510,9 @@ window.addEventListener("beforeinstallprompt", (e) => {
 btnInstallApp.onclick = async () => {
   if (deferredInstallPrompt) {
     deferredInstallPrompt.prompt();
-    try { await deferredInstallPrompt.userChoice; } catch (_) {}
+    try {
+      await deferredInstallPrompt.userChoice;
+    } catch (_) {}
     deferredInstallPrompt = null;
     return;
   }
