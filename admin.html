@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -502,7 +501,7 @@
           </div>
 
           <div class="mini" style="margin-top:14px;">
-            DIGIY n’est pas une banque.  
+            DIGIY n'est pas une banque.  
             Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le commerçant.
           </div>
         </div>
@@ -525,7 +524,7 @@
 
             <div class="btnrow">
               <button id="btnOpenQr" class="btn primary" type="button">🔎 Afficher mon QR</button>
-              <button id="btnDownloadQr" class="btn primary" type="button">⬇️ Télécharger mon QR</button>
+              <button id="btnDownloadQr" class="btn primary" type="button">📥 Télécharger / Enregistrer QR</button>
               <button id="btnRenderQr" class="btn ghost" type="button">♻️ Régénérer le QR</button>
             </div>
           </div>
@@ -551,8 +550,9 @@
             </div>
 
             <div class="mini">
-              Sur ordi : clique <b>Télécharger mon QR</b>, puis ouvre le PNG dans <b>Téléchargements</b>.  
-              Là, c’est gagné.
+              📱 <b>iPhone/iPad :</b> clique Télécharger → appui long sur l'image → Enregistrer dans Photos.<br>
+              🤖 <b>Android :</b> clique Télécharger → fichier dans Téléchargements.<br>
+              💻 <b>Mac/PC :</b> clique Télécharger → PNG dans Téléchargements.
             </div>
           </div>
         </div>
@@ -565,7 +565,7 @@
 
         <div class="cardMaker">
           <div class="mini" style="margin-top:0;">
-            La carte PNG est régénérée à chaque clic, en chassant l’ancienne image.
+            La carte PNG est régénérée à chaque clic, en chassant l'ancienne image.
             QR forcé sur <b>JBBEAUVILLE</b> • Wave forcé sur <b>221771342889</b>.
           </div>
 
@@ -575,7 +575,7 @@
 
           <div class="btnrow">
             <button id="btnOpenCard" class="btn primary" type="button">🖼️ Ouvrir ma carte</button>
-            <button id="btnDownloadCard" class="btn primary" type="button">📥 Télécharger PNG</button>
+            <button id="btnDownloadCard" class="btn primary" type="button">📥 Télécharger / Enregistrer carte</button>
             <button id="btnRenderCard" class="btn ghost" type="button">🎨 Actualiser la carte</button>
           </div>
         </div>
@@ -601,6 +601,16 @@
   <script>
     (function () {
       "use strict";
+
+      // ── Device detection ──────────────────────────────────────────
+      function isIOS() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      }
+      function isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+      }
+      function isMobile() { return isIOS() || isAndroid(); }
 
       const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
       const SUPABASE_ANON_KEY =
@@ -1303,7 +1313,7 @@
 
         ctx.fillStyle = "#111827";
         ctx.font = "900 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("DIGIY n’est pas une banque", 120, 1060);
+        ctx.fillText("DIGIY n'est pas une banque", 120, 1060);
         ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText("Le paiement affiché ici passe actuellement par Wave.", 120, 1092);
 
@@ -1356,6 +1366,71 @@
         return renderQrOnly(true);
       }
 
+      // ── Téléchargement universel : MacBook + iOS + Android ────────
+      // iOS ne supporte pas blob download → on ouvre une page avec l'image
+      // Android Chrome + Mac/PC → blob URL + <a download> natif
+      function smartDownload(dataUrl, filename) {
+        if (!dataUrl) { setError("Image non disponible."); return; }
+
+        if (isIOS()) {
+          // iOS Safari : nouvelle page avec l'image + instructions appui long
+          const html = [
+            "<!DOCTYPE html><html><head>",
+            "<meta charset='utf-8'>",
+            "<meta name='viewport' content='width=device-width,initial-scale=1'>",
+            "<title>", filename, "</title>",
+            "<style>",
+            "body{margin:0;background:#0a0a0a;display:flex;flex-direction:column;",
+            "align-items:center;padding:20px;gap:16px;}",
+            "img{width:min(100%,500px);border-radius:16px;",
+            "box-shadow:0 12px 40px rgba(0,0,0,.6);}",
+            ".tip{color:#fde68a;font-family:system-ui,sans-serif;font-weight:900;",
+            "font-size:15px;text-align:center;padding:14px 18px;",
+            "background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.4);",
+            "border-radius:14px;max-width:500px;line-height:1.65;}",
+            "</style></head><body>",
+            "<div class='tip'>",
+            "📲 Appui long sur l'image ci-dessous<br>",
+            "→ <b>Enregistrer dans Photos</b><br>",
+            "ou <b>Ajouter à la photothèque</b>",
+            "</div>",
+            "<img src='", dataUrl, "' alt='", filename, "'>",
+            "</body></html>"
+          ].join("");
+          const win = window.open("", "_blank");
+          if (win) {
+            win.document.write(html);
+            win.document.close();
+            setOk("📲 Page ouverte — appui long sur l'image → Enregistrer dans Photos.");
+          } else {
+            setError("Pop-up bloquée. Active les pop-ups pour ce site dans Safari puis réessaie.");
+          }
+          return;
+        }
+
+        // Android Chrome + MacBook + Windows/Linux → blob download natif
+        try {
+          const parts = dataUrl.split(",");
+          const byteStr = atob(parts[1]);
+          const ab = new Uint8Array(byteStr.length);
+          for (let i = 0; i < byteStr.length; i++) ab[i] = byteStr.charCodeAt(i);
+          const blob = new Blob([ab], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          setOk(isAndroid()
+            ? "📥 Téléchargement lancé — vérifie ton dossier Téléchargements."
+            : "📥 PNG enregistré dans ton dossier Téléchargements.");
+        } catch (e) {
+          setError("Téléchargement impossible. " + String(e.message || e));
+        }
+      }
+
       function openPreviewWithDataUrl(dataUrl, title, hint) {
         if (!dataUrl) return;
         cardPreviewImage.src = dataUrl;
@@ -1382,11 +1457,11 @@
           openPreviewWithDataUrl(
             dataUrl,
             "Ma carte est prête",
-            "Sur téléphone, tu peux l’ouvrir en grand puis faire ta capture immédiatement."
+            "Sur téléphone, tu peux l'ouvrir en grand puis faire ta capture immédiatement."
           );
           setOk("Carte ouverte en grand.");
         } catch (e) {
-          setError("Impossible d’ouvrir la carte. " + String(e.message || e));
+          setError("Impossible d'ouvrir la carte. " + String(e.message || e));
         } finally {
           btnOpenCard.disabled = false;
         }
@@ -1406,71 +1481,19 @@
           );
           setOk("QR ouvert.");
         } catch (e) {
-          setError("Impossible d’ouvrir le QR. " + String(e.message || e));
+          setError("Impossible d'ouvrir le QR. " + String(e.message || e));
         } finally {
           btnOpenQr.disabled = false;
         }
       }
 
-      async function downloadBlobWithFallback(blob, filename, fallbackDataUrl, okMsg, fallbackMsg) {
-        try {
-          const file = new File([blob], filename, { type: "image/png" });
-
-          const canShareFiles =
-            typeof navigator !== "undefined" &&
-            typeof navigator.canShare === "function" &&
-            navigator.canShare({ files: [file] });
-
-          if (canShareFiles) {
-            try {
-              await navigator.share({
-                files: [file],
-                title: filename,
-                text: filename
-              });
-              setOk(okMsg);
-              return;
-            } catch (shareErr) {
-              if (shareErr && shareErr.name === "AbortError") {
-                setInfo("Partage annulé.");
-                return;
-              }
-            }
-          }
-
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 1500);
-          setOk(okMsg);
-        } catch (_) {
-          if (fallbackDataUrl) {
-            openPreviewWithDataUrl(fallbackDataUrl, "Aperçu PNG", fallbackMsg);
-            setInfo(fallbackMsg);
-          } else {
-            setError("Téléchargement impossible.");
-          }
-        }
-      }
-
+      // ── Download card (universal) ─────────────────────────────────
       async function downloadCard() {
         resetBoxes();
         btnDownloadCard.disabled = true;
-
         try {
-          await ensureFreshCard();
-          const blob = await canvasToBlob(cardCanvas);
-          await downloadBlobWithFallback(
-            blob,
-            buildCardFilename(),
-            lastCardDataUrl,
-            "PNG téléchargé.",
-            "Téléchargement direct indisponible ici. Carte ouverte pour capture immédiate."
-          );
+          const dataUrl = await ensureFreshCard();
+          smartDownload(dataUrl || lastCardDataUrl, buildCardFilename());
         } catch (e) {
           setError("Impossible de télécharger la carte. " + String(e.message || e));
         } finally {
@@ -1478,20 +1501,13 @@
         }
       }
 
+      // ── Download QR (universal) ───────────────────────────────────
       async function downloadQr() {
         resetBoxes();
         btnDownloadQr.disabled = true;
-
         try {
-          await ensureFreshQr();
-          const blob = await canvasToBlob(qrCanvas);
-          await downloadBlobWithFallback(
-            blob,
-            buildQrFilename(),
-            lastQrDataUrl,
-            "QR téléchargé dans Téléchargements.",
-            "Téléchargement direct indisponible ici. QR ouvert pour capture immédiate."
-          );
+          const dataUrl = await ensureFreshQr();
+          smartDownload(dataUrl || lastQrDataUrl, buildQrFilename());
         } catch (e) {
           setError("Impossible de télécharger le QR. " + String(e.message || e));
         } finally {
