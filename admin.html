@@ -285,6 +285,58 @@
       background:#fff;
     }
 
+    .qrBlock{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:340px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media(max-width:920px){
+      .qrBlock{grid-template-columns:1fr}
+    }
+    .qrPreviewBox{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+    .qrCanvasWrap{
+      margin-top:10px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:260px;
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:12px;
+      background:rgba(255,255,255,.02);
+    }
+    #qrCanvas{
+      width:min(100%,280px);
+      height:auto;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+    }
+    .qrMeta{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+    .qrMetaLine{
+      margin-top:10px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(2,6,23,.52);
+      border:1px solid rgba(255,255,255,.08);
+      color:#e5e7eb;
+      font-weight:850;
+      line-height:1.55;
+      word-break:break-word;
+    }
+
     .previewModal{
       position:fixed;
       inset:0;
@@ -459,6 +511,56 @@
       <div class="sep"></div>
 
       <div class="panel">
+        <h2>Mon QR Wave</h2>
+
+        <div class="qrBlock">
+          <div class="qrPreviewBox">
+            <div class="mini" style="margin-top:0;">
+              Ici tu génères le <b>QR seul</b>, pas la carte complète.
+            </div>
+
+            <div class="qrCanvasWrap">
+              <canvas id="qrCanvas" width="700" height="700"></canvas>
+            </div>
+
+            <div class="btnrow">
+              <button id="btnOpenQr" class="btn primary" type="button">🔎 Afficher mon QR</button>
+              <button id="btnDownloadQr" class="btn primary" type="button">⬇️ Télécharger mon QR</button>
+              <button id="btnRenderQr" class="btn ghost" type="button">♻️ Régénérer le QR</button>
+            </div>
+          </div>
+
+          <div class="qrMeta">
+            <div class="mini" style="margin-top:0;">
+              Le QR est forcé sur la destination finale du wallet actif.
+            </div>
+
+            <div class="qrMetaLine">
+              <b>Code pro actif :</b><br>
+              <span id="qrActiveCode" class="mono">JBBEAUVILLE</span>
+            </div>
+
+            <div class="qrMetaLine">
+              <b>Numéro Wave actif :</b><br>
+              <span id="qrActiveWave" class="mono">221771342889</span>
+            </div>
+
+            <div class="qrMetaLine">
+              <b>URL encodée dans le QR :</b><br>
+              <span id="qrActiveUrl" class="mono">https://pay.digiylyfe.com/?pro=JBBEAUVILLE</span>
+            </div>
+
+            <div class="mini">
+              Sur ordi : clique <b>Télécharger mon QR</b>, puis ouvre le PNG dans <b>Téléchargements</b>.  
+              Là, c’est gagné.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="panel">
         <h2>Ma carte de paiement</h2>
 
         <div class="cardMaker">
@@ -485,13 +587,13 @@
     <div class="previewBox">
       <div class="previewTop">
         <div>
-          <div class="previewTitle">Ma carte est prête</div>
-          <div class="previewHint">Sur téléphone, tu peux l’ouvrir en grand puis faire ta capture immédiatement.</div>
+          <div id="previewTitle" class="previewTitle">Aperçu</div>
+          <div id="previewHint" class="previewHint">Image prête.</div>
         </div>
         <button id="btnClosePreview" class="btn ghost" type="button" style="flex:0 0 auto;min-width:auto;">✕ Fermer</button>
       </div>
       <div class="previewBody">
-        <img id="cardPreviewImage" alt="Carte MON ARGENT">
+        <img id="cardPreviewImage" alt="Aperçu">
       </div>
     </div>
   </div>
@@ -513,7 +615,6 @@
       const LS_MODULE_SLUGS = "digiy_module_slugs";
       const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
 
-      // ✅ Force actuelle demandée
       const CARD_FORCE_CODE = "JBBEAUVILLE";
       const CARD_FORCE_WAVE = "221771342889";
       const FORCE_CARD_VALUES = true;
@@ -547,11 +648,20 @@
       const publicStatus = $("publicStatus");
       const btnOpenPublic = $("btnOpenPublic");
 
+      const qrActiveCode = $("qrActiveCode");
+      const qrActiveWave = $("qrActiveWave");
+      const qrActiveUrl = $("qrActiveUrl");
+
       const btnSave = $("btnSave");
       const btnReload = $("btnReload");
       const btnCopyLink = $("btnCopyLink");
       const btnLogout = $("btnLogout");
       const btnSupport = $("btnSupport");
+
+      const btnOpenQr = $("btnOpenQr");
+      const btnDownloadQr = $("btnDownloadQr");
+      const btnRenderQr = $("btnRenderQr");
+
       const btnOpenCard = $("btnOpenCard");
       const btnDownloadCard = $("btnDownloadCard");
       const btnRenderCard = $("btnRenderCard");
@@ -560,12 +670,17 @@
       const errorBox = $("errorBox");
       const okBox = $("okBox");
 
+      const qrCanvas = $("qrCanvas");
+      const qrCtx = qrCanvas.getContext("2d");
+
       const cardCanvas = $("cardCanvas");
       const cardCtx = cardCanvas.getContext("2d");
 
       const cardPreviewModal = $("cardPreviewModal");
       const cardPreviewImage = $("cardPreviewImage");
       const btnClosePreview = $("btnClosePreview");
+      const previewTitle = $("previewTitle");
+      const previewHint = $("previewHint");
 
       const qs = new URLSearchParams(location.search);
 
@@ -576,6 +691,10 @@
       let renderToken = 0;
       let lastRenderFingerprint = "";
       let lastCardDataUrl = "";
+
+      let qrRenderToken = 0;
+      let lastQrFingerprint = "";
+      let lastQrDataUrl = "";
 
       function normPhone(v) {
         let s = String(v || "").trim();
@@ -713,6 +832,11 @@
         publicStatus.textContent = walletActive.checked ? "Actif" : "Inactif";
         btnOpenPublic.href = code ? url : PUBLIC_BASE_URL;
 
+        qrActiveCode.textContent = code || "—";
+        qrActiveWave.textContent = wave || "—";
+        qrActiveUrl.textContent = url || "—";
+
+        void renderQrOnly();
         void renderCard();
       }
 
@@ -935,8 +1059,14 @@
         renderToken += 1;
         lastRenderFingerprint = "";
         lastCardDataUrl = "";
-        cardPreviewImage.removeAttribute("src");
         cardCtx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
+      }
+
+      function wipeQrState() {
+        qrRenderToken += 1;
+        lastQrFingerprint = "";
+        lastQrDataUrl = "";
+        qrCtx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
       }
 
       function loadImage(src) {
@@ -948,17 +1078,82 @@
         });
       }
 
-      function generateQrDataUrl(text) {
+      function generateQrDataUrl(text, width = 420) {
         return QRCode.toDataURL(text, {
           errorCorrectionLevel: "H",
           type: "image/png",
           margin: 1,
-          width: 420,
+          width,
           color: {
             dark: "#0f172a",
             light: "#ffffff"
           }
         });
+      }
+
+      function currentQrFingerprint() {
+        return [
+          getEffectiveCardCode(),
+          getEffectiveCardWave(),
+          getEffectiveCardUrl(),
+          walletActive.checked ? "1" : "0"
+        ].join("|");
+      }
+
+      async function renderQrOnly(force = false) {
+        const fingerprint = currentQrFingerprint();
+        if (!force && fingerprint === lastQrFingerprint && lastQrDataUrl) {
+          return lastQrDataUrl;
+        }
+
+        const myToken = ++qrRenderToken;
+        const W = qrCanvas.width;
+        const H = qrCanvas.height;
+        const publicUrl = getEffectiveCardUrl();
+
+        qrCtx.clearRect(0, 0, W, H);
+
+        qrCtx.fillStyle = "#ffffff";
+        qrCtx.fillRect(0, 0, W, H);
+
+        qrCtx.fillStyle = "#111827";
+        qrCtx.font = "900 30px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        qrCtx.textAlign = "center";
+        qrCtx.fillText("MON ARGENT by DIGIY", W / 2, 60);
+
+        qrCtx.fillStyle = "#4b5563";
+        qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        qrCtx.fillText(getEffectiveCardCode(), W / 2, 94);
+
+        try {
+          const qrDataUrl = await generateQrDataUrl(publicUrl, 520);
+
+          if (myToken !== qrRenderToken) return "";
+
+          const qrImg = await loadImage(qrDataUrl);
+
+          if (myToken !== qrRenderToken) return "";
+
+          qrCtx.drawImage(qrImg, 90, 120, 520, 520);
+
+          qrCtx.fillStyle = "#6b7280";
+          qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+          qrCtx.fillText("Scanne pour ouvrir le wallet", W / 2, 675);
+        } catch (_) {
+          if (myToken !== qrRenderToken) return "";
+
+          qrCtx.fillStyle = "#f3f4f6";
+          qrCtx.fillRect(90, 120, 520, 520);
+          qrCtx.fillStyle = "#111827";
+          qrCtx.font = "700 24px system-ui, sans-serif";
+          qrCtx.fillText("QR indisponible", W / 2, 400);
+        }
+
+        if (myToken !== qrRenderToken) return "";
+
+        lastQrFingerprint = fingerprint;
+        lastQrDataUrl = qrCanvas.toDataURL("image/png");
+        return lastQrDataUrl;
       }
 
       function currentCardFingerprint() {
@@ -985,7 +1180,6 @@
         const wave = getEffectiveCardWave();
         const publicUrl = getEffectiveCardUrl();
 
-        cardPreviewImage.removeAttribute("src");
         ctx.clearRect(0, 0, W, H);
 
         const bg = ctx.createLinearGradient(0, 0, W, H);
@@ -1065,7 +1259,7 @@
         ctx.fillText("Scanne le QR ou utilise le code pro", 90, 700);
 
         try {
-          const qrDataUrl = await generateQrDataUrl(publicUrl);
+          const qrDataUrl = await generateQrDataUrl(publicUrl, 420);
 
           if (myToken !== renderToken) return "";
 
@@ -1147,14 +1341,26 @@
         return (code ? ("mon-argent-" + code.toLowerCase()) : fallback) + ".png";
       }
 
+      function buildQrFilename() {
+        const code = getEffectiveCardCode();
+        return "qr-wave-" + (code ? code.toLowerCase() : "wallet") + ".png";
+      }
+
       async function ensureFreshCard() {
         wipeCardState();
         return renderCard(true);
       }
 
-      function openPreviewWithDataUrl(dataUrl) {
+      async function ensureFreshQr() {
+        wipeQrState();
+        return renderQrOnly(true);
+      }
+
+      function openPreviewWithDataUrl(dataUrl, title, hint) {
         if (!dataUrl) return;
         cardPreviewImage.src = dataUrl;
+        previewTitle.textContent = title || "Aperçu";
+        previewHint.textContent = hint || "Image prête.";
         cardPreviewModal.classList.add("open");
         cardPreviewModal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modalOpen");
@@ -1173,7 +1379,11 @@
         try {
           const dataUrl = await ensureFreshCard();
           if (!dataUrl) throw new Error("Carte vide");
-          openPreviewWithDataUrl(dataUrl);
+          openPreviewWithDataUrl(
+            dataUrl,
+            "Ma carte est prête",
+            "Sur téléphone, tu peux l’ouvrir en grand puis faire ta capture immédiatement."
+          );
           setOk("Carte ouverte en grand.");
         } catch (e) {
           setError("Impossible d’ouvrir la carte. " + String(e.message || e));
@@ -1182,15 +1392,28 @@
         }
       }
 
-      async function downloadCard() {
+      async function openQrPreview() {
         resetBoxes();
-        btnDownloadCard.disabled = true;
+        btnOpenQr.disabled = true;
 
         try {
-          await ensureFreshCard();
+          const dataUrl = await ensureFreshQr();
+          if (!dataUrl) throw new Error("QR vide");
+          openPreviewWithDataUrl(
+            dataUrl,
+            "Mon QR Wave est prêt",
+            "Sur ordi, tu peux aussi le télécharger directement dans Téléchargements."
+          );
+          setOk("QR ouvert.");
+        } catch (e) {
+          setError("Impossible d’ouvrir le QR. " + String(e.message || e));
+        } finally {
+          btnOpenQr.disabled = false;
+        }
+      }
 
-          const blob = await canvasToBlob(cardCanvas);
-          const filename = buildCardFilename();
+      async function downloadBlobWithFallback(blob, filename, fallbackDataUrl, okMsg, fallbackMsg) {
+        try {
           const file = new File([blob], filename, { type: "image/png" });
 
           const canShareFiles =
@@ -1202,10 +1425,10 @@
             try {
               await navigator.share({
                 files: [file],
-                title: "Ma carte MON ARGENT",
-                text: "Carte MON ARGENT PNG"
+                title: filename,
+                text: filename
               });
-              setOk("Carte prête à être enregistrée ou partagée.");
+              setOk(okMsg);
               return;
             } catch (shareErr) {
               if (shareErr && shareErr.name === "AbortError") {
@@ -1222,20 +1445,57 @@
           document.body.appendChild(a);
           a.click();
           a.remove();
-
           setTimeout(() => URL.revokeObjectURL(url), 1500);
-          setOk("PNG téléchargé.");
+          setOk(okMsg);
         } catch (_) {
-          try {
-            const dataUrl = lastCardDataUrl || await renderCard(true);
-            if (!dataUrl) throw new Error("Carte non générée");
-            openPreviewWithDataUrl(dataUrl);
-            setInfo("Téléchargement direct indisponible ici. Carte ouverte pour capture immédiate.");
-          } catch (e) {
-            setError("Impossible de télécharger la carte.");
+          if (fallbackDataUrl) {
+            openPreviewWithDataUrl(fallbackDataUrl, "Aperçu PNG", fallbackMsg);
+            setInfo(fallbackMsg);
+          } else {
+            setError("Téléchargement impossible.");
           }
+        }
+      }
+
+      async function downloadCard() {
+        resetBoxes();
+        btnDownloadCard.disabled = true;
+
+        try {
+          await ensureFreshCard();
+          const blob = await canvasToBlob(cardCanvas);
+          await downloadBlobWithFallback(
+            blob,
+            buildCardFilename(),
+            lastCardDataUrl,
+            "PNG téléchargé.",
+            "Téléchargement direct indisponible ici. Carte ouverte pour capture immédiate."
+          );
+        } catch (e) {
+          setError("Impossible de télécharger la carte. " + String(e.message || e));
         } finally {
           btnDownloadCard.disabled = false;
+        }
+      }
+
+      async function downloadQr() {
+        resetBoxes();
+        btnDownloadQr.disabled = true;
+
+        try {
+          await ensureFreshQr();
+          const blob = await canvasToBlob(qrCanvas);
+          await downloadBlobWithFallback(
+            blob,
+            buildQrFilename(),
+            lastQrDataUrl,
+            "QR téléchargé dans Téléchargements.",
+            "Téléchargement direct indisponible ici. QR ouvert pour capture immédiate."
+          );
+        } catch (e) {
+          setError("Impossible de télécharger le QR. " + String(e.message || e));
+        } finally {
+          btnDownloadQr.disabled = false;
         }
       }
 
@@ -1243,6 +1503,23 @@
       btnSave.addEventListener("click", saveProfile);
       btnCopyLink.addEventListener("click", copyPublicLink);
       btnSupport.addEventListener("click", openSupport);
+
+      btnRenderQr.addEventListener("click", async () => {
+        resetBoxes();
+        btnRenderQr.disabled = true;
+        try {
+          await ensureFreshQr();
+          setOk("QR régénéré proprement.");
+        } catch (e) {
+          setError("Impossible de régénérer le QR. " + String(e.message || e));
+        } finally {
+          btnRenderQr.disabled = false;
+        }
+      });
+
+      btnOpenQr.addEventListener("click", openQrPreview);
+      btnDownloadQr.addEventListener("click", downloadQr);
+
       btnRenderCard.addEventListener("click", async () => {
         resetBoxes();
         btnRenderCard.disabled = true;
@@ -1255,6 +1532,7 @@
           btnRenderCard.disabled = false;
         }
       });
+
       btnOpenCard.addEventListener("click", openCardPreview);
       btnDownloadCard.addEventListener("click", downloadCard);
 
