@@ -426,7 +426,18 @@ let deferredInstallPrompt = null;
 let sb = null;
 
 if (window.supabase && typeof window.supabase.createClient === "function") {
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      storage: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {}
+      }
+    }
+  });
 }
 
 function show(el, on = true) {
@@ -580,33 +591,32 @@ async function loadByCode(code) {
   try {
     showAutoMsg("Chargement du commerçant...");
 
-    const { data, error } = await sb
-      .from("digiy_pay_pro")
-      .select("business_name,business_code,wave_phone,is_active")
-      .eq("business_code", cleaned)
-      .eq("is_active", true)
-      .maybeSingle();
+    const { data, error } = await sb.rpc("digiy_pay_lookup_public", {
+      p_code: cleaned
+    });
 
     if (error) throw error;
 
     show(autoMsg, false);
 
-    if (!data) {
+    const row = Array.isArray(data) ? data[0] : data;
+
+    if (!row) {
       proName.textContent = "Commerçant introuvable";
       proHint.textContent = "Vérifie le code ou scanne un QR valide.";
       showAutoError("Aucun commerçant actif trouvé pour ce code.");
       return;
     }
 
-    const phone = normalizePhone(data.wave_phone);
+    const phone = normalizePhone(row.wave_phone);
     if (phone.length < 12) {
-      proName.textContent = data.business_name || cleaned;
+      proName.textContent = row.business_name || cleaned;
       proHint.textContent = "Compte incomplet.";
       showAutoError("Ce commerçant n’a pas encore de numéro Wave valide.");
       return;
     }
 
-    showPayCard(data.business_name || cleaned, phone);
+    showPayCard(row.business_name || cleaned, phone);
   } catch (e) {
     console.error("DIGIY PAY loadByCode error:", e);
     proName.textContent = "Service indisponible";
