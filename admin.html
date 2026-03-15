@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -9,6 +10,12 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1">
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
   <link rel="manifest" href="./site.webmanifest?v=1">
+
+  <script>
+    window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+    window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+    window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
@@ -35,10 +42,7 @@
       color:var(--text);
     }
     body.modalOpen{overflow:hidden}
-    .wrap{
-      width:min(1100px,100%);
-      margin:0 auto;
-    }
+    .wrap{width:min(1100px,100%);margin:0 auto}
     .card{
       background:rgba(2,8,24,.96);
       border:1px solid rgba(19,78,74,.9);
@@ -129,10 +133,8 @@
       font-weight:900;
       outline:none;
     }
-    input[readonly]{
-      opacity:.92;
-      cursor:not-allowed;
-    }
+    input::placeholder{color:#a8b3cf}
+    input[readonly]{opacity:.92;cursor:not-allowed}
     .hint{
       margin-top:6px;
       color:var(--muted);
@@ -161,11 +163,11 @@
       cursor:pointer;
       user-select:none;
       text-decoration:none;
+      transition:transform .16s ease,opacity .16s ease;
     }
-    .btn[disabled]{
-      opacity:.6;
-      cursor:not-allowed;
-    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
     .btn.primary{
       background:linear-gradient(135deg,#22c55e,#16a34a);
       color:#022c22;
@@ -256,7 +258,6 @@
     .mono{
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
     }
-
     .cardMaker{
       margin-top:12px;
       border:1px solid var(--line);
@@ -283,7 +284,6 @@
       box-shadow:0 16px 40px rgba(0,0,0,.35);
       background:#fff;
     }
-
     .qrBlock{
       margin-top:14px;
       display:grid;
@@ -335,7 +335,6 @@
       line-height:1.55;
       word-break:break-word;
     }
-
     .previewModal{
       position:fixed;
       inset:0;
@@ -450,7 +449,7 @@
             <input id="walletActive" type="checkbox">
             <div>
               <div style="font-weight:950">Wallet actif</div>
-              <div class="mini">Si décoché, le wallet public ne doit plus être servi comme actif.</div>
+              <div class="mini">Si décoché, le wallet public n’est plus servi comme actif.</div>
             </div>
           </div>
 
@@ -501,7 +500,7 @@
           </div>
 
           <div class="mini" style="margin-top:14px;">
-            DIGIY n'est pas une banque.  
+            DIGIY n'est pas une banque.
             Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le commerçant.
           </div>
         </div>
@@ -515,7 +514,7 @@
         <div class="qrBlock">
           <div class="qrPreviewBox">
             <div class="mini" style="margin-top:0;">
-              Ici tu génères le <b>QR seul</b>, pas la carte complète.
+              Ici tu génères le <b>QR seul</b> du wallet actif.
             </div>
 
             <div class="qrCanvasWrap">
@@ -531,22 +530,22 @@
 
           <div class="qrMeta">
             <div class="mini" style="margin-top:0;">
-              Le QR est forcé sur la destination finale du wallet actif.
+              Le QR suit toujours le <b>code pro actif</b> de ce wallet.
             </div>
 
             <div class="qrMetaLine">
               <b>Code pro actif :</b><br>
-              <span id="qrActiveCode" class="mono">JBBEAUVILLE</span>
+              <span id="qrActiveCode" class="mono">—</span>
             </div>
 
             <div class="qrMetaLine">
               <b>Numéro Wave actif :</b><br>
-              <span id="qrActiveWave" class="mono">221771342889</span>
+              <span id="qrActiveWave" class="mono">—</span>
             </div>
 
             <div class="qrMetaLine">
               <b>URL encodée dans le QR :</b><br>
-              <span id="qrActiveUrl" class="mono">https://pay.digiylyfe.com/?pro=JBBEAUVILLE</span>
+              <span id="qrActiveUrl" class="mono">—</span>
             </div>
 
             <div class="mini">
@@ -565,8 +564,7 @@
 
         <div class="cardMaker">
           <div class="mini" style="margin-top:0;">
-            La carte PNG est régénérée à chaque clic, en chassant l'ancienne image.
-            QR forcé sur <b>JBBEAUVILLE</b> • Wave forcé sur <b>221771342889</b>.
+            La carte PNG est régénérée à chaque clic, sans garder l'ancienne identité d'un autre wallet.
           </div>
 
           <div class="canvasWrap">
@@ -602,7 +600,6 @@
     (function () {
       "use strict";
 
-      // ── Device detection ──────────────────────────────────────────
       function isIOS() {
         return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
           (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -610,19 +607,17 @@
       function isAndroid() {
         return /Android/i.test(navigator.userAgent);
       }
-      function isMobile() { return isIOS() || isAndroid(); }
-      // Safari desktop = Safari sans Chrome/Chromium/Android/iOS
-      function isSafariDesktop() {
-        const ua = navigator.userAgent;
-        return /Safari/i.test(ua) &&
-          !/Chrome|Chromium|Android/i.test(ua) &&
-          !isIOS();
-      }
 
-      const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+      const SUPABASE_URL =
+        window.DIGIY_SUPABASE_URL ||
+        "https://wesqmwjjtsefyjnluosj.supabase.co";
+
       const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+        window.DIGIY_SUPABASE_ANON_KEY ||
+        window.DIGIY_SUPABASE_ANON ||
+        "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
 
+      const MODULE_CODE = "PAY";
       const PUBLIC_BASE_URL = "https://pay.digiylyfe.com/";
       const PIN_URL = "https://pay.digiylyfe.com/pin.html";
       const SUPPORT_WA = "+221771342889";
@@ -630,13 +625,11 @@
       const LS_PHONE = "digiy_phone";
       const LS_SLUG = "digiy_slug";
       const LS_MODULE_SLUGS = "digiy_module_slugs";
+      const LS_PAY_PHONE = "digiy_pay_phone";
+      const LS_PAY_SLUG = "digiy_pay_slug";
       const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
 
-      const CARD_FORCE_CODE = "JBBEAUVILLE";
-      const CARD_FORCE_WAVE = "221771342889";
-      const FORCE_CARD_VALUES = true;
-
-      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
@@ -744,6 +737,7 @@
       }
 
       function show(el, on = true) {
+        if (!el) return;
         el.style.display = on ? "" : "none";
       }
 
@@ -751,6 +745,9 @@
         show(infoBox, false);
         show(errorBox, false);
         show(okBox, false);
+        infoBox.textContent = "";
+        errorBox.textContent = "";
+        okBox.textContent = "";
       }
 
       function setInfo(msg) {
@@ -783,10 +780,19 @@
         let slug = normSlug(qs.get("slug") || "");
 
         if (!phone) {
-          try { phone = normPhone(localStorage.getItem(LS_PHONE) || ""); } catch (_) {}
+          try { phone = normPhone(localStorage.getItem(LS_PAY_PHONE) || ""); } catch (_) {}
         }
         if (!slug) {
-          try { slug = normSlug(localStorage.getItem(LS_SLUG) || ""); } catch (_) {}
+          try { slug = normSlug(localStorage.getItem(LS_PAY_SLUG) || ""); } catch (_) {}
+        }
+
+        if (!phone || !slug) {
+          try {
+            const raw = localStorage.getItem(SESSION_KEY);
+            const s = raw ? JSON.parse(raw) : null;
+            if (!phone && s?.phone) phone = normPhone(s.phone);
+            if (!slug && s?.slug) slug = normSlug(s.slug);
+          } catch (_) {}
         }
 
         if (!slug) {
@@ -795,12 +801,10 @@
         }
 
         if (!phone) {
-          try {
-            const raw = localStorage.getItem(SESSION_KEY);
-            const s = raw ? JSON.parse(raw) : null;
-            if (s?.phone) phone = normPhone(s.phone);
-            if (!slug && s?.slug) slug = normSlug(s.slug);
-          } catch (_) {}
+          try { phone = normPhone(localStorage.getItem(LS_PHONE) || ""); } catch (_) {}
+        }
+        if (!slug) {
+          try { slug = normSlug(localStorage.getItem(LS_SLUG) || ""); } catch (_) {}
         }
 
         return { phone, slug };
@@ -809,55 +813,73 @@
       function clearSession() {
         try {
           localStorage.removeItem(SESSION_KEY);
-          localStorage.removeItem(LS_PHONE);
-          localStorage.removeItem(LS_SLUG);
+          localStorage.removeItem(LS_PAY_PHONE);
+          localStorage.removeItem(LS_PAY_SLUG);
+
           const map = readModuleSlugs();
           delete map.PAY;
           localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
         } catch (_) {}
       }
 
+      function saveSession(phone, slug) {
+        const p = normPhone(phone || "");
+        const s = normSlug(slug || "");
+        try {
+          if (p) localStorage.setItem(LS_PAY_PHONE, p);
+          if (s) localStorage.setItem(LS_PAY_SLUG, s);
+
+          const map = readModuleSlugs();
+          if (s) {
+            map.PAY = s;
+            localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
+          }
+
+          localStorage.setItem(SESSION_KEY, JSON.stringify({
+            phone: p,
+            slug: s,
+            module: MODULE_CODE,
+            ts: Date.now()
+          }));
+        } catch (_) {}
+      }
+
       function buildPublicUrl(code) {
-        const c = makeCode(code);
+        const clean = makeCode(code);
         const u = new URL(PUBLIC_BASE_URL);
-        if (c) u.searchParams.set("pro", c);
+        if (clean) u.searchParams.set("pro", clean);
         return u.toString();
       }
 
-      function getEffectiveCardCode() {
-        return FORCE_CARD_VALUES ? CARD_FORCE_CODE : makeCode(walletCode.value || "");
+      function getEffectiveCode() {
+        return makeCode(walletCode.value || "");
       }
 
-      function getEffectiveCardWave() {
-        return FORCE_CARD_VALUES ? CARD_FORCE_WAVE : digitsOnly(walletPhone.value || "");
+      function getEffectiveWave() {
+        return digitsOnly(walletPhone.value || "");
       }
 
-      function getEffectiveCardUrl() {
-        return buildPublicUrl(getEffectiveCardCode());
+      function getEffectivePublicUrl() {
+        return buildPublicUrl(getEffectiveCode());
       }
 
-      function updatePreview() {
-        const code = getEffectiveCardCode();
-        const wave = getEffectiveCardWave();
-        const url = getEffectiveCardUrl();
+      async function resolvePhoneFromSlug(slug) {
+        const s = normSlug(slug);
+        if (!s) return "";
 
-        sessionPhone.textContent = currentPhone ? digitsOnly(currentPhone) : "—";
-        sessionSlug.textContent = currentSlug || "—";
-        merchantWave.textContent = wave || "—";
-        publicLink.textContent = code ? url : "—";
-        publicCode.textContent = code || "—";
-        publicStatus.textContent = walletActive.checked ? "Actif" : "Inactif";
-        btnOpenPublic.href = code ? url : PUBLIC_BASE_URL;
+        const { data, error } = await sb
+          .from("digiy_subscriptions_public")
+          .select("phone,slug,module")
+          .eq("slug", s)
+          .limit(1)
+          .maybeSingle();
 
-        qrActiveCode.textContent = code || "—";
-        qrActiveWave.textContent = wave || "—";
-        qrActiveUrl.textContent = url || "—";
-
-        void renderQrOnly();
-        void renderCard();
+        if (error || !data?.phone) return "";
+        return normPhone(data.phone);
       }
 
       async function ensureWallet(phoneDigits) {
+        if (!phoneDigits) return;
         try {
           await sb.rpc("rpc_wallet_ensure", { p_phone: phoneDigits });
         } catch (_) {}
@@ -899,10 +921,31 @@
         return data || null;
       }
 
+      function updatePreview() {
+        const code = getEffectiveCode();
+        const wave = getEffectiveWave();
+        const url = getEffectivePublicUrl();
+
+        sessionPhone.textContent = currentPhone ? digitsOnly(currentPhone) : "—";
+        sessionSlug.textContent = currentSlug || "—";
+        merchantWave.textContent = wave || "—";
+        publicLink.textContent = code ? url : "—";
+        publicCode.textContent = code || "—";
+        publicStatus.textContent = walletActive.checked ? "Actif" : "Inactif";
+        btnOpenPublic.href = code ? url : PUBLIC_BASE_URL;
+
+        qrActiveCode.textContent = code || "—";
+        qrActiveWave.textContent = wave || "—";
+        qrActiveUrl.textContent = code ? url : "—";
+
+        void renderQrOnly();
+        void renderCard();
+      }
+
       function fillForm(profile) {
-        walletName.value = profile?.business_name || "JB BEAUVILLE";
-        walletCode.value = makeCode(profile?.business_code || CARD_FORCE_CODE);
-        walletPhone.value = digitsOnly(profile?.wave_phone || CARD_FORCE_WAVE || currentPhone || "");
+        walletName.value = profile?.business_name || "";
+        walletCode.value = makeCode(profile?.business_code || "");
+        walletPhone.value = digitsOnly(profile?.wave_phone || currentPhone || "");
         walletSlug.value = currentSlug || "";
         walletActive.checked = profile?.is_active !== false;
         loadedProfile = profile || null;
@@ -927,10 +970,17 @@
         currentPhone = normPhone(session.phone || "");
         currentSlug = normSlug(session.slug || "");
 
+        if (!currentPhone && currentSlug) {
+          setInfo("Résolution du téléphone à partir du slug…");
+          currentPhone = await resolvePhoneFromSlug(currentSlug);
+        }
+
         if (!currentPhone) {
           location.replace(PIN_URL);
           return;
         }
+
+        saveSession(currentPhone, currentSlug);
 
         walletSlug.value = currentSlug || "";
         sessionPhone.textContent = digitsOnly(currentPhone);
@@ -947,16 +997,14 @@
           profile = await fetchByBusinessCode(qs.get("pro"));
         }
 
-        if (!profile) {
-          profile = await fetchByBusinessCode(CARD_FORCE_CODE);
-        }
-
         fillForm(profile);
         resetBoxes();
 
         if (profile) {
           setOk("Wallet chargé.");
         } else {
+          walletPhone.value = phoneDigits;
+          updatePreview();
           setInfo("Aucune fiche publique trouvée. Tu peux la créer maintenant.");
         }
       }
@@ -1006,11 +1054,28 @@
 
             if (error) throw error;
           } else {
-            const { error } = await sb
-              .from("digiy_pay_pro")
-              .insert(payload);
+            let updateOk = false;
 
-            if (error) throw error;
+            if (currentPhone) {
+              const byPhone = await sb
+                .from("digiy_pay_pro")
+                .update(payload)
+                .eq("wave_phone", digitsOnly(currentPhone))
+                .select("business_code")
+                .limit(1);
+
+              if (!byPhone.error && Array.isArray(byPhone.data) && byPhone.data.length > 0) {
+                updateOk = true;
+              }
+            }
+
+            if (!updateOk) {
+              const { error } = await sb
+                .from("digiy_pay_pro")
+                .insert(payload);
+
+              if (error) throw error;
+            }
           }
 
           loadedProfile = {
@@ -1021,17 +1086,15 @@
           };
 
           currentPhone = normPhone(phoneDigits);
-          try {
-            localStorage.setItem(LS_PHONE, currentPhone);
-          } catch (_) {}
+          saveSession(currentPhone, currentSlug);
 
           fillForm(loadedProfile);
           resetBoxes();
           setOk("Fiche wallet sauvegardée.");
         } catch (e) {
           setError(
-            "Sauvegarde refusée ou bloquée par la base. " +
-            "Détail: " + String(e.message || e)
+            "Sauvegarde refusée ou bloquée par la base. Détail: " +
+            String(e?.message || e)
           );
         } finally {
           btnSave.disabled = false;
@@ -1039,16 +1102,28 @@
       }
 
       function copyPublicLink() {
-        const url = getEffectiveCardUrl();
-        navigator.clipboard?.writeText(url).then(
-          () => setOk("Lien public copié."),
-          () => setInfo(url)
-        );
+        const code = getEffectiveCode();
+        if (!code) {
+          setError("Code pro manquant.");
+          walletCode.focus();
+          return;
+        }
+
+        const url = getEffectivePublicUrl();
+
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(url).then(
+            () => setOk("Lien public copié."),
+            () => window.prompt("Copie ce lien :", url)
+          );
+        } else {
+          window.prompt("Copie ce lien :", url);
+        }
       }
 
       function openSupport() {
         const phoneDigits = digitsOnly(walletPhone.value || currentPhone || "");
-        const code = makeCode(walletCode.value || "");
+        const code = getEffectiveCode();
         let msg = "DIGIY — MON ARGENT PRO\n\n";
         if (phoneDigits) msg += "Numéro Wave: " + phoneDigits + "\n";
         if (code) msg += "Code: " + code + "\n";
@@ -1110,15 +1185,18 @@
 
       function currentQrFingerprint() {
         return [
-          getEffectiveCardCode(),
-          getEffectiveCardWave(),
-          getEffectiveCardUrl(),
+          getEffectiveCode(),
+          getEffectiveWave(),
+          getEffectivePublicUrl(),
           walletActive.checked ? "1" : "0"
         ].join("|");
       }
 
       async function renderQrOnly(force = false) {
+        const code = getEffectiveCode();
+        const publicUrl = getEffectivePublicUrl();
         const fingerprint = currentQrFingerprint();
+
         if (!force && fingerprint === lastQrFingerprint && lastQrDataUrl) {
           return lastQrDataUrl;
         }
@@ -1126,10 +1204,8 @@
         const myToken = ++qrRenderToken;
         const W = qrCanvas.width;
         const H = qrCanvas.height;
-        const publicUrl = getEffectiveCardUrl();
 
         qrCtx.clearRect(0, 0, W, H);
-
         qrCtx.fillStyle = "#ffffff";
         qrCtx.fillRect(0, 0, W, H);
 
@@ -1140,30 +1216,35 @@
 
         qrCtx.fillStyle = "#4b5563";
         qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        qrCtx.fillText(getEffectiveCardCode(), W / 2, 94);
+        qrCtx.fillText(code || "CODE PRO MANQUANT", W / 2, 94);
 
-        try {
-          const qrDataUrl = await generateQrDataUrl(publicUrl, 520);
+        if (code) {
+          try {
+            const qrDataUrl = await generateQrDataUrl(publicUrl, 520);
+            if (myToken !== qrRenderToken) return "";
 
-          if (myToken !== qrRenderToken) return "";
+            const qrImg = await loadImage(qrDataUrl);
+            if (myToken !== qrRenderToken) return "";
 
-          const qrImg = await loadImage(qrDataUrl);
+            qrCtx.drawImage(qrImg, 90, 120, 520, 520);
 
-          if (myToken !== qrRenderToken) return "";
-
-          qrCtx.drawImage(qrImg, 90, 120, 520, 520);
-
-          qrCtx.fillStyle = "#6b7280";
-          qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-          qrCtx.fillText("Scanne pour ouvrir le wallet", W / 2, 675);
-        } catch (_) {
-          if (myToken !== qrRenderToken) return "";
-
+            qrCtx.fillStyle = "#6b7280";
+            qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+            qrCtx.fillText("Scanne pour ouvrir le wallet", W / 2, 675);
+          } catch (_) {
+            if (myToken !== qrRenderToken) return "";
+            qrCtx.fillStyle = "#f3f4f6";
+            qrCtx.fillRect(90, 120, 520, 520);
+            qrCtx.fillStyle = "#111827";
+            qrCtx.font = "700 24px system-ui, sans-serif";
+            qrCtx.fillText("QR indisponible", W / 2, 400);
+          }
+        } else {
           qrCtx.fillStyle = "#f3f4f6";
           qrCtx.fillRect(90, 120, 520, 520);
           qrCtx.fillStyle = "#111827";
           qrCtx.font = "700 24px system-ui, sans-serif";
-          qrCtx.fillText("QR indisponible", W / 2, 400);
+          qrCtx.fillText("Code pro requis", W / 2, 400);
         }
 
         if (myToken !== qrRenderToken) return "";
@@ -1174,9 +1255,9 @@
       }
 
       function currentCardFingerprint() {
-        const name = String(walletName.value || "MON ARGENT").trim() || "MON ARGENT";
-        const code = getEffectiveCardCode();
-        const wave = getEffectiveCardWave();
+        const name = String(walletName.value || "").trim();
+        const code = getEffectiveCode();
+        const wave = getEffectiveWave();
         const active = walletActive.checked ? "1" : "0";
         return [name, code, wave, active].join("|");
       }
@@ -1192,10 +1273,10 @@
         const W = cardCanvas.width;
         const H = cardCanvas.height;
 
-        const name = String(walletName.value || "MON ARGENT").trim() || "MON ARGENT";
-        const code = getEffectiveCardCode();
-        const wave = getEffectiveCardWave();
-        const publicUrl = getEffectiveCardUrl();
+        const name = String(walletName.value || "").trim() || "MON ARGENT";
+        const code = getEffectiveCode();
+        const wave = getEffectiveWave();
+        const publicUrl = getEffectivePublicUrl();
 
         ctx.clearRect(0, 0, W, H);
 
@@ -1249,7 +1330,7 @@
 
         ctx.fillStyle = "#fde68a";
         ctx.font = "900 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("QR ACTIF FINAL", 668, 120);
+        ctx.fillText("QR WALLET ACTIF", 660, 120);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 42px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
@@ -1275,33 +1356,40 @@
         ctx.font = "800 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText("Scanne le QR ou utilise le code pro", 90, 700);
 
-        try {
-          const qrDataUrl = await generateQrDataUrl(publicUrl, 420);
+        if (code) {
+          try {
+            const qrDataUrl = await generateQrDataUrl(publicUrl, 420);
+            if (myToken !== renderToken) return "";
 
-          if (myToken !== renderToken) return "";
+            const qrImg = await loadImage(qrDataUrl);
+            if (myToken !== renderToken) return "";
 
-          const qrImg = await loadImage(qrDataUrl);
+            ctx.fillStyle = "#f9fafb";
+            roundedRect(ctx, 560, 420, 260, 260, 24);
+            ctx.fill();
 
-          if (myToken !== renderToken) return "";
+            ctx.drawImage(qrImg, 590, 450, 200, 200);
 
-          ctx.fillStyle = "#f9fafb";
-          roundedRect(ctx, 560, 420, 260, 260, 24);
-          ctx.fill();
+            ctx.fillStyle = "#4b5563";
+            ctx.font = "800 14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+            ctx.fillText("QR généré depuis le code actif", 575, 695);
+          } catch (_) {
+            if (myToken !== renderToken) return "";
 
-          ctx.drawImage(qrImg, 590, 450, 200, 200);
-
-          ctx.fillStyle = "#4b5563";
-          ctx.font = "800 14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-          ctx.fillText("QR forcé sur JBBEAUVILLE", 575, 695);
-        } catch (_) {
-          if (myToken !== renderToken) return "";
-
+            ctx.fillStyle = "#e5e7eb";
+            roundedRect(ctx, 560, 420, 260, 260, 24);
+            ctx.fill();
+            ctx.fillStyle = "#111827";
+            ctx.font = "700 24px system-ui, sans-serif";
+            ctx.fillText("QR indisponible", 605, 555);
+          }
+        } else {
           ctx.fillStyle = "#e5e7eb";
           roundedRect(ctx, 560, 420, 260, 260, 24);
           ctx.fill();
           ctx.fillStyle = "#111827";
-          ctx.font = "700 24px system-ui, sans-serif";
-          ctx.fillText("QR indisponible", 605, 555);
+          ctx.font = "700 22px system-ui, sans-serif";
+          ctx.fillText("Code pro requis", 610, 555);
         }
 
         ctx.fillStyle = "#111827";
@@ -1326,7 +1414,7 @@
 
         ctx.fillStyle = "#6b7280";
         ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("Lien public : " + publicUrl, 90, 1185);
+        ctx.fillText("Lien public : " + (code ? publicUrl : "—"), 90, 1185);
 
         ctx.fillStyle = "#16a34a";
         ctx.font = "900 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
@@ -1343,23 +1431,14 @@
         return lastCardDataUrl;
       }
 
-      function canvasToBlob(canvas) {
-        return new Promise((resolve, reject) => {
-          canvas.toBlob((blob) => {
-            if (blob) resolve(blob);
-            else reject(new Error("PNG introuvable"));
-          }, "image/png");
-        });
-      }
-
       function buildCardFilename() {
-        const code = getEffectiveCardCode();
+        const code = getEffectiveCode();
         const fallback = "ma-carte-mon-argent";
         return (code ? ("mon-argent-" + code.toLowerCase()) : fallback) + ".png";
       }
 
       function buildQrFilename() {
-        const code = getEffectiveCardCode();
+        const code = getEffectiveCode();
         return "qr-wave-" + (code ? code.toLowerCase() : "wallet") + ".png";
       }
 
@@ -1373,8 +1452,6 @@
         return renderQrOnly(true);
       }
 
-      // ── Téléchargement universel ──────────────────────────────────
-      // 4 cas : iOS · Safari Mac · Android · Chrome/Firefox Mac/PC
       function openImagePage(dataUrl, filename, tipHtml) {
         const html = [
           "<!DOCTYPE html><html><head>",
@@ -1383,22 +1460,17 @@
           "<title>", filename, "</title>",
           "<style>",
           "*{box-sizing:border-box;margin:0;padding:0}",
-          "body{background:#060f0a;min-height:100vh;display:flex;flex-direction:column;",
-          "align-items:center;justify-content:flex-start;padding:24px 16px;gap:20px;",
-          "font-family:system-ui,sans-serif;}",
-          ".tip{width:min(100%,560px);color:#fde68a;font-weight:900;font-size:16px;",
-          "text-align:center;padding:18px 22px;line-height:1.75;",
-          "background:rgba(250,204,21,.1);border:2px solid rgba(250,204,21,.45);",
-          "border-radius:18px;}",
-          ".tip b{font-size:18px;}",
-          ".tip .sub{margin-top:8px;color:#bbf7d0;font-size:14px;font-weight:800;}",
-          "img{width:min(100%,560px);border-radius:20px;",
-          "box-shadow:0 20px 60px rgba(0,0,0,.7);background:#fff;}",
+          "body{background:#060f0a;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px;gap:20px;font-family:system-ui,sans-serif;}",
+          ".tip{width:min(100%,560px);color:#fde68a;font-weight:900;font-size:16px;text-align:center;padding:18px 22px;line-height:1.75;background:rgba(250,204,21,.1);border:2px solid rgba(250,204,21,.45);border-radius:18px;}",
+          ".tip b{font-size:18px}",
+          ".tip .sub{margin-top:8px;color:#bbf7d0;font-size:14px;font-weight:800}",
+          "img{width:min(100%,560px);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.7);background:#fff;}",
           "</style></head><body>",
           "<div class='tip'>", tipHtml, "</div>",
           "<img src='", dataUrl, "' alt='", filename, "'>",
           "</body></html>"
         ].join("");
+
         const win = window.open("", "_blank");
         if (win) {
           win.document.write(html);
@@ -1409,26 +1481,27 @@
       }
 
       function smartDownload(dataUrl, filename) {
-        if (!dataUrl) { setError("Image non disponible."); return; }
+        if (!dataUrl) {
+          setError("Image non disponible.");
+          return;
+        }
 
-        // ① iOS (iPhone / iPad) → appui long sur l'image
         if (isIOS()) {
-          openImagePage(dataUrl, filename,
-            "📲 <b>Appui long sur l'image</b><br>" +
-            "→ Enregistrer dans Photos<br>" +
-            "<span class='sub'>ou Ajouter à la photothèque</span>"
+          openImagePage(
+            dataUrl,
+            filename,
+            "📲 <b>Appui long sur l'image</b><br>→ Enregistrer dans Photos<br><span class='sub'>ou Ajouter à la photothèque</span>"
           );
           setOk("📲 Page ouverte — appui long sur l'image → Enregistrer dans Photos.");
           return;
         }
 
-        // ② Tout le reste : Safari Mac + Chrome Mac + Android + Windows
-        // → blob download natif → Finder Téléchargements directement
         try {
           const parts = dataUrl.split(",");
           const byteStr = atob(parts[1]);
           const ab = new Uint8Array(byteStr.length);
           for (let i = 0; i < byteStr.length; i++) ab[i] = byteStr.charCodeAt(i);
+
           const blob = new Blob([ab], { type: "image/png" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
@@ -1437,7 +1510,12 @@
           a.style.display = "none";
           document.body.appendChild(a);
           a.click();
-          setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 3000);
+
+          setTimeout(() => {
+            a.remove();
+            URL.revokeObjectURL(url);
+          }, 3000);
+
           setOk(isAndroid()
             ? "📥 Téléchargé — vérifie ton dossier Téléchargements."
             : "📥 Fichier dans Téléchargements — ouvre ton Finder 📂");
@@ -1469,6 +1547,7 @@
         try {
           const dataUrl = await ensureFreshCard();
           if (!dataUrl) throw new Error("Carte vide");
+
           openPreviewWithDataUrl(
             dataUrl,
             "Ma carte est prête",
@@ -1489,6 +1568,7 @@
         try {
           const dataUrl = await ensureFreshQr();
           if (!dataUrl) throw new Error("QR vide");
+
           openPreviewWithDataUrl(
             dataUrl,
             "Mon QR Wave est prêt",
@@ -1502,7 +1582,6 @@
         }
       }
 
-      // ── Download card (universal) ─────────────────────────────────
       async function downloadCard() {
         resetBoxes();
         btnDownloadCard.disabled = true;
@@ -1516,7 +1595,6 @@
         }
       }
 
-      // ── Download QR (universal) ───────────────────────────────────
       async function downloadQr() {
         resetBoxes();
         btnDownloadQr.disabled = true;
@@ -1605,3 +1683,4 @@
   </script>
 </body>
 </html>
+
