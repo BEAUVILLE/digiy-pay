@@ -11,6 +11,11 @@
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
   <link rel="manifest" href="./site.webmanifest?v=1">
 
+  <script>
+    window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+    window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+    window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -109,6 +114,9 @@
       font-weight:900;
       outline:none;
     }
+    input::placeholder{
+      color:#a8b3cf;
+    }
     small{
       display:block;
       margin-top:6px;
@@ -138,7 +146,10 @@
       cursor:pointer;
       user-select:none;
       text-decoration:none;
+      transition:transform .16s ease,opacity .16s ease;
     }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
     .btn.primary{
       background:linear-gradient(135deg,#22c55e,#16a34a);
       color:#022c22;
@@ -263,9 +274,14 @@
 (function () {
   "use strict";
 
-  const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+  const SUPABASE_URL =
+    window.DIGIY_SUPABASE_URL ||
+    "https://wesqmwjjtsefyjnluosj.supabase.co";
+
   const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+    window.DIGIY_SUPABASE_ANON_KEY ||
+    window.DIGIY_SUPABASE_ANON ||
+    "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
 
   const MODULE_CODE = "PAY";
   const ADMIN_URL = "https://pay.digiylyfe.com/admin.html";
@@ -274,9 +290,11 @@
   const LS_PHONE = "digiy_phone";
   const LS_SLUG = "digiy_slug";
   const LS_MODULE_SLUGS = "digiy_module_slugs";
+  const LS_PAY_PHONE = "digiy_pay_phone";
+  const LS_PAY_SLUG = "digiy_pay_slug";
   const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -338,6 +356,9 @@
     show(infoBox, false);
     show(errorBox, false);
     show(okBox, false);
+    infoBox.textContent = "";
+    errorBox.textContent = "";
+    okBox.textContent = "";
   }
 
   function setInfo(msg) {
@@ -370,8 +391,15 @@
     const cleanSlug = normSlug(slug || "");
 
     try {
-      if (cleanPhone) localStorage.setItem(LS_PHONE, cleanPhone);
-      if (cleanSlug) localStorage.setItem(LS_SLUG, cleanSlug);
+      if (cleanPhone) {
+        localStorage.setItem(LS_PHONE, cleanPhone);
+        localStorage.setItem(LS_PAY_PHONE, cleanPhone);
+      }
+
+      if (cleanSlug) {
+        localStorage.setItem(LS_SLUG, cleanSlug);
+        localStorage.setItem(LS_PAY_SLUG, cleanSlug);
+      }
 
       const map = readModuleSlugs();
       if (cleanSlug) {
@@ -395,11 +423,21 @@
     try {
       const raw = localStorage.getItem(SESSION_KEY);
       const data = raw ? JSON.parse(raw) : null;
-      if (!data || typeof data !== "object") return null;
-      return {
-        phone: normPhone(data.phone || ""),
-        slug: normSlug(data.slug || "")
-      };
+      const map = readModuleSlugs();
+
+      const phone =
+        normPhone(data?.phone || "") ||
+        normPhone(localStorage.getItem(LS_PAY_PHONE) || "") ||
+        normPhone(localStorage.getItem(LS_PHONE) || "");
+
+      const slug =
+        normSlug(data?.slug || "") ||
+        normSlug(localStorage.getItem(LS_PAY_SLUG) || "") ||
+        normSlug(map[MODULE_CODE] || "") ||
+        normSlug(localStorage.getItem(LS_SLUG) || "");
+
+      if (!phone && !slug) return null;
+      return { phone, slug };
     } catch (_) {
       return null;
     }
@@ -423,20 +461,40 @@
     const s = normSlug(slug);
     if (!s) return "";
 
-    const url =
-      `${SUPABASE_URL}/rest/v1/digiy_subscriptions_public` +
-      `?select=phone,slug,module&slug=eq.${encodeURIComponent(s)}&limit=1`;
+    const { data, error } = await sb
+      .from("digiy_subscriptions_public")
+      .select("phone,slug,module")
+      .eq("slug", s)
+      .limit(1)
+      .maybeSingle();
 
-    const r = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
+    if (error || !data?.phone) return "";
+    return normPhone(data.phone);
+  }
 
-    const arr = await r.json().catch(() => []);
-    if (!r.ok || !Array.isArray(arr) || !arr[0]?.phone) return "";
-    return normPhone(arr[0].phone);
+  async function resolveSlugFromPhone(phone) {
+    const p = digitsOnly(phone);
+    if (!p) return "";
+
+    let { data, error } = await sb
+      .from("digiy_subscriptions_public")
+      .select("slug,module,phone")
+      .eq("phone", p)
+      .eq("module", "PAY")
+      .limit(1)
+      .maybeSingle();
+
+    if (!error && data?.slug) return normSlug(data.slug);
+
+    const fallback = await sb
+      .from("digiy_subscriptions_public")
+      .select("slug,module,phone")
+      .eq("phone", p)
+      .limit(1)
+      .maybeSingle();
+
+    if (fallback.error || !fallback.data?.slug) return "";
+    return normSlug(fallback.data.slug);
   }
 
   async function tryPinRpc(phone, pin) {
@@ -506,7 +564,7 @@
 
     let phone = normPhone(phoneInput.value || phoneQ || "");
     const pin = digitsOnly(pinInput.value || "");
-    const slug = normSlug(slugQ || "");
+    let slug = normSlug(slugQ || "");
 
     if (!phone && slug) {
       setInfo("Résolution du téléphone à partir du slug…");
@@ -542,12 +600,16 @@
         throw new Error("PIN refusé ou accès wallet non trouvé.");
       }
 
+      if (!parsed.slug && !slug) {
+        slug = await resolveSlugFromPhone(parsed.phone || phone);
+      }
+
       setOk("Accès validé. Redirection vers MON ARGENT PRO…");
       setTimeout(() => {
         goAdmin(parsed.phone || phone, parsed.slug || slug);
       }, 300);
     } catch (e) {
-      setError(String(e.message || e || "Connexion impossible."));
+      setError(String(e?.message || e || "Connexion impossible."));
     } finally {
       btnLogin.disabled = false;
     }
@@ -600,16 +662,36 @@
     }
   });
 
-  btnSession.addEventListener("click", () => {
+  btnSession.addEventListener("click", async () => {
     resetBoxes();
     const saved = readSavedSession();
-    if (!saved?.phone) {
+
+    if (!saved?.phone && !saved?.slug) {
       setError("Aucune session wallet trouvée.");
       return;
     }
+
+    let phone = saved?.phone || "";
+    let slug = saved?.slug || "";
+
+    if (!phone && slug) {
+      setInfo("Résolution du téléphone à partir de la session…");
+      phone = await resolvePhoneFromSlug(slug);
+    }
+
+    if (!slug && phone) {
+      setInfo("Résolution du slug wallet à partir de la session…");
+      slug = await resolveSlugFromPhone(phone);
+    }
+
+    if (!phone) {
+      setError("Session incomplète. Téléphone introuvable.");
+      return;
+    }
+
     setOk("Session trouvée. Redirection…");
     setTimeout(() => {
-      goAdmin(saved.phone, saved.slug);
+      goAdmin(phone, slug);
     }, 250);
   });
 
@@ -620,3 +702,4 @@
 </script>
 </body>
 </html>
+
