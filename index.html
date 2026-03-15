@@ -11,6 +11,12 @@
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
   <link rel="manifest" href="./site.webmanifest?v=1">
 
+  <script>
+    window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+    window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+    window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
+  </script>
+
 <style>
 :root{
   --bg:#020617;
@@ -21,7 +27,12 @@
   --line:rgba(148,163,184,.22);
   --soft:rgba(2,6,23,.75);
 }
-*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  margin:0;
+  padding:0;
+}
 body{
   min-height:100vh;
   display:flex;
@@ -74,8 +85,17 @@ body{
   box-shadow:0 18px 45px rgba(0,0,0,.45);
 }
 .top{text-align:center}
-h1{font-weight:950;color:var(--ok);letter-spacing:.04em}
-.sub{margin-top:6px;color:#e5e7eb;font-weight:850;line-height:1.45}
+h1{
+  font-weight:950;
+  color:var(--ok);
+  letter-spacing:.04em;
+}
+.sub{
+  margin-top:6px;
+  color:#e5e7eb;
+  font-weight:850;
+  line-height:1.45;
+}
 .pill{
   display:inline-flex;
   gap:8px;
@@ -111,7 +131,6 @@ h1{font-weight:950;color:var(--ok);letter-spacing:.04em}
   line-height:1.55;
   text-align:center;
 }
-
 .panel{
   margin-top:14px;
   padding:14px;
@@ -145,6 +164,9 @@ input{
   font-weight:900;
   outline:none;
 }
+input::placeholder{
+  color:#a8b3cf;
+}
 small{
   display:block;
   margin-top:6px;
@@ -173,6 +195,13 @@ small{
   cursor:pointer;
   user-select:none;
   text-decoration:none;
+  transition:transform .16s ease, opacity .16s ease, background .16s ease, border-color .16s ease;
+}
+.btn:hover{
+  transform:translateY(-1px);
+}
+.btn:active{
+  transform:translateY(0);
 }
 .btn.primary{
   background:linear-gradient(135deg,#22c55e,#16a34a);
@@ -189,7 +218,6 @@ small{
   border:1px solid rgba(250,204,21,.38);
   color:#fde68a;
 }
-
 .paybox{
   margin-top:14px;
   padding:14px;
@@ -283,8 +311,8 @@ code{
 <div class="card">
 
   <div class="top">
-    <h1>MON ARGENT by DIGIY♾️</h1>
-    <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • Paiement direct via Wave • 0% commission</div>
+    <h1>MON ARGENT by DIGIY ♾️</h1>
+    <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • Paiement Wave direct au commerçant • 0% commission</div>
     <div class="pill">✅ Simple • Direct • Souverain</div>
 
     <div class="topActions">
@@ -300,16 +328,16 @@ code{
     <h2>Charger (code / QR)</h2>
     <div class="grid">
       <div>
-        <input id="codeInput" placeholder="Entre un code pro (ex: JBBEAUVILLE)" autocomplete="off">
-        <small>QR attendu : <b>...?pro=CODE</b></small>
+        <input id="codeInput" placeholder="Entre un code pro (ex : JBBEAUVILLE)" autocomplete="off">
+        <small>QR attendu : <b>?pro=CODE</b></small>
       </div>
       <div class="btnrow" style="margin-top:0">
         <button id="btnLoad" class="btn ghost" type="button">🔎 Charger</button>
         <button id="btnManual" class="btn" type="button">✍️ Saisie manuelle</button>
       </div>
     </div>
-    <div id="autoMsg" class="msg" style="display:none"></div>
-    <div id="autoErr" class="err" style="display:none"></div>
+    <div id="autoMsg" class="msg" style="display:none" aria-live="polite"></div>
+    <div id="autoErr" class="err" style="display:none" aria-live="polite"></div>
   </div>
 
   <div id="manualPanel" class="panel" style="display:none">
@@ -319,14 +347,14 @@ code{
         <input id="nameInput" placeholder="Nom du commerçant" autocomplete="off">
       </div>
       <div>
-        <input id="phoneInput" placeholder="Numéro Wave (22177...)" autocomplete="off">
+        <input id="phoneInput" placeholder="Numéro Wave (22177...)" autocomplete="off" inputmode="numeric">
       </div>
     </div>
     <div class="btnrow">
       <button id="btnShow" class="btn primary" type="button">✅ Afficher</button>
       <button id="btnHide" class="btn ghost" type="button">↩︎ Retour</button>
     </div>
-    <div id="manualErr" class="err" style="display:none"></div>
+    <div id="manualErr" class="err" style="display:none" aria-live="polite"></div>
   </div>
 
   <div id="paybox" class="paybox" style="display:none">
@@ -357,14 +385,15 @@ code{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ✅ PUBLIC / ADMIN */
+/* CONFIG */
 const ADMIN_URL = "https://pay.digiylyfe.com/pin.html";
-
-/* ✅ SUPABASE */
-const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+const SUPABASE_URL =
+  window.DIGIY_SUPABASE_URL ||
+  "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzupabaseIiwicmVmIjoid2VzcW13amp0c2VmeWpubHVvc2oiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc2NTE3ODg4MiwiZXhwIjoyMDgwNzU0ODgyfQ.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.DIGIY_SUPABASE_ANON_KEY ||
+  window.DIGIY_SUPABASE_ANON ||
+  "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
 
 /* UI */
 const proName = document.getElementById("proName");
@@ -394,8 +423,14 @@ const howto = document.getElementById("howto");
 btnAdmin.href = ADMIN_URL;
 
 let deferredInstallPrompt = null;
+let sb = null;
+
+if (window.supabase && typeof window.supabase.createClient === "function") {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 
 function show(el, on = true) {
+  if (!el) return;
   el.style.display = on ? "" : "none";
 }
 
@@ -404,6 +439,9 @@ function digitsOnly(v) {
 }
 
 function resetMessages() {
+  autoMsg.textContent = "";
+  autoErr.textContent = "";
+  manualErr.textContent = "";
   show(autoMsg, false);
   show(autoErr, false);
   show(manualErr, false);
@@ -413,9 +451,14 @@ function setNeutralState() {
   resetMessages();
   show(paybox, false);
   show(manualPanel, false);
+  show(howto, false);
 
   proName.textContent = "MON ARGENT by DIGIY";
   proHint.textContent = "Scanne un QR ou entre un code pro.";
+  payName.textContent = "—";
+  payPhone.textContent = "—";
+  btnCall.href = "#";
+  btnCopy.textContent = "📋 Copier";
 }
 
 function showAutoError(message) {
@@ -428,11 +471,20 @@ function showAutoMsg(message) {
   show(autoMsg, true);
 }
 
+function normalizePhone(phoneDigits) {
+  const raw = digitsOnly(phoneDigits);
+  if (!raw) return "";
+
+  if (raw.startsWith("221") && raw.length >= 12) return raw;
+  if (raw.length === 9) return "221" + raw;
+  return raw;
+}
+
 function showPayCard(name, phoneDigits) {
   const cleanName = String(name || "").trim();
-  const cleanPhone = digitsOnly(phoneDigits);
+  const cleanPhone = normalizePhone(phoneDigits);
 
-  if (!cleanName || cleanPhone.length < 9) {
+  if (!cleanName || cleanPhone.length < 12) {
     show(paybox, false);
     return;
   }
@@ -440,15 +492,20 @@ function showPayCard(name, phoneDigits) {
   const phone = "+" + cleanPhone;
 
   proName.textContent = cleanName;
-  proHint.textContent = "Paiement direct via Wave • 0% commission";
+  proHint.textContent = "Paiement Wave direct au commerçant • 0% commission";
 
   payName.textContent = cleanName;
   payPhone.textContent = phone;
   btnCall.href = "tel:" + phone;
 
   btnCopy.onclick = async () => {
+    const original = btnCopy.textContent;
     try {
       await navigator.clipboard.writeText(phone);
+      btnCopy.textContent = "✅ Copié";
+      setTimeout(() => {
+        btnCopy.textContent = original;
+      }, 1400);
     } catch (e) {
       window.prompt("Copie :", phone);
     }
@@ -463,9 +520,11 @@ function openManual(prefillName = "", prefillPhone = "") {
   resetMessages();
   show(paybox, false);
   show(manualPanel, true);
+  show(howto, false);
 
   nameInput.value = prefillName;
   phoneInput.value = prefillPhone;
+  nameInput.focus();
 }
 
 btnManual.onclick = () => openManual("", "");
@@ -477,7 +536,7 @@ btnHide.onclick = () => {
 
 btnShow.onclick = () => {
   const n = (nameInput.value || "").trim();
-  const p = digitsOnly(phoneInput.value);
+  const p = normalizePhone(phoneInput.value);
 
   show(manualErr, false);
 
@@ -487,7 +546,7 @@ btnShow.onclick = () => {
     return;
   }
 
-  if (p.length < 9) {
+  if (p.length < 12) {
     manualErr.textContent = "Entre un numéro Wave valide.";
     show(manualErr, true);
     return;
@@ -498,10 +557,12 @@ btnShow.onclick = () => {
 };
 
 async function loadByCode(code) {
-  const cleaned = (code || "").trim().toUpperCase();
+  const cleaned = String(code || "").trim().toUpperCase();
 
   resetMessages();
   show(paybox, false);
+  show(howto, false);
+  codeInput.value = cleaned;
 
   if (!cleaned) {
     setNeutralState();
@@ -509,7 +570,16 @@ async function loadByCode(code) {
     return;
   }
 
+  if (!sb) {
+    proName.textContent = "Service indisponible";
+    proHint.textContent = "Le moteur de chargement n’est pas prêt.";
+    showAutoError("Supabase n’a pas pu être initialisé.");
+    return;
+  }
+
   try {
+    showAutoMsg("Chargement du commerçant...");
+
     const { data, error } = await sb
       .from("digiy_pay_pro")
       .select("business_name,business_code,wave_phone,is_active")
@@ -519,6 +589,8 @@ async function loadByCode(code) {
 
     if (error) throw error;
 
+    show(autoMsg, false);
+
     if (!data) {
       proName.textContent = "Commerçant introuvable";
       proHint.textContent = "Vérifie le code ou scanne un QR valide.";
@@ -526,8 +598,8 @@ async function loadByCode(code) {
       return;
     }
 
-    const phone = digitsOnly(data.wave_phone);
-    if (phone.length < 9) {
+    const phone = normalizePhone(data.wave_phone);
+    if (phone.length < 12) {
       proName.textContent = data.business_name || cleaned;
       proHint.textContent = "Compte incomplet.";
       showAutoError("Ce commerçant n’a pas encore de numéro Wave valide.");
@@ -536,6 +608,7 @@ async function loadByCode(code) {
 
     showPayCard(data.business_name || cleaned, phone);
   } catch (e) {
+    console.error("DIGIY PAY loadByCode error:", e);
     proName.textContent = "Service indisponible";
     proHint.textContent = "Impossible de charger ce commerçant pour le moment.";
     showAutoError("Erreur de chargement. Réessaie plus tard.");
@@ -551,7 +624,7 @@ codeInput.addEventListener("keydown", (e) => {
   }
 });
 
-/* ✅ INSTALL APP */
+/* INSTALL APP */
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
@@ -567,12 +640,12 @@ btnInstallApp.onclick = async () => {
     return;
   }
 
-  alert("Pour installer l’app, utilise l’option “Ajouter à l’écran d’accueil” de ton navigateur.");
+  alert("Pour installer l’app, utilise l’option « Ajouter à l’écran d’accueil » de ton navigateur.");
 };
 
-/* ✅ BOOT */
+/* BOOT */
 const params = new URLSearchParams(location.search);
-const boot = (params.get("pro") || "").trim().toUpperCase();
+const boot = String(params.get("pro") || "").trim().toUpperCase();
 
 codeInput.value = boot;
 
