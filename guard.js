@@ -5,13 +5,21 @@
   // =============================
   // SUPABASE
   // =============================
-  const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+  const SUPABASE_URL =
+    window.DIGIY_SUPABASE_URL ||
+    "https://wesqmwjjtsefyjnluosj.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    window.DIGIY_SUPABASE_ANON_KEY ||
+    window.DIGIY_SUPABASE_ANON ||
+    "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
 
   // =============================
   // PAIEMENT
   // =============================
-  const PAY_URL = "https://beauville.github.io/commencer-a-payer/";
+  const PAY_URL =
+    window.DIGIY_PAY_URL ||
+    "https://commencer-a-payer.digiylyfe.com/";
 
   // =============================
   // BASE GitHub Pages
@@ -20,23 +28,29 @@
   const parts = path.split("/").filter(Boolean);
   const BASE = (parts.length >= 1) ? ("/" + parts[0]) : "";
 
-  function normalizePhone(p){
-    return String(p || "").replace(/[^\d+]/g, "");
+  function normalizePhone(value){
+    return String(value || "").replace(/\D/g, "");
   }
 
-  function nowMs(){ return Date.now(); }
+  function nowMs(){
+    return Date.now();
+  }
 
   // =============================
   // CACHE (60s)
   // =============================
-  function cacheKey(phone, module){ return `digiy_access:${phone}:${module}`; }
+  function cacheKey(phone, module){
+    return `digiy_access:${phone}:${module}`;
+  }
 
   function cacheGet(phone, module){
     try{
-      const raw = sessionStorage.getItem(cacheKey(phone,module));
+      const raw = sessionStorage.getItem(cacheKey(phone, module));
       if(!raw) return null;
+
       const obj = JSON.parse(raw);
       if(obj?.ok && obj?.exp && obj.exp > nowMs()) return true;
+
       return null;
     }catch(_){
       return null;
@@ -45,10 +59,13 @@
 
   function cacheSet(phone, module, seconds){
     try{
-      sessionStorage.setItem(cacheKey(phone,module), JSON.stringify({
-        ok: true,
-        exp: nowMs() + (seconds * 1000)
-      }));
+      sessionStorage.setItem(
+        cacheKey(phone, module),
+        JSON.stringify({
+          ok: true,
+          exp: nowMs() + (seconds * 1000)
+        })
+      );
     }catch(_){}
   }
 
@@ -76,81 +93,128 @@
   window.__sb = supabase;
 
   // =============================
-  // PHONE (3 sources)
+  // PHONE HELPERS
+  // =============================
+  function readJsonStorage(key, store){
+    try{
+      const raw = store.getItem(key);
+      if(!raw) return null;
+      return JSON.parse(raw);
+    }catch(_){
+      return null;
+    }
+  }
+
+  function pickPhoneFromKnownStores(){
+    const directKeys = [
+      "digiy_phone",
+      "digiy_driver_phone",
+      "digiy_market_phone",
+      "digiy_build_phone",
+      "digiy_loc_phone",
+      "digiy_resa_phone",
+      "digiy_pos_phone",
+      "digiy_commerce_phone",
+      "digiy_pay_phone"
+    ];
+
+    for(const key of directKeys){
+      const v1 = normalizePhone(sessionStorage.getItem(key));
+      if(v1) return v1;
+
+      const v2 = normalizePhone(localStorage.getItem(key));
+      if(v2) return v2;
+    }
+
+    const jsonKeys = [
+      "digiy_driver_access_pin",
+      "digiy_market_access_pin",
+      "digiy_build_access_pin",
+      "digiy_loc_access_pin",
+      "digiy_resa_access_pin",
+      "digiy_pos_access_pin",
+      "digiy_commerce_access_pin",
+      "digiy_pay_access_pin",
+      "digiy_access_pin"
+    ];
+
+    for(const key of jsonKeys){
+      const sObj = readJsonStorage(key, sessionStorage);
+      const sPhone = normalizePhone(sObj?.phone);
+      if(sPhone) return sPhone;
+
+      const lObj = readJsonStorage(key, localStorage);
+      const lPhone = normalizePhone(lObj?.phone);
+      if(lPhone) return lPhone;
+    }
+
+    return null;
+  }
+
+  // =============================
+  // PHONE (Auth + session/local)
   // =============================
   async function getPhone(){
-    // 1️⃣ Supabase Auth
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
+    // 1) Supabase Auth
+    try{
+      const { data } = await supabase.auth.getSession();
+      const session = data?.session || null;
+
       const p =
         session?.user?.phone ||
         session?.user?.user_metadata?.phone ||
         session?.user?.user_metadata?.phone_number ||
         session?.user?.identities?.[0]?.identity_data?.phone ||
         "";
-      const phone = normalizePhone(p);
-      if (phone) return phone;
-    } catch(e){
+
+      const authPhone = normalizePhone(p);
+      if(authPhone) return authPhone;
+    }catch(e){
       console.warn("⚠️ getSession error:", e);
     }
 
-    // 2️⃣ sessionStorage
-    const s = normalizePhone(sessionStorage.getItem("digiy_driver_phone"));
-    if (s) return s;
-
-    // 3️⃣ localStorage
-    try{
-      const a = JSON.parse(localStorage.getItem("digiy_driver_access_pin") || "null");
-      const p = normalizePhone(a?.phone);
-      if (p) return p;
-    }catch(_){}
+    // 2) session/local storage connus
+    const storedPhone = pickPhoneFromKnownStores();
+    if(storedPhone) return storedPhone;
 
     return null;
   }
 
   // =============================
   // CHECK SUBSCRIPTION
+  // rail propre : RPC digiy_has_access
   // =============================
   async function isActive(phone, module){
-    // Cache check
     const cached = cacheGet(phone, module);
     if (cached) {
       console.log("✅ Cache hit:", module);
       return true;
     }
 
-    // Query DB
-    const nowIso = new Date().toISOString();
-
-    const { data, error } = await supabase
-      .from("digiy_subscriptions")
-      .select("id, plan, current_period_end")
-      .eq("phone", phone)
-      .eq("module", module)
-      .eq("status", "active")
-      .gt("current_period_end", nowIso)
-      .limit(1)
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("digiy_has_access", {
+      p_phone: phone,
+      p_module: module
+    });
 
     if (error) {
-      console.error("❌ DB error:", error);
+      console.error("❌ RPC digiy_has_access error:", error);
       throw error;
     }
 
-    const ok = !!data?.id;
-    
+    const ok =
+      data === true ||
+      data === 1 ||
+      data === "true" ||
+      data?.ok === true;
+
     if (ok) {
-      console.log("✅ Abonnement trouvé:", {
-        module,
-        plan: data.plan,
-        expire: new Date(data.current_period_end).toLocaleDateString('fr-FR')
-      });
+      console.log("✅ Abonnement actif:", { phone, module });
       cacheSet(phone, module, 60);
     } else {
-      console.log("❌ Pas d'abonnement actif pour:", module);
+      console.log("❌ Pas d'abonnement actif:", { phone, module });
     }
 
-    return ok;
+    return !!ok;
   }
 
   // =============================
@@ -159,17 +223,23 @@
   window.DIGIY = {
     BASE,
     PAY_URL,
-    getPhone, // ✅ Exposé pour usage dans index.html
+    getPhone,
 
     async guardOrPay(module, loginPath){
+      module = String(module || "").trim();
+      if(!module){
+        console.error("❌ guardOrPay: module manquant");
+        return false;
+      }
+
       say("Vérification...");
 
       const phone = await getPhone();
 
-      // ❌ Pas de phone → Login
+      // Pas de phone -> login
       if(!phone){
         say("❌ Connexion requise");
-        console.log("❌ Pas de phone → Redirection login");
+        console.log("❌ Pas de phone -> redirection login");
 
         const target = loginPath
           ? (loginPath.startsWith("http") ? loginPath : (BASE + loginPath))
@@ -189,13 +259,12 @@
       console.log("✅ Phone:", phone);
       say("Vérification abonnement...");
 
-      // Expose phone pour l'app
-      window.DIGIY_ACCESS = { phone, module };
+      window.DIGIY_ACCESS = { phone, module, ok: false };
 
       try{
         const ok = await isActive(phone, module);
 
-        // ❌ Pas d'abonnement → Paiement
+        // Pas d'abonnement -> paiement
         if(!ok){
           say("❌ Abonnement requis");
 
@@ -211,14 +280,13 @@
           return false;
         }
 
-        // ✅ Tout OK
+        // Accès OK
         say("✅ Accès autorisé");
         console.log("✅ Accès OK pour:", module);
 
         document.documentElement.classList.add("access-ok");
         window.DIGIY_ACCESS.ok = true;
 
-        // Masquer le status après 2s
         setTimeout(() => {
           const el = document.getElementById("guard_status");
           if(el) el.style.display = "none";
@@ -227,7 +295,6 @@
         return true;
 
       }catch(e){
-        // ❌ Erreur système → Fail closed
         console.error("❌ Guard error:", e);
         say("❌ Erreur vérification");
 
