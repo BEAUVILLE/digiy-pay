@@ -1,597 +1,1930 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>DIGIY PAY — Cockpit financier terrain</title>
-  <meta name="description" content="DIGIY PAY — le cockpit financier terrain de DIGIYLYFE. Voir ses flux utiles, piloter ses entrées, dépenses pro et épargne, sans commission et sans devenir une banque.">
-  <meta name="theme-color" content="#04130d">
-  <meta name="robots" content="index,follow">
+  <title>MON ARGENT PRO — Cockpit</title>
+  <meta name="theme-color" content="#04110d">
+  <meta
+    name="description"
+    content="MON ARGENT PRO by DIGIY — cockpit wallet sécurisé, QR Wave, carte PNG, lien public et pilotage PAY."
+  >
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
+  <link rel="manifest" href="./site.webmanifest?v=1">
+
+  <script>
+    window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+    window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+    window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
+    window.DIGIY_MODULE = "PAY";
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 
   <style>
     :root{
-      --bg:#04130d;
-      --bg2:#081d15;
-      --bg3:#0c281d;
-      --card:#0d261c;
-      --card2:#123126;
-      --line:rgba(255,255,255,.10);
-      --text:#f8f5ef;
-      --muted:rgba(248,245,239,.72);
-
-      --gold:#f4dfb5;
-      --gold-2:#d8b56a;
+      --bg:#04110d;
+      --bg2:#071a13;
+      --card:#0b1f18;
+      --line:rgba(255,255,255,.08);
+      --line-strong:rgba(34,197,94,.28);
+      --text:#f3fff7;
+      --muted:rgba(243,255,247,.72);
       --green:#22c55e;
-      --green-2:#16a34a;
-
-      --gold-soft:rgba(216,181,106,.14);
-      --green-soft:rgba(34,197,94,.12);
-
-      --radius:26px;
-      --shadow:0 22px 58px rgba(0,0,0,.28);
-      --max:1180px;
+      --green2:#16a34a;
+      --gold:#facc15;
+      --gold-soft:rgba(250,204,21,.10);
+      --danger:#f87171;
+      --danger-soft:rgba(248,113,113,.10);
+      --shadow:0 18px 50px rgba(0,0,0,.32);
+      --radius:24px;
+      --max:1120px;
     }
 
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:0}
     body{
       min-height:100vh;
-      font-family:'Nunito',system-ui,sans-serif;
-      color:var(--text);
+      padding:14px;
       background:
-        radial-gradient(circle at top left, rgba(34,197,94,.11), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(216,181,106,.11), transparent 34%),
-        linear-gradient(180deg,var(--bg),#061812 45%, #081d15 100%);
+        radial-gradient(circle at top left, rgba(34,197,94,.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(250,204,21,.06), transparent 28%),
+        linear-gradient(180deg, var(--bg), #061710 55%, #04110d);
+      color:var(--text);
     }
 
-    a{text-decoration:none;color:inherit}
+    body.modalOpen{overflow:hidden}
 
-    .nav{
-      position:sticky;
-      top:0;
-      z-index:60;
-      backdrop-filter:blur(16px);
-      background:rgba(4,19,13,.76);
-      border-bottom:1px solid var(--line);
-    }
-    .nav-inner{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:14px 16px;
-      display:flex;
+    .site-back-float{
+      position:fixed;
+      top:calc(env(safe-area-inset-top, 0px) + 12px);
+      left:calc(env(safe-area-inset-left, 0px) + 12px);
+      z-index:9999;
+      display:inline-flex;
       align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .logo{
-      width:44px;height:44px;border-radius:15px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:20px;font-weight:900;color:#072413;
-      background:linear-gradient(135deg,var(--gold),var(--gold-2));
-      box-shadow:0 12px 28px rgba(216,181,106,.22);
-    }
-    .brand-title{
-      font-family:'Cormorant Garamond',serif;
-      font-size:29px;
-      line-height:1;
-      color:var(--gold);
-      font-weight:700;
-      letter-spacing:.03em;
-    }
-    .brand-sub{
-      margin-top:3px;
-      font-size:11px;
-      font-weight:900;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.12em;
-    }
-
-    .nav-actions{
-      display:flex;
+      justify-content:center;
       gap:8px;
+      min-height:44px;
+      padding:10px 14px;
+      border-radius:999px;
+      text-decoration:none;
+      font-weight:950;
+      font-size:14px;
+      color:#e5e7eb;
+      background:rgba(4,17,13,.82);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      box-shadow:0 14px 30px rgba(0,0,0,.28);
+      transition:transform .18s ease,background .18s ease,border-color .18s ease;
+    }
+    .site-back-float:hover{
+      transform:translateY(-1px);
+      background:rgba(8,24,18,.96);
+      border-color:rgba(250,204,21,.30);
+    }
+
+    .wrap{width:min(var(--max),100%);margin:0 auto;padding-top:62px}
+
+    .card{
+      background:linear-gradient(180deg, rgba(11,31,24,.98), rgba(9,24,19,.98));
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .topLeft{min-width:0}
+    h1{
+      font-weight:1000;
+      color:var(--gold);
+      letter-spacing:.03em;
+      line-height:1.05;
+    }
+    .sub{
+      margin-top:6px;
+      color:#e5e7eb;
+      font-weight:850;
+      line-height:1.45;
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(250,204,21,.35);
+      background:rgba(250,204,21,.10);
+      color:#fde68a;
+      font-weight:950;
+      font-size:13px;
+    }
+
+    .topBtns{
+      display:flex;
+      gap:10px;
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      border-radius:999px;
-      padding:11px 16px;
+
+    .nav-mini{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .nav-card{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      padding:12px 12px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      text-decoration:none;
+      color:var(--text);
+      min-height:78px;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease;
+    }
+    .nav-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(250,204,21,.24);
+      background:rgba(255,255,255,.04);
+    }
+    .nav-card strong{
       font-size:13px;
+      font-weight:1000;
+      color:var(--gold);
+      line-height:1.2;
+    }
+    .nav-card span{
+      font-size:11px;
+      line-height:1.45;
+      color:var(--muted);
+      font-weight:850;
+    }
+
+    .sep{
+      height:1px;
+      background:rgba(255,255,255,.08);
+      margin:16px 0;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:14px;
+    }
+    @media(max-width:920px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .panel{
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.025);
+    }
+    .panel h2{
+      font-size:13px;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:#bbf7d0;
+      font-weight:950;
+    }
+
+    .formGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    @media(max-width:640px){
+      .formGrid{grid-template-columns:1fr}
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:#bbf7d0;
+      font-weight:950;
+      margin-bottom:6px;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:#fff;
       font-weight:900;
-      transition:.18s ease;
-      display:inline-flex;
+      outline:none;
+    }
+    input::placeholder{color:#a8b3cf}
+    input[readonly]{opacity:.92;cursor:not-allowed}
+
+    .hint{
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:850;
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .btn{
+      flex:1;
+      min-width:160px;
+      padding:12px 14px;
+      border-radius:999px;
+      font-weight:980;
+      display:flex;
+      justify-content:center;
       align-items:center;
-      gap:8px;
+      border:1px solid rgba(34,197,94,.55);
+      background:rgba(34,197,94,.18);
+      color:#bbf7d0;
+      cursor:pointer;
+      user-select:none;
+      text-decoration:none;
+      transition:transform .16s ease,opacity .16s ease;
     }
     .btn:hover{transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
-    .btn-primary{
-      background:linear-gradient(135deg,var(--green),var(--green-2));
-      color:#082313;
-      box-shadow:0 12px 28px rgba(34,197,94,.22);
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+    .btn.primary{
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#022c22;
+      border:none;
     }
-    .btn-secondary{
-      background:rgba(216,181,106,.08);
-      border:1px solid rgba(216,181,106,.24);
-      color:var(--gold);
-    }
-    .btn-ghost{
-      background:rgba(255,255,255,.03);
+    .btn.ghost{
+      background:rgba(255,255,255,.02);
       border:1px solid var(--line);
+      color:#e5e7eb;
+    }
+    .btn.warn{
+      background:rgba(250,204,21,.12);
+      border:1px solid rgba(250,204,21,.35);
+      color:#fde68a;
+    }
+    .btn.bad{
+      background:rgba(248,113,113,.10);
+      border:1px solid rgba(248,113,113,.35);
+      color:#fecaca;
+    }
+
+    .msg,.err,.okbox{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:16px;
+      font-weight:950;
+      font-size:13px;
+      line-height:1.55;
+    }
+    .msg{
+      border:1px solid rgba(250,204,21,.35);
+      background:rgba(250,204,21,.08);
+      color:#fde68a;
+    }
+    .err{
+      border:1px solid rgba(248,113,113,.45);
+      background:rgba(248,113,113,.10);
+      color:#fecaca;
+    }
+    .okbox{
+      border:1px solid rgba(34,197,94,.45);
+      background:rgba(34,197,94,.10);
+      color:#dcfce7;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .stat{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
+      padding:12px;
+    }
+    .statLabel{
+      font-size:12px;
       color:var(--muted);
-    }
-
-    .wrap{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:24px 16px 44px;
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:16px;
-      align-items:stretch;
-      margin-bottom:18px;
-    }
-    @media (max-width:920px){
-      .hero{grid-template-columns:1fr}
-    }
-
-    .hero-main,
-    .hero-side,
-    .card{
-      border:1px solid var(--line);
-      border-radius:32px;
-      background:linear-gradient(180deg,rgba(18,49,38,.72),rgba(13,38,28,.96));
-      box-shadow:var(--shadow);
-    }
-
-    .hero-main{
-      padding:28px;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero-main::after{
-      content:"";
-      position:absolute;
-      right:-80px;
-      bottom:-100px;
-      width:280px;
-      height:280px;
-      border-radius:50%;
-      background:radial-gradient(circle,var(--gold-soft),transparent 70%);
-      pointer-events:none;
-    }
-
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:var(--green-soft);
-      border:1px solid rgba(34,197,94,.2);
-      color:#86efac;
-      font-size:11px;
       font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+    .statValue{
+      font-size:16px;
+      font-weight:950;
+      word-break:break-word;
     }
 
-    h1{
-      margin:16px 0 0;
-      font-family:'Cormorant Garamond',serif;
-      font-size:56px;
-      line-height:.92;
-      color:var(--gold);
-      font-weight:700;
-      max-width:760px;
-    }
-    .lead{
-      margin-top:16px;
-      font-size:17px;
-      line-height:1.8;
-      color:var(--text);
-      max-width:760px;
-    }
-    .hero-bullets{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+    .switch{
+      display:flex;
+      align-items:center;
       gap:10px;
-      margin-top:18px;
-    }
-    @media (max-width:720px){
-      .hero-bullets{grid-template-columns:1fr}
-      h1{font-size:42px}
-    }
-    .bullet{
-      padding:13px 14px;
-      border-radius:18px;
+      margin-top:14px;
+      padding:12px;
+      border-radius:16px;
       border:1px solid var(--line);
       background:rgba(255,255,255,.03);
-      font-size:14px;
-      font-weight:800;
-      color:var(--text);
     }
-    .bullet span{
-      color:#86efac;
-      margin-right:6px;
+    .switch input{
+      width:20px;
+      height:20px;
+      accent-color:#22c55e;
     }
 
-    .hero-cta{
+    .mini{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+
+    .cardMaker{
+      margin-top:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .canvasWrap{
+      margin-top:12px;
       display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:22px;
+      justify-content:center;
+      align-items:center;
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:12px;
+      overflow:auto;
+      background:rgba(255,255,255,.02);
+      min-height:260px;
+    }
+    #cardCanvas{
+      width:min(100%,420px);
+      height:auto;
+      border-radius:18px;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+      background:#fff;
     }
 
-    .hero-side{
-      padding:22px;
+    .qrBlock{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:340px 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media(max-width:920px){
+      .qrBlock{grid-template-columns:1fr}
+    }
+
+    .qrPreviewBox{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .qrCanvasWrap{
+      margin-top:10px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:260px;
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:12px;
+      background:rgba(255,255,255,.02);
+    }
+    #qrCanvas{
+      width:min(100%,280px);
+      height:auto;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+    }
+
+    .qrMeta{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .qrMetaLine{
+      margin-top:10px;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(2,6,23,.52);
+      border:1px solid rgba(255,255,255,.08);
+      color:#e5e7eb;
+      font-weight:850;
+      line-height:1.55;
+      word-break:break-word;
+    }
+
+    .previewModal{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      background:rgba(2,6,23,.92);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+    }
+    .previewModal.open{display:flex}
+
+    .previewBox{
+      width:min(100%,560px);
+      max-height:100%;
+      background:#03140f;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:24px;
+      padding:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.55);
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
-      gap:16px;
-    }
-    .mini-title{
-      font-size:11px;
-      font-weight:900;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.12em;
-    }
-    .big-number{
-      margin-top:8px;
-      font-family:'Cormorant Garamond',serif;
-      font-size:54px;
-      line-height:1;
-      color:var(--gold);
-      font-weight:700;
-    }
-    .mini-copy{
-      margin-top:8px;
-      font-size:14px;
-      line-height:1.7;
-      color:var(--text);
-    }
-    .side-stack{
-      display:grid;
-      gap:10px;
-    }
-    .side-chip{
-      padding:12px 14px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      font-size:13px;
-      font-weight:800;
-      color:var(--text);
-    }
-    .side-chip small{
-      display:block;
-      margin-top:4px;
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.6;
-    }
-
-    .section-title{
-      margin:22px 0 12px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-family:'Cormorant Garamond',serif;
-      font-size:27px;
-      color:var(--gold);
-      font-weight:700;
-    }
-    .section-title::after{
-      content:"";
-      height:1px;
-      flex:1;
-      background:linear-gradient(90deg,rgba(216,181,106,.32),transparent);
-    }
-
-    .grid-3{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
       gap:12px;
     }
-    @media (max-width:920px){
-      .grid-3{grid-template-columns:1fr}
-    }
 
-    .card{
-      padding:22px;
-    }
-    .card .kicker{
-      font-size:11px;
-      font-weight:900;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.12em;
-    }
-    .card .title{
-      margin-top:8px;
-      font-family:'Cormorant Garamond',serif;
-      font-size:30px;
-      line-height:1;
-      color:var(--gold);
-      font-weight:700;
-    }
-    .card .txt{
-      margin-top:12px;
-      font-size:14px;
-      line-height:1.8;
-      color:var(--text);
-    }
-
-    .pricing{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:14px;
-    }
-    @media (max-width:980px){
-      .pricing{grid-template-columns:1fr}
-    }
-
-    .price{
-      padding:24px;
-      border-radius:28px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(18,49,38,.72),rgba(13,38,28,.96));
-      box-shadow:var(--shadow);
-      position:relative;
-      overflow:hidden;
-    }
-    .price.featured{
-      border-color:rgba(216,181,106,.34);
-      background:
-        radial-gradient(circle at top right, rgba(216,181,106,.14), transparent 32%),
-        linear-gradient(180deg,rgba(18,49,38,.82),rgba(13,38,28,.98));
-    }
-    .ribbon{
-      position:absolute;
-      top:16px;
-      right:-34px;
-      transform:rotate(34deg);
-      background:linear-gradient(135deg,var(--gold),var(--gold-2));
-      color:#082313;
-      font-size:10px;
-      font-weight:900;
-      padding:6px 42px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .price-name{
-      font-family:'Cormorant Garamond',serif;
-      font-size:28px;
-      color:var(--gold);
-      font-weight:700;
-    }
-    .price-desc{
-      margin-top:6px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
-      line-height:1.7;
-    }
-    .price-amount{
-      margin-top:16px;
-      font-family:'Cormorant Garamond',serif;
-      font-size:52px;
-      line-height:1;
-      color:var(--text);
-      font-weight:700;
-    }
-    .price-amount small{
-      font-size:16px;
-      color:var(--muted);
-      font-family:'Nunito',sans-serif;
-      font-weight:900;
-    }
-    .price-period{
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-      font-weight:800;
-    }
-    .features{
-      list-style:none;
-      padding:0;
-      margin:18px 0 0;
-      display:grid;
+    .previewTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
       gap:10px;
-    }
-    .features li{
-      padding:10px 0;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      font-size:13px;
-      color:var(--text);
-      font-weight:800;
-      line-height:1.7;
-    }
-    .features li:last-child{border-bottom:none}
-    .features span{
-      color:#86efac;
-      margin-right:8px;
+      flex-wrap:wrap;
     }
 
-    .foot{
-      margin-top:26px;
-      text-align:center;
-      color:var(--muted);
+    .previewTitle{
+      font-weight:950;
+      color:#dcfce7;
+      letter-spacing:.02em;
+    }
+
+    .previewHint{
       font-size:12px;
-      font-weight:800;
-      line-height:1.9;
-      padding-bottom:14px;
+      color:#cbd5f5;
+      line-height:1.5;
+    }
+
+    .previewBody{
+      overflow:auto;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      padding:10px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      min-height:220px;
+    }
+
+    .previewBody img{
+      width:min(100%,460px);
+      height:auto;
+      display:block;
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+    }
+
+    @media(max-width:700px){
+      .nav-mini{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media(max-width:640px){
+      body{padding:10px}
+      .wrap{padding-top:58px}
+      .topBtns .btn,
+      .btnrow .btn{
+        flex:1;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="nav">
-    <div class="nav-inner">
-      <div class="brand">
-        <div class="logo">∞</div>
-        <div>
-          <div class="brand-title">DIGIY PAY</div>
-          <div class="brand-sub">Cockpit financier terrain</div>
+  <a class="site-back-float" href="https://digiylyfe.com/" target="_blank" rel="noopener">
+    ← Retour au site
+  </a>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <div class="topLeft">
+          <h1>MON ARGENT PRO</h1>
+          <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • Paiement direct via Wave</div>
+          <div class="pill">🔐 Cockpit wallet sécurisé</div>
+        </div>
+
+        <div class="topBtns">
+          <a id="btnPublicTop" class="btn ghost" href="./index.html">💳 Wallet public</a>
+          <a id="btnPinTop" class="btn ghost" href="./pin.html">🔐 PIN</a>
+          <a id="btnAdminTop" class="btn ghost" href="./admin.html">🛠 Admin</a>
+          <a id="btnActivateTop" class="btn warn" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
+          <button id="btnLogout" class="btn bad" type="button">Déconnexion</button>
         </div>
       </div>
 
-      <div class="nav-actions">
-        <a class="btn btn-ghost" href="https://pay.digiylyfe.com/pin.html">🔐 Entrée PIN</a>
-        <a class="btn btn-secondary" href="https://pay.digiylyfe.com/cockpit.html">📊 Cockpit</a>
-        <a class="btn btn-primary" href="https://commencer-a-payer.digiylyfe.com/">💳 Activer mon module</a>
+      <div class="nav-mini">
+        <a id="navPublic" class="nav-card" href="./index.html">
+          <strong>Wallet public</strong>
+          <span>Vue client du moyen de paiement</span>
+        </a>
+        <a id="navPin" class="nav-card" href="./pin.html">
+          <strong>PIN PAY</strong>
+          <span>Entrée sécurisée du module</span>
+        </a>
+        <a id="navAdmin" class="nav-card" href="./admin.html">
+          <strong>Admin</strong>
+          <span>Outils internes plus profonds</span>
+        </a>
+        <a id="navActivate" class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
+          <strong>Activation</strong>
+          <span>Abonnement et renouvellement</span>
+        </a>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="grid">
+        <div class="panel">
+          <h2>Fiche wallet</h2>
+
+          <div class="formGrid">
+            <div>
+              <label for="walletName">Nom affiché</label>
+              <input id="walletName" type="text" placeholder="Ex: JB BEAUVILLE">
+              <div class="hint">Nom visible sur MON ARGENT public.</div>
+            </div>
+
+            <div>
+              <label for="walletCode">Code pro</label>
+              <input id="walletCode" type="text" placeholder="Ex: JBBEAUVILLE">
+              <div class="hint">Utilisé dans le lien public <span class="mono">?pro=CODE</span>.</div>
+            </div>
+
+            <div>
+              <label for="walletPhone">Numéro Wave</label>
+              <input id="walletPhone" type="tel" placeholder="Ex: 221771342889">
+              <div class="hint">Numéro Wave sur lequel le client envoie le paiement.</div>
+            </div>
+
+            <div>
+              <label for="walletSlug">Slug session</label>
+              <input id="walletSlug" type="text" readonly>
+              <div class="hint">Lu depuis la session PRO.</div>
+            </div>
+          </div>
+
+          <div class="switch">
+            <input id="walletActive" type="checkbox">
+            <div>
+              <div style="font-weight:950">Wallet actif</div>
+              <div class="mini">Si décoché, le wallet public n’est plus servi comme actif.</div>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button id="btnSave" class="btn primary" type="button">💾 Sauvegarder</button>
+            <button id="btnReload" class="btn ghost" type="button">🔄 Recharger</button>
+            <button id="btnCopyLink" class="btn warn" type="button">📋 Copier lien public</button>
+          </div>
+
+          <div id="infoBox" class="msg" style="display:none"></div>
+          <div id="errorBox" class="err" style="display:none"></div>
+          <div id="okBox" class="okbox" style="display:none"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Vue rapide</h2>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="statLabel">Téléphone admin</div>
+              <div class="statValue mono" id="sessionPhone">—</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">Slug session</div>
+              <div class="statValue mono" id="sessionSlug">—</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">Numéro Wave commerçant</div>
+              <div class="statValue mono" id="merchantWave">—</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">Statut</div>
+              <div class="statValue" id="publicStatus">—</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">Lien public</div>
+              <div class="statValue mono" id="publicLink">—</div>
+            </div>
+            <div class="stat">
+              <div class="statLabel">Code pro</div>
+              <div class="statValue mono" id="publicCode">—</div>
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <a id="btnOpenPublic" class="btn" href="./index.html" target="_blank" rel="noopener">🌍 Ouvrir public</a>
+            <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
+          </div>
+
+          <div class="mini" style="margin-top:14px;">
+            DIGIY n'est pas une banque.
+            Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le commerçant.
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="panel">
+        <h2>Mon QR Wave</h2>
+
+        <div class="qrBlock">
+          <div class="qrPreviewBox">
+            <div class="mini" style="margin-top:0;">
+              Ici tu génères le <b>QR seul</b> du wallet actif.
+            </div>
+
+            <div class="qrCanvasWrap">
+              <canvas id="qrCanvas" width="700" height="700"></canvas>
+            </div>
+
+            <div class="btnrow">
+              <button id="btnOpenQr" class="btn primary" type="button">🔎 Afficher mon QR</button>
+              <button id="btnDownloadQr" class="btn primary" type="button">📥 Télécharger / Enregistrer QR</button>
+              <button id="btnRenderQr" class="btn ghost" type="button">♻️ Régénérer le QR</button>
+            </div>
+          </div>
+
+          <div class="qrMeta">
+            <div class="mini" style="margin-top:0;">
+              Le QR suit toujours le <b>code pro actif</b> de ce wallet.
+            </div>
+
+            <div class="qrMetaLine">
+              <b>Code pro actif :</b><br>
+              <span id="qrActiveCode" class="mono">—</span>
+            </div>
+
+            <div class="qrMetaLine">
+              <b>Numéro Wave actif :</b><br>
+              <span id="qrActiveWave" class="mono">—</span>
+            </div>
+
+            <div class="qrMetaLine">
+              <b>URL encodée dans le QR :</b><br>
+              <span id="qrActiveUrl" class="mono">—</span>
+            </div>
+
+            <div class="mini">
+              📱 <b>iPhone/iPad :</b> clique Télécharger → appui long sur l'image → Enregistrer dans Photos.<br>
+              🤖 <b>Android :</b> clique Télécharger → fichier dans Téléchargements.<br>
+              💻 <b>Mac/PC :</b> clique Télécharger → PNG dans Téléchargements.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="panel">
+        <h2>Ma carte de paiement</h2>
+
+        <div class="cardMaker">
+          <div class="mini" style="margin-top:0;">
+            La carte PNG est régénérée à chaque clic, sans garder l'ancienne identité d'un autre wallet.
+          </div>
+
+          <div class="canvasWrap">
+            <canvas id="cardCanvas" width="900" height="1400"></canvas>
+          </div>
+
+          <div class="btnrow">
+            <button id="btnOpenCard" class="btn primary" type="button">🖼️ Ouvrir ma carte</button>
+            <button id="btnDownloadCard" class="btn primary" type="button">📥 Télécharger / Enregistrer carte</button>
+            <button id="btnRenderCard" class="btn ghost" type="button">🎨 Actualiser la carte</button>
+          </div>
+        </div>
       </div>
     </div>
-  </header>
+  </div>
 
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero-main">
-        <div class="tag">DIGIYLYFE — outil terrain</div>
-        <h1>Le cockpit qui aide le pro à voir clair dans ses flux.</h1>
-        <p class="lead">
-          DIGIY PAY ne remplace ni Wave, ni Orange Money, ni le cash, ni les habitudes du terrain.
-          Il vient au-dessus pour donner une vue simple, propre et utile des entrées, des dépenses pro,
-          de l’épargne et du net, module par module.
-        </p>
-
-        <div class="hero-bullets">
-          <div class="bullet"><span>✓</span> Paiement direct entre client et professionnel</div>
-          <div class="bullet"><span>✓</span> 0% commission DIGIY</div>
-          <div class="bullet"><span>✓</span> Vision claire des flux utiles</div>
-          <div class="bullet"><span>✓</span> Pilotage mobile simple et rapide</div>
-        </div>
-
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="https://commencer-a-payer.digiylyfe.com/">💳 Activer mon accès</a>
-          <a class="btn btn-secondary" href="https://pay.digiylyfe.com/pin.html">🔐 Entrer avec mon PIN</a>
-          <a class="btn btn-ghost" href="https://pay.digiylyfe.com/cockpit.html">📊 Voir le cockpit</a>
-        </div>
-      </div>
-
-      <aside class="hero-side">
+  <div id="cardPreviewModal" class="previewModal" aria-hidden="true">
+    <div class="previewBox">
+      <div class="previewTop">
         <div>
-          <div class="mini-title">Positionnement</div>
-          <div class="big-number">0%</div>
-          <div class="mini-copy">
-            Pas de commission DIGIY sur les paiements. L’argent reste dans les rails du professionnel.
-            Le cockpit sert à mieux voir, mieux suivre et mieux décider.
-          </div>
+          <div id="previewTitle" class="previewTitle">Aperçu</div>
+          <div id="previewHint" class="previewHint">Image prête.</div>
         </div>
-
-        <div class="side-stack">
-          <div class="side-chip">
-            🌊 Wave, Orange Money, cash, flux terrain
-            <small>DIGIY PAY ne casse pas le terrain. Il le structure.</small>
-          </div>
-          <div class="side-chip">
-            🧾 Entrées, dépenses pro, épargne, net
-            <small>Lecture claire de l’activité au lieu de chiffres dispersés.</small>
-          </div>
-          <div class="side-chip">
-            ♾️ Connecté à l’écosystème DIGIYLYFE
-            <small>DRIVER, LOC, COMMERCE, MARKET, BUILD et les autres wagons.</small>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <div class="section-title">Pourquoi DIGIY PAY</div>
-    <section class="grid-3">
-      <div class="card">
-        <div class="kicker">Vision</div>
-        <div class="title">Voir l’argent utile</div>
-        <div class="txt">
-          Beaucoup de pros encaissent déjà. Le vrai manque, ce n’est pas toujours un autre moyen de paiement.
-          Le vrai manque, c’est la lecture simple de ce qui entre, ce qui sort et ce qui reste.
-        </div>
+        <button id="btnClosePreview" class="btn ghost" type="button" style="flex:0 0 auto;min-width:auto;">✕ Fermer</button>
       </div>
-
-      <div class="card">
-        <div class="kicker">Terrain</div>
-        <div class="title">Rester simple</div>
-        <div class="txt">
-          Pas besoin de machine lourde, pas besoin de discours compliqué. Un cockpit propre, mobile,
-          rapide, qui respecte les habitudes locales et parle vrai.
-        </div>
+      <div class="previewBody">
+        <img id="cardPreviewImage" alt="Aperçu">
       </div>
-
-      <div class="card">
-        <div class="kicker">Doctrine</div>
-        <div class="title">Piloter, pas garder l’argent</div>
-        <div class="txt">
-          DIGIY PAY n’est pas une banque, n’est pas un wallet custodial et ne retient pas les fonds.
-          C’est une couche de visibilité, d’orchestration et de pilotage.
-        </div>
-      </div>
-    </section>
-
-    <div class="section-title">Plans DIGIY PAY</div>
-    <section class="pricing">
-      <article class="price">
-        <div class="price-name">STARTER</div>
-        <div class="price-desc">Pour démarrer proprement avec une vue simple sur son activité.</div>
-        <div class="price-amount">4 900 <small>F CFA / mois</small></div>
-        <div class="price-period">Environ 163 F CFA / jour</div>
-        <ul class="features">
-          <li><span>✓</span> Cockpit PAY de base</li>
-          <li><span>✓</span> Lecture jour / mois / net</li>
-          <li><span>✓</span> 1 module DIGIY connecté</li>
-          <li><span>✓</span> Vue mobile simple</li>
-          <li><span>✓</span> Paiement manuel uniquement</li>
-        </ul>
-      </article>
-
-      <article class="price featured">
-        <div class="ribbon">Recommandé</div>
-        <div class="price-name">PRO</div>
-        <div class="price-desc">Pour le pro actif qui veut un vrai cockpit financier terrain.</div>
-        <div class="price-amount">9 900 <small>F CFA / mois</small></div>
-        <div class="price-period">Environ 330 F CFA / jour</div>
-        <ul class="features">
-          <li><span>✓</span> Tous les modules DIGIY connectés</li>
-          <li><span>✓</span> Vue élargie entrées / sorties / épargne</li>
-          <li><span>✓</span> Lecture par module et par canal</li>
-          <li><span>✓</span> Cockpit terrain optimisé mobile</li>
-          <li><span>✓</span> Paiement manuel uniquement</li>
-        </ul>
-      </article>
-
-      <article class="price">
-        <div class="price-name">BUSINESS</div>
-        <div class="price-desc">Pour activité plus large, équipe ou plusieurs points de présence.</div>
-        <div class="price-amount">24 900 <small>F CFA / mois</small></div>
-        <div class="price-period">Pilotage renforcé</div>
-        <ul class="features">
-          <li><span>✓</span> Vue multi-activité</li>
-          <li><span>✓</span> Consolidation plus large</li>
-          <li><span>✓</span> Lecture globale plus profonde</li>
-          <li><span>✓</span> Support prioritaire</li>
-          <li><span>✓</span> Paiement manuel uniquement</li>
-        </ul>
-      </article>
-    </section>
-
-    <div class="foot">
-      DIGIY PAY fait partie de l’écosystème DIGIYLYFE.<br>
-      Les paiements restent directs entre le client et le professionnel.<br>
-      0% commission · pensée terrain · souveraineté africaine ♾️
     </div>
-  </main>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      function isIOS() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      }
+
+      function isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+      }
+
+      const SUPABASE_URL =
+        window.DIGIY_SUPABASE_URL ||
+        "https://wesqmwjjtsefyjnluosj.supabase.co";
+
+      const SUPABASE_ANON_KEY =
+        window.DIGIY_SUPABASE_ANON_KEY ||
+        window.DIGIY_SUPABASE_ANON ||
+        "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+
+      const MODULE_CODE = "PAY";
+      const PUBLIC_BASE_URL = "https://pay.digiylyfe.com/";
+      const PIN_URL = "./pin.html";
+      const ADMIN_URL = "./admin.html";
+      const SUPPORT_WA = "+221771342889";
+      const ACTIVATE_BASE = "https://commencer-a-payer.digiylyfe.com/";
+
+      const LS_PHONE = "digiy_phone";
+      const LS_SLUG = "digiy_slug";
+      const LS_MODULE_SLUGS = "digiy_module_slugs";
+      const LS_PAY_PHONE = "digiy_pay_phone";
+      const LS_PAY_SLUG = "digiy_pay_slug";
+      const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
+
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+          storage: {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {}
+          }
+        }
+      });
+
+      const $ = (id) => document.getElementById(id);
+
+      const walletName = $("walletName");
+      const walletCode = $("walletCode");
+      const walletPhone = $("walletPhone");
+      const walletSlug = $("walletSlug");
+      const walletActive = $("walletActive");
+
+      const sessionPhone = $("sessionPhone");
+      const sessionSlug = $("sessionSlug");
+      const merchantWave = $("merchantWave");
+      const publicLink = $("publicLink");
+      const publicCode = $("publicCode");
+      const publicStatus = $("publicStatus");
+      const btnOpenPublic = $("btnOpenPublic");
+
+      const btnPublicTop = $("btnPublicTop");
+      const btnPinTop = $("btnPinTop");
+      const btnAdminTop = $("btnAdminTop");
+      const btnActivateTop = $("btnActivateTop");
+
+      const navPublic = $("navPublic");
+      const navPin = $("navPin");
+      const navAdmin = $("navAdmin");
+      const navActivate = $("navActivate");
+
+      const qrActiveCode = $("qrActiveCode");
+      const qrActiveWave = $("qrActiveWave");
+      const qrActiveUrl = $("qrActiveUrl");
+
+      const btnSave = $("btnSave");
+      const btnReload = $("btnReload");
+      const btnCopyLink = $("btnCopyLink");
+      const btnLogout = $("btnLogout");
+      const btnSupport = $("btnSupport");
+
+      const btnOpenQr = $("btnOpenQr");
+      const btnDownloadQr = $("btnDownloadQr");
+      const btnRenderQr = $("btnRenderQr");
+
+      const btnOpenCard = $("btnOpenCard");
+      const btnDownloadCard = $("btnDownloadCard");
+      const btnRenderCard = $("btnRenderCard");
+
+      const infoBox = $("infoBox");
+      const errorBox = $("errorBox");
+      const okBox = $("okBox");
+
+      const qrCanvas = $("qrCanvas");
+      const qrCtx = qrCanvas.getContext("2d");
+
+      const cardCanvas = $("cardCanvas");
+      const cardCtx = cardCanvas.getContext("2d");
+
+      const cardPreviewModal = $("cardPreviewModal");
+      const cardPreviewImage = $("cardPreviewImage");
+      const btnClosePreview = $("btnClosePreview");
+      const previewTitle = $("previewTitle");
+      const previewHint = $("previewHint");
+
+      const qs = new URLSearchParams(location.search);
+
+      let currentPhone = "";
+      let currentSlug = "";
+      let currentCodeFromQuery = safeUpper(qs.get("code") || "");
+      let loadedProfile = null;
+
+      let renderToken = 0;
+      let lastRenderFingerprint = "";
+      let lastCardDataUrl = "";
+
+      let qrRenderToken = 0;
+      let lastQrFingerprint = "";
+      let lastQrDataUrl = "";
+
+      function normPhone(v) {
+        let s = String(v || "").trim();
+        s = s.replace(/[^\d+]/g, "");
+        if (!s) return "";
+        if (!s.startsWith("+") && s.startsWith("221")) s = "+" + s;
+        return s;
+      }
+
+      function digitsOnly(v) {
+        return String(v || "").replace(/\D/g, "");
+      }
+
+      function normSlug(v) {
+        return String(v || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function safeUpper(v){
+        return String(v || "").trim().toUpperCase();
+      }
+
+      function makeCode(v) {
+        return String(v || "")
+          .trim()
+          .toUpperCase()
+          .replace(/\s+/g, "")
+          .replace(/[^A-Z0-9_]/g, "");
+      }
+
+      function show(el, on = true) {
+        if (!el) return;
+        el.style.display = on ? "" : "none";
+      }
+
+      function resetBoxes() {
+        show(infoBox, false);
+        show(errorBox, false);
+        show(okBox, false);
+        infoBox.textContent = "";
+        errorBox.textContent = "";
+        okBox.textContent = "";
+      }
+
+      function setInfo(msg) {
+        infoBox.textContent = msg;
+        show(infoBox, true);
+      }
+
+      function setError(msg) {
+        errorBox.textContent = msg;
+        show(errorBox, true);
+      }
+
+      function setOk(msg) {
+        okBox.textContent = msg;
+        show(okBox, true);
+      }
+
+      function readModuleSlugs() {
+        try {
+          const raw = localStorage.getItem(LS_MODULE_SLUGS);
+          const parsed = raw ? JSON.parse(raw) : {};
+          return parsed && typeof parsed === "object" ? parsed : {};
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function readSession() {
+        let phone = normPhone(qs.get("phone") || "");
+        let slug = normSlug(qs.get("slug") || "");
+
+        if (!phone) {
+          try { phone = normPhone(localStorage.getItem(LS_PAY_PHONE) || ""); } catch (_) {}
+        }
+        if (!slug) {
+          try { slug = normSlug(localStorage.getItem(LS_PAY_SLUG) || ""); } catch (_) {}
+        }
+
+        if (!phone || !slug) {
+          try {
+            const raw = localStorage.getItem(SESSION_KEY);
+            const s = raw ? JSON.parse(raw) : null;
+            if (!phone && s?.phone) phone = normPhone(s.phone);
+            if (!slug && s?.slug) slug = normSlug(s.slug);
+          } catch (_) {}
+        }
+
+        if (!slug) {
+          const map = readModuleSlugs();
+          if (map.PAY) slug = normSlug(map.PAY);
+        }
+
+        if (!phone) {
+          try { phone = normPhone(localStorage.getItem(LS_PHONE) || ""); } catch (_) {}
+        }
+        if (!slug) {
+          try { slug = normSlug(localStorage.getItem(LS_SLUG) || ""); } catch (_) {}
+        }
+
+        return { phone, slug };
+      }
+
+      function clearSession() {
+        try {
+          localStorage.removeItem(SESSION_KEY);
+          localStorage.removeItem(LS_PAY_PHONE);
+          localStorage.removeItem(LS_PAY_SLUG);
+
+          const map = readModuleSlugs();
+          delete map.PAY;
+          localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
+        } catch (_) {}
+      }
+
+      function saveSession(phone, slug) {
+        const p = normPhone(phone || "");
+        const s = normSlug(slug || "");
+        try {
+          if (p) {
+            localStorage.setItem(LS_PHONE, p);
+            localStorage.setItem(LS_PAY_PHONE, p);
+          }
+          if (s) {
+            localStorage.setItem(LS_SLUG, s);
+            localStorage.setItem(LS_PAY_SLUG, s);
+          }
+
+          const map = readModuleSlugs();
+          if (s) {
+            map.PAY = s;
+            localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
+          }
+
+          localStorage.setItem(SESSION_KEY, JSON.stringify({
+            phone: p,
+            slug: s,
+            module: MODULE_CODE,
+            ts: Date.now()
+          }));
+        } catch (_) {}
+      }
+
+      function buildPublicUrl(code) {
+        const clean = makeCode(code);
+        const u = new URL(PUBLIC_BASE_URL);
+        if (clean) u.searchParams.set("pro", clean);
+        return u.toString();
+      }
+
+      function buildPinUrl(phone = "", slug = "", code = "") {
+        const u = new URL(PIN_URL, window.location.href);
+        const p = digitsOnly(phone || "");
+        const s = normSlug(slug || "");
+        const c = makeCode(code || "");
+        if (p) u.searchParams.set("phone", p);
+        if (s) u.searchParams.set("slug", s);
+        if (c) u.searchParams.set("code", c);
+        return u.toString();
+      }
+
+      function buildAdminUrl(phone = "", slug = "", code = "") {
+        const u = new URL(ADMIN_URL, window.location.href);
+        const p = digitsOnly(phone || "");
+        const s = normSlug(slug || "");
+        const c = makeCode(code || "");
+        if (p) u.searchParams.set("phone", p);
+        if (s) u.searchParams.set("slug", s);
+        if (c) u.searchParams.set("code", c);
+        return u.toString();
+      }
+
+      function buildActivateUrl(phone = "", code = "") {
+        const u = new URL(ACTIVATE_BASE);
+        u.searchParams.set("module", "PAY");
+        const p = digitsOnly(phone || "");
+        const c = makeCode(code || "");
+        if (p) u.searchParams.set("phone", p);
+        if (c) u.searchParams.set("code", c);
+        return u.toString();
+      }
+
+      function syncNavLinks() {
+        const code = getEffectiveCode() || currentCodeFromQuery || "";
+        const phone = currentPhone || walletPhone.value || "";
+        const slug = currentSlug || walletSlug.value || "";
+
+        const publicHref = code ? buildPublicUrl(code) : PUBLIC_BASE_URL;
+        const pinHref = buildPinUrl(phone, slug, code);
+        const adminHref = buildAdminUrl(phone, slug, code);
+        const activateHref = buildActivateUrl(phone, code);
+
+        btnPublicTop.href = publicHref;
+        navPublic.href = publicHref;
+        btnOpenPublic.href = publicHref;
+
+        btnPinTop.href = pinHref;
+        navPin.href = pinHref;
+
+        btnAdminTop.href = adminHref;
+        navAdmin.href = adminHref;
+
+        btnActivateTop.href = activateHref;
+        navActivate.href = activateHref;
+      }
+
+      function getEffectiveCode() {
+        return makeCode(walletCode.value || "");
+      }
+
+      function getEffectiveWave() {
+        return digitsOnly(walletPhone.value || "");
+      }
+
+      function getEffectivePublicUrl() {
+        return buildPublicUrl(getEffectiveCode());
+      }
+
+      async function resolvePhoneFromSlug(slug) {
+        const s = normSlug(slug);
+        if (!s) return "";
+
+        const { data, error } = await sb
+          .from("digiy_subscriptions_public")
+          .select("phone,slug,module")
+          .eq("slug", s)
+          .limit(1)
+          .maybeSingle();
+
+        if (error || !data?.phone) return "";
+        return normPhone(data.phone);
+      }
+
+      async function ensureWallet(phoneDigits) {
+        if (!phoneDigits) return;
+        try {
+          await sb.rpc("rpc_wallet_ensure", { p_phone: phoneDigits });
+        } catch (_) {}
+      }
+
+      async function fetchByWavePhone(phoneDigits) {
+        if (!phoneDigits) return null;
+
+        let { data, error } = await sb
+          .from("digiy_pay_pro")
+          .select("business_name,business_code,wave_phone,is_active")
+          .eq("wave_phone", phoneDigits)
+          .maybeSingle();
+
+        if (!error && data) return data;
+
+        ({ data, error } = await sb
+          .from("digiy_pay_pro")
+          .select("business_name,business_code,wave_phone,is_active")
+          .eq("wave_phone", "+" + phoneDigits)
+          .maybeSingle());
+
+        if (!error && data) return data;
+
+        return null;
+      }
+
+      async function fetchByBusinessCode(code) {
+        const clean = makeCode(code);
+        if (!clean) return null;
+
+        const { data, error } = await sb
+          .from("digiy_pay_pro")
+          .select("business_name,business_code,wave_phone,is_active")
+          .eq("business_code", clean)
+          .maybeSingle();
+
+        if (error) return null;
+        return data || null;
+      }
+
+      function updatePreview() {
+        const code = getEffectiveCode();
+        const wave = getEffectiveWave();
+        const url = getEffectivePublicUrl();
+
+        sessionPhone.textContent = currentPhone ? digitsOnly(currentPhone) : "—";
+        sessionSlug.textContent = currentSlug || "—";
+        merchantWave.textContent = wave || "—";
+        publicLink.textContent = code ? url : "—";
+        publicCode.textContent = code || "—";
+        publicStatus.textContent = walletActive.checked ? "Actif" : "Inactif";
+
+        qrActiveCode.textContent = code || "—";
+        qrActiveWave.textContent = wave || "—";
+        qrActiveUrl.textContent = code ? url : "—";
+
+        syncNavLinks();
+        void renderQrOnly();
+        void renderCard();
+      }
+
+      function fillForm(profile) {
+        walletName.value = profile?.business_name || "";
+        walletCode.value = makeCode(profile?.business_code || currentCodeFromQuery || "");
+        walletPhone.value = digitsOnly(profile?.wave_phone || currentPhone || "");
+        walletSlug.value = currentSlug || "";
+        walletActive.checked = profile?.is_active !== false;
+        loadedProfile = profile || null;
+        updatePreview();
+      }
+
+      function autoCodeFromName() {
+        if (walletCode.value.trim()) return;
+        const raw = String(walletName.value || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toUpperCase()
+          .replace(/[^A-Z0-9]+/g, "");
+        walletCode.value = raw.slice(0, 24);
+        updatePreview();
+      }
+
+      async function loadProfile() {
+        resetBoxes();
+
+        const session = readSession();
+        currentPhone = normPhone(session.phone || "");
+        currentSlug = normSlug(session.slug || "");
+
+        if (!currentPhone && currentSlug) {
+          setInfo("Résolution du téléphone à partir du slug…");
+          currentPhone = await resolvePhoneFromSlug(currentSlug);
+        }
+
+        if (!currentPhone) {
+          location.replace(PIN_URL);
+          return;
+        }
+
+        saveSession(currentPhone, currentSlug);
+
+        walletSlug.value = currentSlug || "";
+        sessionPhone.textContent = digitsOnly(currentPhone);
+        sessionSlug.textContent = currentSlug || "—";
+        syncNavLinks();
+
+        setInfo("Chargement du wallet…");
+
+        const phoneDigits = digitsOnly(currentPhone);
+        await ensureWallet(phoneDigits);
+
+        let profile = await fetchByWavePhone(phoneDigits);
+
+        if (!profile && currentCodeFromQuery) {
+          profile = await fetchByBusinessCode(currentCodeFromQuery);
+        }
+
+        fillForm(profile);
+        resetBoxes();
+
+        if (profile) {
+          setOk("Wallet chargé.");
+        } else {
+          walletPhone.value = phoneDigits;
+          updatePreview();
+          setInfo("Aucune fiche publique trouvée. Tu peux la créer maintenant.");
+        }
+      }
+
+      async function saveProfile() {
+        resetBoxes();
+
+        const phoneDigits = digitsOnly(walletPhone.value || currentPhone || "");
+        const code = makeCode(walletCode.value || "");
+        const name = String(walletName.value || "").trim();
+        const isActive = !!walletActive.checked;
+
+        if (!phoneDigits) {
+          setError("Numéro Wave obligatoire.");
+          walletPhone.focus();
+          return;
+        }
+
+        if (!name) {
+          setError("Nom affiché obligatoire.");
+          walletName.focus();
+          return;
+        }
+
+        if (!code) {
+          setError("Code pro obligatoire.");
+          walletCode.focus();
+          return;
+        }
+
+        btnSave.disabled = true;
+        setInfo("Sauvegarde en cours…");
+
+        const payload = {
+          business_name: name,
+          business_code: code,
+          wave_phone: phoneDigits,
+          is_active: isActive
+        };
+
+        try {
+          if (loadedProfile?.business_code) {
+            const { error } = await sb
+              .from("digiy_pay_pro")
+              .update(payload)
+              .eq("business_code", loadedProfile.business_code);
+
+            if (error) throw error;
+          } else {
+            let updateOk = false;
+
+            if (currentPhone) {
+              const byPhone = await sb
+                .from("digiy_pay_pro")
+                .update(payload)
+                .eq("wave_phone", digitsOnly(currentPhone))
+                .select("business_code")
+                .limit(1);
+
+              if (!byPhone.error && Array.isArray(byPhone.data) && byPhone.data.length > 0) {
+                updateOk = true;
+              }
+            }
+
+            if (!updateOk) {
+              const { error } = await sb
+                .from("digiy_pay_pro")
+                .insert(payload);
+
+              if (error) throw error;
+            }
+          }
+
+          loadedProfile = {
+            business_name: name,
+            business_code: code,
+            wave_phone: phoneDigits,
+            is_active: isActive
+          };
+
+          currentPhone = normPhone(phoneDigits);
+          currentCodeFromQuery = code;
+          saveSession(currentPhone, currentSlug);
+
+          fillForm(loadedProfile);
+          resetBoxes();
+          setOk("Fiche wallet sauvegardée.");
+        } catch (e) {
+          setError(
+            "Sauvegarde refusée ou bloquée par la base. Détail: " +
+            String(e?.message || e)
+          );
+        } finally {
+          btnSave.disabled = false;
+        }
+      }
+
+      function copyPublicLink() {
+        const code = getEffectiveCode();
+        if (!code) {
+          setError("Code pro manquant.");
+          walletCode.focus();
+          return;
+        }
+
+        const url = getEffectivePublicUrl();
+
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(url).then(
+            () => setOk("Lien public copié."),
+            () => window.prompt("Copie ce lien :", url)
+          );
+        } else {
+          window.prompt("Copie ce lien :", url);
+        }
+      }
+
+      function openSupport() {
+        const phoneDigits = digitsOnly(walletPhone.value || currentPhone || "");
+        const code = getEffectiveCode();
+        let msg = "DIGIY — MON ARGENT PRO\n\n";
+        if (phoneDigits) msg += "Numéro Wave: " + phoneDigits + "\n";
+        if (code) msg += "Code: " + code + "\n";
+        if (currentSlug) msg += "Slug: " + currentSlug + "\n";
+        msg += "J'ai besoin d'aide pour MON ARGENT PRO.";
+        const num = SUPPORT_WA.replace(/\+/g, "");
+        location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
+      }
+
+      function roundedRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+
+      function wipeCardState() {
+        renderToken += 1;
+        lastRenderFingerprint = "";
+        lastCardDataUrl = "";
+        cardCtx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
+      }
+
+      function wipeQrState() {
+        qrRenderToken += 1;
+        lastQrFingerprint = "";
+        lastQrDataUrl = "";
+        qrCtx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+      }
+
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      function generateQrDataUrl(text, width = 420) {
+        return QRCode.toDataURL(text, {
+          errorCorrectionLevel: "H",
+          type: "image/png",
+          margin: 1,
+          width,
+          color: {
+            dark: "#0f172a",
+            light: "#ffffff"
+          }
+        });
+      }
+
+      function currentQrFingerprint() {
+        return [
+          getEffectiveCode(),
+          getEffectiveWave(),
+          getEffectivePublicUrl(),
+          walletActive.checked ? "1" : "0"
+        ].join("|");
+      }
+
+      async function renderQrOnly(force = false) {
+        const code = getEffectiveCode();
+        const publicUrl = getEffectivePublicUrl();
+        const fingerprint = currentQrFingerprint();
+
+        if (!force && fingerprint === lastQrFingerprint && lastQrDataUrl) {
+          return lastQrDataUrl;
+        }
+
+        const myToken = ++qrRenderToken;
+        const W = qrCanvas.width;
+        const H = qrCanvas.height;
+
+        qrCtx.clearRect(0, 0, W, H);
+        qrCtx.fillStyle = "#ffffff";
+        qrCtx.fillRect(0, 0, W, H);
+
+        qrCtx.fillStyle = "#111827";
+        qrCtx.font = "900 30px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        qrCtx.textAlign = "center";
+        qrCtx.fillText("MON ARGENT by DIGIY", W / 2, 60);
+
+        qrCtx.fillStyle = "#4b5563";
+        qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        qrCtx.fillText(code || "CODE PRO MANQUANT", W / 2, 94);
+
+        if (code) {
+          try {
+            const qrDataUrl = await generateQrDataUrl(publicUrl, 520);
+            if (myToken !== qrRenderToken) return "";
+
+            const qrImg = await loadImage(qrDataUrl);
+            if (myToken !== qrRenderToken) return "";
+
+            qrCtx.drawImage(qrImg, 90, 120, 520, 520);
+
+            qrCtx.fillStyle = "#6b7280";
+            qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+            qrCtx.fillText("Scanne pour ouvrir le wallet", W / 2, 675);
+          } catch (_) {
+            if (myToken !== qrRenderToken) return "";
+            qrCtx.fillStyle = "#f3f4f6";
+            qrCtx.fillRect(90, 120, 520, 520);
+            qrCtx.fillStyle = "#111827";
+            qrCtx.font = "700 24px system-ui, sans-serif";
+            qrCtx.fillText("QR indisponible", W / 2, 400);
+          }
+        } else {
+          qrCtx.fillStyle = "#f3f4f6";
+          qrCtx.fillRect(90, 120, 520, 520);
+          qrCtx.fillStyle = "#111827";
+          qrCtx.font = "700 24px system-ui, sans-serif";
+          qrCtx.fillText("Code pro requis", W / 2, 400);
+        }
+
+        if (myToken !== qrRenderToken) return "";
+
+        lastQrFingerprint = fingerprint;
+        lastQrDataUrl = qrCanvas.toDataURL("image/png");
+        return lastQrDataUrl;
+      }
+
+      function currentCardFingerprint() {
+        const name = String(walletName.value || "").trim();
+        const code = getEffectiveCode();
+        const wave = getEffectiveWave();
+        const active = walletActive.checked ? "1" : "0";
+        return [name, code, wave, active].join("|");
+      }
+
+      async function renderCard(force = false) {
+        const fingerprint = currentCardFingerprint();
+        if (!force && fingerprint === lastRenderFingerprint && lastCardDataUrl) {
+          return lastCardDataUrl;
+        }
+
+        const myToken = ++renderToken;
+        const ctx = cardCtx;
+        const W = cardCanvas.width;
+        const H = cardCanvas.height;
+
+        const name = String(walletName.value || "").trim() || "MON ARGENT";
+        const code = getEffectiveCode();
+        const wave = getEffectiveWave();
+        const publicUrl = getEffectivePublicUrl();
+
+        ctx.clearRect(0, 0, W, H);
+
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, "#03150f");
+        bg.addColorStop(0.5, "#064e3b");
+        bg.addColorStop(1, "#02110b");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = "rgba(250,204,21,0.08)";
+        ctx.beginPath();
+        ctx.arc(120, 140, 180, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(34,197,94,0.10)";
+        ctx.beginPath();
+        ctx.arc(760, 1160, 220, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        roundedRect(ctx, 36, 36, W - 72, H - 72, 38);
+        ctx.fill();
+
+        const headerGrad = ctx.createLinearGradient(0, 80, W, 280);
+        headerGrad.addColorStop(0, "#0b2f22");
+        headerGrad.addColorStop(1, "#0c5f3e");
+
+        ctx.save();
+        roundedRect(ctx, 60, 60, W - 120, 230, 28);
+        ctx.clip();
+        ctx.fillStyle = headerGrad;
+        ctx.fillRect(60, 60, W - 120, 230);
+        ctx.restore();
+
+        ctx.fillStyle = "#22c55e";
+        ctx.font = "900 30px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("MON ARGENT by DIGIY", 90, 120);
+
+        ctx.fillStyle = "#fef3c7";
+        ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Carte de paiement • Wave", 90, 162);
+
+        ctx.fillStyle = "#dbeafe";
+        ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Paiement direct via Wave • 0% commission", 90, 200);
+
+        ctx.fillStyle = "rgba(255,255,255,.16)";
+        roundedRect(ctx, 640, 92, 170, 42, 16);
+        ctx.fill();
+
+        ctx.fillStyle = "#fde68a";
+        ctx.font = "900 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("QR WALLET ACTIF", 660, 120);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 42px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(name.slice(0, 28), 90, 360);
+
+        ctx.fillStyle = "#4b5563";
+        ctx.font = "800 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Code pro", 90, 430);
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "900 34px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(code || "À RENSEIGNER", 90, 472);
+
+        ctx.fillStyle = "#4b5563";
+        ctx.font = "800 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Numéro Wave", 90, 560);
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "900 38px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(wave ? "+" + wave : "À RENSEIGNER", 90, 606);
+
+        ctx.fillStyle = "#4b5563";
+        ctx.font = "800 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Scanne le QR ou utilise le code pro", 90, 700);
+
+        if (code) {
+          try {
+            const qrDataUrl = await generateQrDataUrl(publicUrl, 420);
+            if (myToken !== renderToken) return "";
+
+            const qrImg = await loadImage(qrDataUrl);
+            if (myToken !== renderToken) return "";
+
+            ctx.fillStyle = "#f9fafb";
+            roundedRect(ctx, 560, 420, 260, 260, 24);
+            ctx.fill();
+
+            ctx.drawImage(qrImg, 590, 450, 200, 200);
+
+            ctx.fillStyle = "#4b5563";
+            ctx.font = "800 14px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+            ctx.fillText("QR généré depuis le code actif", 575, 695);
+          } catch (_) {
+            if (myToken !== renderToken) return "";
+
+            ctx.fillStyle = "#e5e7eb";
+            roundedRect(ctx, 560, 420, 260, 260, 24);
+            ctx.fill();
+            ctx.fillStyle = "#111827";
+            ctx.font = "700 24px system-ui, sans-serif";
+            ctx.fillText("QR indisponible", 605, 555);
+          }
+        } else {
+          ctx.fillStyle = "#e5e7eb";
+          roundedRect(ctx, 560, 420, 260, 260, 24);
+          ctx.fill();
+          ctx.fillStyle = "#111827";
+          ctx.font = "700 22px system-ui, sans-serif";
+          ctx.fillText("Code pro requis", 610, 555);
+        }
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "800 24px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Comment payer ?", 90, 820);
+
+        ctx.fillStyle = "#374151";
+        ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("1. Ouvre Wave", 90, 868);
+        ctx.fillText("2. Choisis Payer", 90, 906);
+        ctx.fillText("3. Colle le numéro ou scanne le QR", 90, 944);
+
+        ctx.fillStyle = "#facc15";
+        roundedRect(ctx, 90, 1010, W - 180, 92, 22);
+        ctx.fill();
+
+        ctx.fillStyle = "#111827";
+        ctx.font = "900 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("DIGIY n'est pas une banque", 120, 1060);
+        ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Le paiement affiché ici passe actuellement par Wave.", 120, 1092);
+
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Lien public : " + (code ? publicUrl : "—"), 90, 1185);
+
+        ctx.fillStyle = "#16a34a";
+        ctx.font = "900 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("MON ARGENT ELECTRONIQUE BY DIGIY", 90, 1260);
+
+        ctx.fillStyle = "#6b7280";
+        ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText("Carte générée depuis MON ARGENT PRO", 90, 1300);
+
+        if (myToken !== renderToken) return "";
+
+        lastRenderFingerprint = fingerprint;
+        lastCardDataUrl = cardCanvas.toDataURL("image/png");
+        return lastCardDataUrl;
+      }
+
+      function buildCardFilename() {
+        const code = getEffectiveCode();
+        const fallback = "ma-carte-mon-argent";
+        return (code ? ("mon-argent-" + code.toLowerCase()) : fallback) + ".png";
+      }
+
+      function buildQrFilename() {
+        const code = getEffectiveCode();
+        return "qr-wave-" + (code ? code.toLowerCase() : "wallet") + ".png";
+      }
+
+      async function ensureFreshCard() {
+        wipeCardState();
+        return renderCard(true);
+      }
+
+      async function ensureFreshQr() {
+        wipeQrState();
+        return renderQrOnly(true);
+      }
+
+      function openImagePage(dataUrl, filename, tipHtml) {
+        const html = [
+          "<!DOCTYPE html><html><head>",
+          "<meta charset='utf-8'>",
+          "<meta name='viewport' content='width=device-width,initial-scale=1'>",
+          "<title>", filename, "</title>",
+          "<style>",
+          "*{box-sizing:border-box;margin:0;padding:0}",
+          "body{background:#060f0a;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px 16px;gap:20px;font-family:system-ui,sans-serif;}",
+          ".tip{width:min(100%,560px);color:#fde68a;font-weight:900;font-size:16px;text-align:center;padding:18px 22px;line-height:1.75;background:rgba(250,204,21,.1);border:2px solid rgba(250,204,21,.45);border-radius:18px;}",
+          ".tip b{font-size:18px}",
+          ".tip .sub{margin-top:8px;color:#bbf7d0;font-size:14px;font-weight:800}",
+          "img{width:min(100%,560px);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.7);background:#fff;}",
+          "</style></head><body>",
+          "<div class='tip'>", tipHtml, "</div>",
+          "<img src='", dataUrl, "' alt='", filename, "'>",
+          "</body></html>"
+        ].join("");
+
+        const win = window.open("", "_blank");
+        if (win) {
+          win.document.write(html);
+          win.document.close();
+        } else {
+          setError("Pop-up bloquée. Autorise les pop-ups pour ce site puis réessaie.");
+        }
+      }
+
+      function smartDownload(dataUrl, filename) {
+        if (!dataUrl) {
+          setError("Image non disponible.");
+          return;
+        }
+
+        if (isIOS()) {
+          openImagePage(
+            dataUrl,
+            filename,
+            "📲 <b>Appui long sur l'image</b><br>→ Enregistrer dans Photos<br><span class='sub'>ou Ajouter à la photothèque</span>"
+          );
+          setOk("📲 Page ouverte — appui long sur l'image → Enregistrer dans Photos.");
+          return;
+        }
+
+        try {
+          const parts = dataUrl.split(",");
+          const byteStr = atob(parts[1]);
+          const ab = new Uint8Array(byteStr.length);
+          for (let i = 0; i < byteStr.length; i++) ab[i] = byteStr.charCodeAt(i);
+
+          const blob = new Blob([ab], { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+
+          setTimeout(() => {
+            a.remove();
+            URL.revokeObjectURL(url);
+          }, 3000);
+
+          setOk(isAndroid()
+            ? "📥 Téléchargé — vérifie ton dossier Téléchargements."
+            : "📥 Fichier dans Téléchargements — ouvre ton Finder 📂");
+        } catch (e) {
+          setError("Téléchargement impossible. " + String(e.message || e));
+        }
+      }
+
+      function openPreviewWithDataUrl(dataUrl, title, hint) {
+        if (!dataUrl) return;
+        cardPreviewImage.src = dataUrl;
+        previewTitle.textContent = title || "Aperçu";
+        previewHint.textContent = hint || "Image prête.";
+        cardPreviewModal.classList.add("open");
+        cardPreviewModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modalOpen");
+      }
+
+      function closePreview() {
+        cardPreviewModal.classList.remove("open");
+        cardPreviewModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modalOpen");
+      }
+
+      async function openCardPreview() {
+        resetBoxes();
+        btnOpenCard.disabled = true;
+
+        try {
+          const dataUrl = await ensureFreshCard();
+          if (!dataUrl) throw new Error("Carte vide");
+
+          openPreviewWithDataUrl(
+            dataUrl,
+            "Ma carte est prête",
+            "Sur téléphone, tu peux l'ouvrir en grand puis faire ta capture immédiatement."
+          );
+          setOk("Carte ouverte en grand.");
+        } catch (e) {
+          setError("Impossible d'ouvrir la carte. " + String(e.message || e));
+        } finally {
+          btnOpenCard.disabled = false;
+        }
+      }
+
+      async function openQrPreview() {
+        resetBoxes();
+        btnOpenQr.disabled = true;
+
+        try {
+          const dataUrl = await ensureFreshQr();
+          if (!dataUrl) throw new Error("QR vide");
+
+          openPreviewWithDataUrl(
+            dataUrl,
+            "Mon QR Wave est prêt",
+            "Sur ordi, tu peux aussi le télécharger directement dans Téléchargements."
+          );
+          setOk("QR ouvert.");
+        } catch (e) {
+          setError("Impossible d'ouvrir le QR. " + String(e.message || e));
+        } finally {
+          btnOpenQr.disabled = false;
+        }
+      }
+
+      async function downloadCard() {
+        resetBoxes();
+        btnDownloadCard.disabled = true;
+        try {
+          const dataUrl = await ensureFreshCard();
+          smartDownload(dataUrl || lastCardDataUrl, buildCardFilename());
+        } catch (e) {
+          setError("Impossible de télécharger la carte. " + String(e.message || e));
+        } finally {
+          btnDownloadCard.disabled = false;
+        }
+      }
+
+      async function downloadQr() {
+        resetBoxes();
+        btnDownloadQr.disabled = true;
+        try {
+          const dataUrl = await ensureFreshQr();
+          smartDownload(dataUrl || lastQrDataUrl, buildQrFilename());
+        } catch (e) {
+          setError("Impossible de télécharger le QR. " + String(e.message || e));
+        } finally {
+          btnDownloadQr.disabled = false;
+        }
+      }
+
+      btnReload.addEventListener("click", loadProfile);
+      btnSave.addEventListener("click", saveProfile);
+      btnCopyLink.addEventListener("click", copyPublicLink);
+      btnSupport.addEventListener("click", openSupport);
+
+      btnRenderQr.addEventListener("click", async () => {
+        resetBoxes();
+        btnRenderQr.disabled = true;
+        try {
+          await ensureFreshQr();
+          setOk("QR régénéré proprement.");
+        } catch (e) {
+          setError("Impossible de régénérer le QR. " + String(e.message || e));
+        } finally {
+          btnRenderQr.disabled = false;
+        }
+      });
+
+      btnOpenQr.addEventListener("click", openQrPreview);
+      btnDownloadQr.addEventListener("click", downloadQr);
+
+      btnRenderCard.addEventListener("click", async () => {
+        resetBoxes();
+        btnRenderCard.disabled = true;
+        try {
+          await ensureFreshCard();
+          setOk("Carte régénérée proprement.");
+        } catch (e) {
+          setError("Impossible de régénérer la carte. " + String(e.message || e));
+        } finally {
+          btnRenderCard.disabled = false;
+        }
+      });
+
+      btnOpenCard.addEventListener("click", openCardPreview);
+      btnDownloadCard.addEventListener("click", downloadCard);
+
+      btnLogout.addEventListener("click", () => {
+        clearSession();
+        location.href = PIN_URL;
+      });
+
+      btnClosePreview.addEventListener("click", closePreview);
+      cardPreviewModal.addEventListener("click", (e) => {
+        if (e.target === cardPreviewModal) closePreview();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && cardPreviewModal.classList.contains("open")) {
+          closePreview();
+        }
+      });
+
+      walletName.addEventListener("blur", () => {
+        autoCodeFromName();
+        void renderCard(true);
+      });
+
+      walletCode.addEventListener("input", () => {
+        walletCode.value = makeCode(walletCode.value);
+        currentCodeFromQuery = makeCode(walletCode.value);
+        updatePreview();
+      });
+
+      walletPhone.addEventListener("input", () => {
+        walletPhone.value = digitsOnly(walletPhone.value);
+        updatePreview();
+      });
+
+      walletActive.addEventListener("change", updatePreview);
+
+      void loadProfile();
+    })();
+  </script>
 </body>
 </html>
