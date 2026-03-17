@@ -249,6 +249,10 @@
       background:rgba(250,204,21,.12);
       color:#fde68a;
     }
+    .btn[disabled]{
+      opacity:.62;
+      cursor:not-allowed;
+    }
 
     .name{
       margin-top:16px;
@@ -432,11 +436,11 @@
           <strong>Wallet public</strong>
           <span>Vue publique du moyen de paiement</span>
         </a>
-        <a class="nav-card" href="./cockpit.html">
+        <a id="navCockpit" class="nav-card" href="./cockpit.html">
           <strong>Cockpit</strong>
           <span>Vue financière pro</span>
         </a>
-        <a class="nav-card" href="./admin.html">
+        <a id="navAdmin" class="nav-card" href="./admin.html">
           <strong>Admin</strong>
           <span>Outils internes plus profonds</span>
         </a>
@@ -469,6 +473,7 @@
           <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
           <a id="btnPublic" class="btn ghost" href="./index.html">💳 Wallet public</a>
           <a id="btnCockpitGhost" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
+          <a id="btnAdminGhost" class="btn ghost" href="./admin.html">⚙️ Admin</a>
         </div>
 
         <div id="infoBox" class="msg"></div>
@@ -531,6 +536,9 @@
   const btnSession = $("btnSession");
   const btnSupport = $("btnSupport");
   const btnCockpitGhost = $("btnCockpitGhost");
+  const btnAdminGhost = $("btnAdminGhost");
+  const navCockpit = $("navCockpit");
+  const navAdmin = $("navAdmin");
   const infoBox = $("infoBox");
   const errorBox = $("errorBox");
   const okBox = $("okBox");
@@ -541,22 +549,19 @@
   const qs = new URLSearchParams(location.search);
   let phoneQ = normPhone(qs.get("phone") || "");
   let slugQ = normSlug(qs.get("slug") || "");
-  const codeQ = safeUpper(qs.get("code") || "");
-
-  function safeUpper(v){
-    return String(v || "").trim().toUpperCase();
-  }
-
-  function normPhone(v) {
-    let s = String(v || "").trim();
-    s = s.replace(/[^\d+]/g, "");
-    if (!s) return "";
-    if (!s.startsWith("+") && s.startsWith("221")) s = "+" + s;
-    return s;
-  }
+  let codeQ = normalizeCode(qs.get("code") || "");
 
   function digitsOnly(v) {
     return String(v || "").replace(/\D/g, "");
+  }
+
+  function normPhone(v) {
+    const raw = digitsOnly(v);
+    if (!raw) return "";
+    if (raw.startsWith("221") && raw.length >= 12) return "+" + raw;
+    if (raw.length === 9) return "+221" + raw;
+    if (String(v || "").trim().startsWith("+")) return "+" + raw;
+    return "+" + raw;
   }
 
   function normSlug(v) {
@@ -569,9 +574,22 @@
       .replace(/^-|-$/g, "");
   }
 
+  function normalizeCode(v){
+    return String(v || "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, "")
+      .replace(/[^A-Z0-9_-]/g, "");
+  }
+
   function show(el, on = true) {
     if (!el) return;
     el.style.display = on ? "" : "none";
+  }
+
+  function setBusy(btn, on) {
+    if (!btn) return;
+    btn.disabled = !!on;
   }
 
   function resetBoxes() {
@@ -606,6 +624,26 @@
     } catch (_) {
       return {};
     }
+  }
+
+  function saveQueryState(phone, slug, code) {
+    try {
+      const url = new URL(window.location.href);
+      const p = digitsOnly(phone || "");
+      const s = normSlug(slug || "");
+      const c = normalizeCode(code || "");
+
+      if (p) url.searchParams.set("phone", p);
+      else url.searchParams.delete("phone");
+
+      if (s) url.searchParams.set("slug", s);
+      else url.searchParams.delete("slug");
+
+      if (c) url.searchParams.set("code", c);
+      else url.searchParams.delete("code");
+
+      history.replaceState({}, "", url.toString());
+    } catch (_) {}
   }
 
   function saveSession({ phone, slug }) {
@@ -669,7 +707,7 @@
     const u = new URL(COCKPIT_URL, window.location.href);
     const p = digitsOnly(phone || "");
     const s = normSlug(slug || "");
-    const c = safeUpper(code || "");
+    const c = normalizeCode(code || "");
 
     if (p) u.searchParams.set("phone", p);
     if (s) u.searchParams.set("slug", s);
@@ -682,7 +720,7 @@
     const u = new URL(ADMIN_URL, window.location.href);
     const p = digitsOnly(phone || "");
     const s = normSlug(slug || "");
-    const c = safeUpper(code || "");
+    const c = normalizeCode(code || "");
 
     if (p) u.searchParams.set("phone", p);
     if (s) u.searchParams.set("slug", s);
@@ -691,9 +729,21 @@
     return u.toString();
   }
 
+  function syncQuickLinks(phone, slug, code = "") {
+    const cockpitHref = buildCockpitUrl(phone, slug, code);
+    const adminHref = buildAdminUrl(phone, slug, code);
+    btnCockpitGhost.href = cockpitHref;
+    btnAdminGhost.href = adminHref;
+    navCockpit.href = cockpitHref;
+    navAdmin.href = adminHref;
+  }
+
   function goCockpit(phone, slug) {
-    saveSession({ phone, slug });
-    location.href = buildCockpitUrl(phone, slug, codeQ);
+    const finalPhone = normPhone(phone || "");
+    const finalSlug = normSlug(slug || "");
+    saveSession({ phone: finalPhone, slug: finalSlug });
+    saveQueryState(finalPhone, finalSlug, codeQ);
+    location.href = buildCockpitUrl(finalPhone, finalSlug, codeQ);
   }
 
   async function resolvePhoneFromSlug(slug) {
@@ -704,11 +754,13 @@
       .from("digiy_subscriptions_public")
       .select("phone,slug,module")
       .eq("slug", s)
+      .eq("module", "PAY")
       .limit(1)
       .maybeSingle();
 
-    if (error || !data?.phone) return "";
-    return normPhone(data.phone);
+    if (!error && data?.phone) return normPhone(data.phone);
+
+    return "";
   }
 
   async function resolveSlugFromPhone(phone) {
@@ -725,15 +777,17 @@
 
     if (!error && data?.slug) return normSlug(data.slug);
 
-    const fallback = await sb
+    ({ data, error } = await sb
       .from("digiy_subscriptions_public")
       .select("slug,module,phone")
-      .eq("phone", p)
+      .eq("phone", "+" + p)
+      .eq("module", "PAY")
       .limit(1)
-      .maybeSingle();
+      .maybeSingle());
 
-    if (fallback.error || !fallback.data?.slug) return "";
-    return normSlug(fallback.data.slug);
+    if (!error && data?.slug) return normSlug(data.slug);
+
+    return "";
   }
 
   async function tryPinRpc(phone, pin) {
@@ -753,13 +807,15 @@
     let lastError = null;
 
     for (const attempt of attempts) {
-      const { data, error } = await sb.rpc(attempt.name, attempt.params);
-
-      if (!error) {
-        return { ok: true, rpc: attempt.name, data };
+      try {
+        const { data, error } = await sb.rpc(attempt.name, attempt.params);
+        if (!error) {
+          return { ok: true, rpc: attempt.name, data };
+        }
+        lastError = error;
+      } catch (e) {
+        lastError = e;
       }
-
-      lastError = error;
     }
 
     return {
@@ -769,13 +825,49 @@
     };
   }
 
+  function unwrapRpcPayload(raw) {
+    if (raw == null) return null;
+    const first = Array.isArray(raw) ? (raw[0] || null) : raw;
+    if (first == null) return null;
+
+    if (typeof first !== "object") {
+      return { ok: !!first };
+    }
+
+    if (first.row && typeof first.row === "object") {
+      return { ...first.row, __meta: first };
+    }
+
+    if (first.data && typeof first.data === "object") {
+      return { ...first.data, __meta: first };
+    }
+
+    if (first.result && typeof first.result === "object") {
+      return { ...first.result, __meta: first };
+    }
+
+    return first;
+  }
+
   function extractLoginResult(raw, fallbackPhone, fallbackSlug) {
-    const row = Array.isArray(raw) ? raw[0] : raw;
+    const row = unwrapRpcPayload(raw) || {};
+
+    const meta = row.__meta || {};
+    const ok =
+      raw === true ||
+      row === true ||
+      row?.ok === true ||
+      row?.valid === true ||
+      row?.success === true ||
+      meta?.ok === true ||
+      meta?.valid === true ||
+      meta?.success === true;
 
     const phone = normPhone(
       row?.phone ||
       row?.p_phone ||
       row?.user_phone ||
+      meta?.phone ||
       fallbackPhone ||
       ""
     );
@@ -784,18 +876,14 @@
       row?.slug ||
       row?.subscription_slug ||
       row?.public_slug ||
+      row?.pay_slug ||
+      row?.module_slug ||
+      meta?.slug ||
       fallbackSlug ||
       ""
     );
 
-    const ok =
-      raw === true ||
-      row === true ||
-      row?.ok === true ||
-      row?.valid === true ||
-      row?.success === true;
-
-    return { ok, phone, slug };
+    return { ok, phone, slug, row };
   }
 
   async function login() {
@@ -824,7 +912,7 @@
     }
 
     setInfo("Vérification sécurisée en cours…");
-    btnLogin.disabled = true;
+    setBusy(btnLogin, true);
 
     try {
       const res = await tryPinRpc(phone, pin);
@@ -839,7 +927,7 @@
         throw new Error("PIN refusé ou accès wallet non trouvé.");
       }
 
-      if (!parsed.slug && !slug) {
+      if (!parsed.slug) {
         slug = await resolveSlugFromPhone(parsed.phone || phone);
       }
 
@@ -850,6 +938,12 @@
         throw new Error("Slug PAY introuvable pour ce compte.");
       }
 
+      phoneQ = finalPhone;
+      slugQ = finalSlug;
+      saveSession({ phone: finalPhone, slug: finalSlug });
+      saveQueryState(finalPhone, finalSlug, codeQ);
+      syncQuickLinks(finalPhone, finalSlug, codeQ);
+
       setOk("Accès validé. Redirection vers le cockpit…");
       setTimeout(() => {
         goCockpit(finalPhone, finalSlug);
@@ -857,15 +951,16 @@
     } catch (e) {
       setError(String(e?.message || e || "Connexion impossible."));
     } finally {
-      btnLogin.disabled = false;
+      setBusy(btnLogin, false);
     }
   }
 
   function supportMessage() {
     const p = normPhone(phoneInput.value || phoneQ || "");
+    const s = normSlug(slugQ || "");
     let msg = "DIGIY — MON ARGENT PRO\n\n";
     if (p) msg += "Téléphone: " + p + "\n";
-    if (slugQ) msg += "Slug: " + slugQ + "\n";
+    if (s) msg += "Slug: " + s + "\n";
     if (codeQ) msg += "Code: " + codeQ + "\n";
     msg += "J'ai besoin d'aide pour accéder à MON ARGENT PRO.";
     return msg;
@@ -884,14 +979,15 @@
 
     if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
 
+    saveQueryState(phoneQ, slugQ, codeQ);
+    syncQuickLinks(phoneQ, slugQ, codeQ);
+
     if (slugQ) {
       screenName.textContent = "Accès wallet détecté";
       screenHint.textContent = "Un slug PAY a été détecté. Il sera utilisé pour ouvrir le cockpit.";
-      slugHint.textContent = "Slug détecté : " + slugQ;
-      btnCockpitGhost.href = buildCockpitUrl(phoneQ, slugQ, codeQ);
+      slugHint.textContent = "Slug PAY détecté : " + slugQ;
     } else {
       slugHint.textContent = "Aucun slug transmis. Le téléphone + PIN suffisent.";
-      btnCockpitGhost.href = COCKPIT_URL;
     }
   }
 
@@ -913,40 +1009,54 @@
 
   btnSession.addEventListener("click", async () => {
     resetBoxes();
-    const saved = readSavedSession();
+    setBusy(btnSession, true);
 
-    if (!saved?.phone && !saved?.slug) {
-      setError("Aucune session wallet trouvée.");
-      return;
+    try {
+      const saved = readSavedSession();
+
+      if (!saved?.phone && !saved?.slug) {
+        setError("Aucune session wallet trouvée.");
+        return;
+      }
+
+      let phone = saved?.phone || "";
+      let slug = saved?.slug || "";
+
+      if (!phone && slug) {
+        setInfo("Résolution du téléphone à partir de la session…");
+        phone = await resolvePhoneFromSlug(slug);
+      }
+
+      if (!slug && phone) {
+        setInfo("Résolution du slug wallet à partir de la session…");
+        slug = await resolveSlugFromPhone(phone);
+      }
+
+      if (!phone) {
+        setError("Session incomplète. Téléphone introuvable.");
+        return;
+      }
+
+      if (!slug) {
+        setError("Session incomplète. Slug PAY introuvable.");
+        return;
+      }
+
+      phoneQ = phone;
+      slugQ = slug;
+      if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
+
+      saveSession({ phone, slug });
+      saveQueryState(phone, slug, codeQ);
+      syncQuickLinks(phone, slug, codeQ);
+
+      setOk("Session trouvée. Redirection vers le cockpit…");
+      setTimeout(() => {
+        goCockpit(phone, slug);
+      }, 250);
+    } finally {
+      setBusy(btnSession, false);
     }
-
-    let phone = saved?.phone || "";
-    let slug = saved?.slug || "";
-
-    if (!phone && slug) {
-      setInfo("Résolution du téléphone à partir de la session…");
-      phone = await resolvePhoneFromSlug(slug);
-    }
-
-    if (!slug && phone) {
-      setInfo("Résolution du slug wallet à partir de la session…");
-      slug = await resolveSlugFromPhone(phone);
-    }
-
-    if (!phone) {
-      setError("Session incomplète. Téléphone introuvable.");
-      return;
-    }
-
-    if (!slug) {
-      setError("Session incomplète. Slug PAY introuvable.");
-      return;
-    }
-
-    setOk("Session trouvée. Redirection vers le cockpit…");
-    setTimeout(() => {
-      goCockpit(phone, slug);
-    }, 250);
   });
 
   btnSupport.addEventListener("click", openSupport);
