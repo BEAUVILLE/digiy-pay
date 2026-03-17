@@ -610,7 +610,7 @@
           <div class="switch">
             <input id="walletActive" type="checkbox">
             <div>
-              <div style="font-weight:950">Accès PAY actif</div>
+              <div style="font-weight:950">Affichage public PAY actif</div>
               <div class="mini">Si décoché, la page publique ne doit plus être considérée comme active.</div>
             </div>
           </div>
@@ -631,7 +631,7 @@
 
           <div class="stats">
             <div class="stat">
-              <div class="statLabel">Téléphone admin</div>
+              <div class="statLabel">Téléphone session</div>
               <div class="statValue mono" id="sessionPhone">—</div>
             </div>
             <div class="stat">
@@ -662,8 +662,7 @@
           </div>
 
           <div class="mini" style="margin-top:14px;">
-            DIGIY n'est pas une banque.
-            Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le professionnel.
+            DIGIY n'est pas une banque. Le paiement affiché dans MON ARGENT passe en direct vers le professionnel.
           </div>
         </div>
       </div>
@@ -871,7 +870,7 @@
 
       let currentPhone = "";
       let currentSlug = "";
-      let currentCodeFromQuery = safeUpper(qs.get("code") || "");
+      let currentCodeFromQuery = normalizeCode(qs.get("code") || "");
       let loadedProfile = null;
 
       let renderToken = 0;
@@ -882,16 +881,21 @@
       let lastQrFingerprint = "";
       let lastQrDataUrl = "";
 
-      function normPhone(v) {
-        let s = String(v || "").trim();
-        s = s.replace(/[^\d+]/g, "");
-        if (!s) return "";
-        if (!s.startsWith("+") && s.startsWith("221")) s = "+" + s;
-        return s;
-      }
-
       function digitsOnly(v) {
         return String(v || "").replace(/\D/g, "");
+      }
+
+      function normPhone(v) {
+        const raw = digitsOnly(v);
+        if (!raw) return "";
+        if (raw.startsWith("221") && raw.length >= 12) return "+" + raw;
+        if (raw.length === 9) return "+221" + raw;
+        if (String(v || "").trim().startsWith("+")) return "+" + raw;
+        return "+" + raw;
+      }
+
+      function phoneDigits(v) {
+        return digitsOnly(v);
       }
 
       function normSlug(v) {
@@ -904,21 +908,22 @@
           .replace(/^-|-$/g, "");
       }
 
-      function safeUpper(v){
-        return String(v || "").trim().toUpperCase();
-      }
-
-      function makeCode(v) {
+      function normalizeCode(v) {
         return String(v || "")
           .trim()
           .toUpperCase()
           .replace(/\s+/g, "")
-          .replace(/[^A-Z0-9_]/g, "");
+          .replace(/[^A-Z0-9_-]/g, "");
       }
 
       function show(el, on = true) {
         if (!el) return;
         el.style.display = on ? "" : "none";
+      }
+
+      function setBusy(btn, on) {
+        if (!btn) return;
+        btn.disabled = !!on;
       }
 
       function resetBoxes() {
@@ -953,6 +958,26 @@
         } catch (_) {
           return {};
         }
+      }
+
+      function saveQueryState(phone, slug, code) {
+        try {
+          const url = new URL(window.location.href);
+          const p = phoneDigits(phone || "");
+          const s = normSlug(slug || "");
+          const c = normalizeCode(code || "");
+
+          if (p) url.searchParams.set("phone", p);
+          else url.searchParams.delete("phone");
+
+          if (s) url.searchParams.set("slug", s);
+          else url.searchParams.delete("slug");
+
+          if (c) url.searchParams.set("code", c);
+          else url.searchParams.delete("code");
+
+          history.replaceState({}, "", url.toString());
+        } catch (_) {}
       }
 
       function readSession() {
@@ -1031,7 +1056,7 @@
       }
 
       function buildPublicUrl(code) {
-        const clean = makeCode(code);
+        const clean = normalizeCode(code);
         const u = new URL(PUBLIC_BASE_URL);
         if (clean) u.searchParams.set("pro", clean);
         return u.toString();
@@ -1039,9 +1064,9 @@
 
       function buildPinUrl(phone = "", slug = "", code = "") {
         const u = new URL(PIN_URL, window.location.href);
-        const p = digitsOnly(phone || "");
+        const p = phoneDigits(phone || "");
         const s = normSlug(slug || "");
-        const c = makeCode(code || "");
+        const c = normalizeCode(code || "");
         if (p) u.searchParams.set("phone", p);
         if (s) u.searchParams.set("slug", s);
         if (c) u.searchParams.set("code", c);
@@ -1050,9 +1075,9 @@
 
       function buildAdminUrl(phone = "", slug = "", code = "") {
         const u = new URL(ADMIN_URL, window.location.href);
-        const p = digitsOnly(phone || "");
+        const p = phoneDigits(phone || "");
         const s = normSlug(slug || "");
-        const c = makeCode(code || "");
+        const c = normalizeCode(code || "");
         if (p) u.searchParams.set("phone", p);
         if (s) u.searchParams.set("slug", s);
         if (c) u.searchParams.set("code", c);
@@ -1062,8 +1087,8 @@
       function buildActivateUrl(phone = "", code = "") {
         const u = new URL(ACTIVATE_BASE);
         u.searchParams.set("module", "PAY");
-        const p = digitsOnly(phone || "");
-        const c = makeCode(code || "");
+        const p = phoneDigits(phone || "");
+        const c = normalizeCode(code || "");
         if (p) u.searchParams.set("phone", p);
         if (c) u.searchParams.set("code", c);
         return u.toString();
@@ -1094,11 +1119,11 @@
       }
 
       function getEffectiveCode() {
-        return makeCode(walletCode.value || "");
+        return normalizeCode(walletCode.value || "");
       }
 
       function getEffectiveWave() {
-        return digitsOnly(walletPhone.value || "");
+        return phoneDigits(walletPhone.value || "");
       }
 
       function getEffectivePublicUrl() {
@@ -1120,20 +1145,20 @@
         return normPhone(data.phone);
       }
 
-      async function ensurePayProfile(phoneDigits) {
-        if (!phoneDigits) return;
+      async function ensurePayProfile(phoneDigitsValue) {
+        if (!phoneDigitsValue) return;
         try {
-          await sb.rpc("rpc_wallet_ensure", { p_phone: phoneDigits });
+          await sb.rpc("rpc_wallet_ensure", { p_phone: phoneDigitsValue });
         } catch (_) {}
       }
 
-      async function fetchByPhone(phoneDigits) {
-        if (!phoneDigits) return null;
+      async function fetchByPhone(phoneDigitsValue) {
+        if (!phoneDigitsValue) return null;
 
         let { data, error } = await sb
           .from("digiy_pay_pro")
           .select("business_name,business_code,wave_phone,is_active")
-          .eq("wave_phone", phoneDigits)
+          .eq("wave_phone", phoneDigitsValue)
           .maybeSingle();
 
         if (!error && data) return data;
@@ -1141,7 +1166,7 @@
         ({ data, error } = await sb
           .from("digiy_pay_pro")
           .select("business_name,business_code,wave_phone,is_active")
-          .eq("wave_phone", "+" + phoneDigits)
+          .eq("wave_phone", "+" + phoneDigitsValue)
           .maybeSingle());
 
         if (!error && data) return data;
@@ -1150,7 +1175,7 @@
       }
 
       async function fetchByCode(code) {
-        const clean = makeCode(code);
+        const clean = normalizeCode(code);
         if (!clean) return null;
 
         const { data, error } = await sb
@@ -1168,7 +1193,7 @@
         const wave = getEffectiveWave();
         const url = getEffectivePublicUrl();
 
-        sessionPhone.textContent = currentPhone ? digitsOnly(currentPhone) : "—";
+        sessionPhone.textContent = currentPhone ? phoneDigits(currentPhone) : "—";
         sessionSlug.textContent = currentSlug || "—";
         merchantWave.textContent = wave || "—";
         publicLink.textContent = code ? url : "—";
@@ -1179,6 +1204,7 @@
         qrActiveWave.textContent = wave || "—";
         qrActiveUrl.textContent = code ? url : "—";
 
+        saveQueryState(currentPhone || walletPhone.value || "", currentSlug || walletSlug.value || "", code);
         syncNavLinks();
         void renderQrOnly();
         void renderCard();
@@ -1186,11 +1212,12 @@
 
       function fillForm(profile) {
         walletName.value = profile?.business_name || "";
-        walletCode.value = makeCode(profile?.business_code || currentCodeFromQuery || "");
-        walletPhone.value = digitsOnly(profile?.wave_phone || currentPhone || "");
+        walletCode.value = normalizeCode(profile?.business_code || currentCodeFromQuery || "");
+        walletPhone.value = phoneDigits(profile?.wave_phone || currentPhone || "");
         walletSlug.value = currentSlug || "";
         walletActive.checked = profile?.is_active !== false;
         loadedProfile = profile || null;
+        currentCodeFromQuery = normalizeCode(walletCode.value || currentCodeFromQuery || "");
         updatePreview();
       }
 
@@ -1202,6 +1229,7 @@
           .toUpperCase()
           .replace(/[^A-Z0-9]+/g, "");
         walletCode.value = raw.slice(0, 24);
+        currentCodeFromQuery = normalizeCode(walletCode.value);
         updatePreview();
       }
 
@@ -1225,16 +1253,16 @@
         saveSession(currentPhone, currentSlug);
 
         walletSlug.value = currentSlug || "";
-        sessionPhone.textContent = digitsOnly(currentPhone);
+        sessionPhone.textContent = phoneDigits(currentPhone);
         sessionSlug.textContent = currentSlug || "—";
         syncNavLinks();
 
         setInfo("Chargement du profil PAY…");
 
-        const phoneDigits = digitsOnly(currentPhone);
-        await ensurePayProfile(phoneDigits);
+        const currentPhoneDigits = phoneDigits(currentPhone);
+        await ensurePayProfile(currentPhoneDigits);
 
-        let profile = await fetchByPhone(phoneDigits);
+        let profile = await fetchByPhone(currentPhoneDigits);
 
         if (!profile && currentCodeFromQuery) {
           profile = await fetchByCode(currentCodeFromQuery);
@@ -1246,7 +1274,7 @@
         if (profile) {
           setOk("Profil PAY chargé.");
         } else {
-          walletPhone.value = phoneDigits;
+          walletPhone.value = currentPhoneDigits;
           updatePreview();
           setInfo("Aucune fiche publique trouvée. Tu peux la créer maintenant.");
         }
@@ -1255,12 +1283,12 @@
       async function saveProfile() {
         resetBoxes();
 
-        const phoneDigits = digitsOnly(walletPhone.value || currentPhone || "");
-        const code = makeCode(walletCode.value || "");
+        const phoneDigitsValue = phoneDigits(walletPhone.value || currentPhone || "");
+        const code = normalizeCode(walletCode.value || "");
         const name = String(walletName.value || "").trim();
         const isActive = !!walletActive.checked;
 
-        if (!phoneDigits) {
+        if (!phoneDigitsValue) {
           setError("Numéro de paiement obligatoire.");
           walletPhone.focus();
           return;
@@ -1278,41 +1306,68 @@
           return;
         }
 
-        btnSave.disabled = true;
+        setBusy(btnSave, true);
         setInfo("Sauvegarde en cours…");
 
         const payload = {
           business_name: name,
           business_code: code,
-          wave_phone: phoneDigits,
+          wave_phone: phoneDigitsValue,
           is_active: isActive
         };
 
         try {
+          let updated = false;
+
           if (loadedProfile?.business_code) {
             const { error } = await sb
               .from("digiy_pay_pro")
               .update(payload)
-              .eq("business_code", loadedProfile.business_code);
+              .eq("business_code", normalizeCode(loadedProfile.business_code));
 
-            if (error) throw error;
+            if (!error) updated = true;
+            else throw error;
           } else {
-            let updateOk = false;
-
             if (currentPhone) {
-              const byPhone = await sb
+              const byPhoneDigits = await sb
                 .from("digiy_pay_pro")
                 .update(payload)
-                .eq("wave_phone", digitsOnly(currentPhone))
+                .eq("wave_phone", phoneDigits(currentPhone))
                 .select("business_code")
                 .limit(1);
 
-              if (!byPhone.error && Array.isArray(byPhone.data) && byPhone.data.length > 0) {
-                updateOk = true;
+              if (!byPhoneDigits.error && Array.isArray(byPhoneDigits.data) && byPhoneDigits.data.length > 0) {
+                updated = true;
+              }
+
+              if (!updated) {
+                const byPhonePlus = await sb
+                  .from("digiy_pay_pro")
+                  .update(payload)
+                  .eq("wave_phone", normPhone(currentPhone))
+                  .select("business_code")
+                  .limit(1);
+
+                if (!byPhonePlus.error && Array.isArray(byPhonePlus.data) && byPhonePlus.data.length > 0) {
+                  updated = true;
+                }
               }
             }
 
-            if (!updateOk) {
+            if (!updated && code) {
+              const byCode = await sb
+                .from("digiy_pay_pro")
+                .update(payload)
+                .eq("business_code", code)
+                .select("business_code")
+                .limit(1);
+
+              if (!byCode.error && Array.isArray(byCode.data) && byCode.data.length > 0) {
+                updated = true;
+              }
+            }
+
+            if (!updated) {
               const { error } = await sb
                 .from("digiy_pay_pro")
                 .insert(payload);
@@ -1324,11 +1379,11 @@
           loadedProfile = {
             business_name: name,
             business_code: code,
-            wave_phone: phoneDigits,
+            wave_phone: phoneDigitsValue,
             is_active: isActive
           };
 
-          currentPhone = normPhone(phoneDigits);
+          currentPhone = normPhone(phoneDigitsValue);
           currentCodeFromQuery = code;
           saveSession(currentPhone, currentSlug);
 
@@ -1336,12 +1391,9 @@
           resetBoxes();
           setOk("Fiche PAY sauvegardée.");
         } catch (e) {
-          setError(
-            "Sauvegarde refusée ou bloquée par la base. Détail: " +
-            String(e?.message || e)
-          );
+          setError("Sauvegarde refusée ou bloquée par la base. Détail: " + String(e?.message || e));
         } finally {
-          btnSave.disabled = false;
+          setBusy(btnSave, false);
         }
       }
 
@@ -1366,10 +1418,10 @@
       }
 
       function openSupport() {
-        const phoneDigits = digitsOnly(walletPhone.value || currentPhone || "");
+        const phoneDigitsValue = phoneDigits(walletPhone.value || currentPhone || "");
         const code = getEffectiveCode();
         let msg = "DIGIY — MON ARGENT PRO\n\n";
-        if (phoneDigits) msg += "Numéro de paiement: " + phoneDigits + "\n";
+        if (phoneDigitsValue) msg += "Numéro de paiement: " + phoneDigitsValue + "\n";
         if (code) msg += "Code: " + code + "\n";
         if (currentSlug) msg += "Slug: " + currentSlug + "\n";
         msg += "J'ai besoin d'aide pour MON ARGENT PRO.";
@@ -1562,11 +1614,11 @@
 
         ctx.fillStyle = "#fef3c7";
         ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("Carte de paiement • Wave", 90, 162);
+        ctx.fillText("Carte de paiement", 90, 162);
 
         ctx.fillStyle = "#dbeafe";
         ctx.font = "600 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("Paiement direct via Wave • 0% commission", 90, 200);
+        ctx.fillText("Paiement direct vers le professionnel • 0% commission", 90, 200);
 
         ctx.fillStyle = "rgba(255,255,255,.16)";
         roundedRect(ctx, 640, 92, 170, 42, 16);
@@ -1642,7 +1694,7 @@
 
         ctx.fillStyle = "#374151";
         ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("1. Ouvre Wave", 90, 868);
+        ctx.fillText("1. Ouvre ton moyen de paiement", 90, 868);
         ctx.fillText("2. Choisis Payer", 90, 906);
         ctx.fillText("3. Colle le numéro ou scanne le QR", 90, 944);
 
@@ -1654,7 +1706,7 @@
         ctx.font = "900 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText("DIGIY n'est pas une banque", 120, 1060);
         ctx.font = "700 20px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("Le paiement affiché ici passe actuellement par Wave.", 120, 1092);
+        ctx.fillText("Le paiement affiché ici va directement vers le professionnel.", 120, 1092);
 
         ctx.fillStyle = "#6b7280";
         ctx.font = "700 17px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
@@ -1786,7 +1838,7 @@
 
       async function openCardPreview() {
         resetBoxes();
-        btnOpenCard.disabled = true;
+        setBusy(btnOpenCard, true);
 
         try {
           const dataUrl = await ensureFreshCard();
@@ -1801,13 +1853,13 @@
         } catch (e) {
           setError("Impossible d'ouvrir la carte. " + String(e.message || e));
         } finally {
-          btnOpenCard.disabled = false;
+          setBusy(btnOpenCard, false);
         }
       }
 
       async function openQrPreview() {
         resetBoxes();
-        btnOpenQr.disabled = true;
+        setBusy(btnOpenQr, true);
 
         try {
           const dataUrl = await ensureFreshQr();
@@ -1822,33 +1874,33 @@
         } catch (e) {
           setError("Impossible d'ouvrir le QR. " + String(e.message || e));
         } finally {
-          btnOpenQr.disabled = false;
+          setBusy(btnOpenQr, false);
         }
       }
 
       async function downloadCard() {
         resetBoxes();
-        btnDownloadCard.disabled = true;
+        setBusy(btnDownloadCard, true);
         try {
           const dataUrl = await ensureFreshCard();
           smartDownload(dataUrl || lastCardDataUrl, buildCardFilename());
         } catch (e) {
           setError("Impossible de télécharger la carte. " + String(e.message || e));
         } finally {
-          btnDownloadCard.disabled = false;
+          setBusy(btnDownloadCard, false);
         }
       }
 
       async function downloadQr() {
         resetBoxes();
-        btnDownloadQr.disabled = true;
+        setBusy(btnDownloadQr, true);
         try {
           const dataUrl = await ensureFreshQr();
           smartDownload(dataUrl || lastQrDataUrl, buildQrFilename());
         } catch (e) {
           setError("Impossible de télécharger le QR. " + String(e.message || e));
         } finally {
-          btnDownloadQr.disabled = false;
+          setBusy(btnDownloadQr, false);
         }
       }
 
@@ -1859,14 +1911,14 @@
 
       btnRenderQr.addEventListener("click", async () => {
         resetBoxes();
-        btnRenderQr.disabled = true;
+        setBusy(btnRenderQr, true);
         try {
           await ensureFreshQr();
           setOk("QR régénéré proprement.");
         } catch (e) {
           setError("Impossible de régénérer le QR. " + String(e.message || e));
         } finally {
-          btnRenderQr.disabled = false;
+          setBusy(btnRenderQr, false);
         }
       });
 
@@ -1875,14 +1927,14 @@
 
       btnRenderCard.addEventListener("click", async () => {
         resetBoxes();
-        btnRenderCard.disabled = true;
+        setBusy(btnRenderCard, true);
         try {
           await ensureFreshCard();
           setOk("Carte régénérée proprement.");
         } catch (e) {
           setError("Impossible de régénérer la carte. " + String(e.message || e));
         } finally {
-          btnRenderCard.disabled = false;
+          setBusy(btnRenderCard, false);
         }
       });
 
@@ -1911,13 +1963,13 @@
       });
 
       walletCode.addEventListener("input", () => {
-        walletCode.value = makeCode(walletCode.value);
-        currentCodeFromQuery = makeCode(walletCode.value);
+        walletCode.value = normalizeCode(walletCode.value);
+        currentCodeFromQuery = normalizeCode(walletCode.value);
         updatePreview();
       });
 
       walletPhone.addEventListener("input", () => {
-        walletPhone.value = digitsOnly(walletPhone.value);
+        walletPhone.value = phoneDigits(walletPhone.value);
         updatePreview();
       });
 
