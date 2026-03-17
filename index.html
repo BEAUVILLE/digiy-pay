@@ -672,12 +672,24 @@
       return raw;
     }
 
-    function safeUpper(v){
-      return String(v || "").trim().toUpperCase();
+    function normalizeCode(v){
+      return String(v || "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "")
+        .replace(/[^A-Z0-9_-]/g, "");
+    }
+
+    function escapeHtml(value){
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
     function cacheKey(code){
-      return "digiy_pay_public_" + safeUpper(code);
+      return "digiy_pay_public_" + normalizeCode(code);
     }
 
     function saveCache(code, payload){
@@ -720,88 +732,110 @@
       els.payPhone.textContent = "—";
       els.btnCall.href = "#";
       els.btnCopy.textContent = "📋 Copier";
+
       els.btnPinTop.href = PIN_URL;
       els.btnCockpitTop.href = COCKPIT_URL;
       els.btnPinLocked.href = PIN_URL;
       els.btnCockpitLocked.href = COCKPIT_URL;
       els.btnPinInline.href = PIN_URL;
       els.btnCockpitInline.href = COCKPIT_URL;
+
+      els.btnSubscribeTop.href = SUBSCRIBE_BASE + "?module=" + MODULE;
+      els.btnSubscribeLocked.href = SUBSCRIBE_BASE + "?module=" + MODULE;
     }
 
     function showMsg(text){
-      els.autoMsg.textContent = text;
-      show(els.autoMsg, true);
+      els.autoMsg.textContent = text || "";
+      show(els.autoMsg, !!text);
     }
 
     function showErr(text){
-      els.autoErr.textContent = text;
-      show(els.autoErr, true);
+      els.autoErr.textContent = text || "";
+      show(els.autoErr, !!text);
+    }
+
+    function updateUrlCode(code){
+      try{
+        const url = new URL(window.location.href);
+        const cleaned = normalizeCode(code);
+        if (cleaned){
+          url.searchParams.set("pro", cleaned);
+        } else {
+          url.searchParams.delete("pro");
+        }
+        history.replaceState({}, "", url.toString());
+      }catch(_){}
+    }
+
+    function pickBusinessName(row, fallbackCode = ""){
+      return String(
+        row?.business_name ||
+        row?.display_name ||
+        row?.public_label ||
+        row?.merchant_name ||
+        row?.shop_name ||
+        fallbackCode ||
+        "MON ARGENT by DIGIY"
+      ).trim();
+    }
+
+    function pickPhone(row){
+      return normalizePhone(
+        row?.wave_phone ||
+        row?.phone ||
+        row?.business_phone ||
+        row?.whatsapp ||
+        row?.wallet_phone ||
+        row?.pay_phone ||
+        ""
+      );
+    }
+
+    function pickSlug(row){
+      return String(
+        row?.slug ||
+        row?.pay_slug ||
+        row?.subscription_slug ||
+        row?.module_slug ||
+        ""
+      ).trim();
     }
 
     function buildSubscribeUrl(row, code){
       const params = new URLSearchParams();
       params.set("module", MODULE);
 
-      const phone = normalizePhone(
-        row?.phone ||
-        row?.wave_phone ||
-        row?.business_phone ||
-        row?.whatsapp ||
-        ""
-      );
+      const phone = pickPhone(row);
+      const cleanedCode = normalizeCode(code);
 
       if (phone) params.set("phone", phone);
-      if (code) params.set("code", safeUpper(code));
+      if (cleanedCode) params.set("code", cleanedCode);
 
       return SUBSCRIBE_BASE + "?" + params.toString();
     }
 
     function buildPinUrl(row, code){
       const params = new URLSearchParams();
-
-      const slug = String(
-        row?.slug ||
-        row?.pay_slug ||
-        row?.subscription_slug ||
-        ""
-      ).trim();
-
-      const phone = normalizePhone(
-        row?.phone ||
-        row?.wave_phone ||
-        row?.business_phone ||
-        row?.whatsapp ||
-        ""
-      );
+      const slug = pickSlug(row);
+      const phone = pickPhone(row);
+      const cleanedCode = normalizeCode(code);
 
       if (slug) params.set("slug", slug);
       if (phone) params.set("phone", phone);
-      if (code) params.set("code", safeUpper(code));
+      if (cleanedCode) params.set("code", cleanedCode);
 
       return params.toString() ? (PIN_URL + "?" + params.toString()) : PIN_URL;
     }
 
     function buildCockpitUrl(row, code){
       const params = new URLSearchParams();
-
-      const slug = String(
-        row?.slug ||
-        row?.pay_slug ||
-        row?.subscription_slug ||
-        ""
-      ).trim();
-
-      const phone = normalizePhone(
-        row?.phone ||
-        row?.wave_phone ||
-        row?.business_phone ||
-        row?.whatsapp ||
-        ""
-      );
+      const slug = pickSlug(row);
+      const phone = pickPhone(row);
+      const cleanedCode = normalizeCode(code);
 
       if (slug) params.set("slug", slug);
       if (phone) params.set("phone", phone);
-      if (code) params.set("code", safeUpper(code));
+      if (cleanedCode) params.set("code", cleanedCode);
 
       return params.toString() ? (COCKPIT_URL + "?" + params.toString()) : COCKPIT_URL;
     }
@@ -824,7 +858,10 @@
         row.is_active,
         row.active,
         row.enabled,
-        row.has_access
+        row.has_access,
+        row.public_active,
+        row.pay_active,
+        row.found && row.ok
       ];
 
       if (boolCandidates.some(isTruthyStatus)) return true;
@@ -833,7 +870,9 @@
         row.subscription_status,
         row.status,
         row.access_status,
-        row.plan_status
+        row.plan_status,
+        row.public_status,
+        row.pay_status
       ];
 
       if (statusCandidates.some(isActiveStatus)) return true;
@@ -842,14 +881,10 @@
     }
 
     function showLocked(row, code){
-      const businessName =
-        String(
-          row?.business_name ||
-          row?.display_name ||
-          row?.public_label ||
-          code ||
-          "ce professionnel"
-        ).trim();
+      const businessName = pickBusinessName(row, code);
+      const subscribeUrl = buildSubscribeUrl(row, code);
+      const pinUrl = buildPinUrl(row, code);
+      const cockpitUrl = buildCockpitUrl(row, code);
 
       els.proName.textContent = businessName;
       els.proHint.textContent = "Affichage public PAY non actif.";
@@ -858,12 +893,9 @@
         "<b>" + escapeHtml(businessName) + "</b> existe, mais l’affichage public PAY n’est pas encore actif.<br>" +
         "Active le module pour remettre la carte de paiement sur les rails.";
 
-      const subscribeUrl = buildSubscribeUrl(row, code);
-      const pinUrl = buildPinUrl(row, code);
-      const cockpitUrl = buildCockpitUrl(row, code);
-
       els.btnSubscribeLocked.href = subscribeUrl;
       els.btnSubscribeTop.href = subscribeUrl;
+
       els.btnPinLocked.href = pinUrl;
       els.btnCockpitLocked.href = cockpitUrl;
       els.btnPinTop.href = pinUrl;
@@ -874,11 +906,11 @@
       show(els.lockedBox, true);
     }
 
-    function showPayCard(name, phoneDigits, code = "", row = null){
-      const cleanName = String(name || "").trim();
-      const cleanPhone = normalizePhone(phoneDigits);
+    function showPayCard(row, code){
+      const businessName = pickBusinessName(row, code);
+      const cleanPhone = pickPhone(row);
 
-      if (!cleanName || cleanPhone.length < 12){
+      if (!businessName || cleanPhone.length < 12){
         show(els.paybox, false);
         return;
       }
@@ -887,12 +919,12 @@
       const pinUrl = buildPinUrl(row, code);
       const cockpitUrl = buildCockpitUrl(row, code);
 
-      els.proName.textContent = cleanName;
+      els.proName.textContent = businessName;
       els.proHint.textContent = "Paiement direct au professionnel • PAY actif";
 
-      els.payName.textContent = cleanName;
+      els.payName.textContent = businessName;
       els.payPhone.textContent = phone;
-      els.btnCall.href = "tel:" + phone;
+      els.btnCall.href = "tel:" + cleanPhone;
 
       els.btnPinTop.href = pinUrl;
       els.btnCockpitTop.href = cockpitUrl;
@@ -913,7 +945,7 @@
       };
 
       els.howto.innerHTML =
-        "👉 Ouvre ton moyen de paiement direct puis utilise le numéro <b>" + phone + "</b>" +
+        "👉 Ouvre ton moyen de paiement direct puis utilise le numéro <b>" + escapeHtml(phone) + "</b>" +
         (code ? "<br><b>Code pro :</b> " + escapeHtml(code) : "") +
         "<br><br>🔐 Côté professionnel, l’entrée protégée se fait par le PIN PAY.";
 
@@ -921,16 +953,25 @@
       show(els.paybox, true);
     }
 
-    function escapeHtml(value){
-      return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+    function normalizeRpcPayload(data){
+      if (!data) return null;
+
+      const first = Array.isArray(data) ? (data[0] || null) : data;
+      if (!first || typeof first !== "object") return null;
+
+      if (first.row && typeof first.row === "object"){
+        return { ...first.row, __meta: first };
+      }
+
+      if (first.data && typeof first.data === "object"){
+        return { ...first.data, __meta: first };
+      }
+
+      return first;
     }
 
     async function fetchPublicWalletRow(code){
-      const cleaned = safeUpper(code);
+      const cleaned = normalizeCode(code);
       if (!cleaned) return null;
 
       const cached = readCache(cleaned);
@@ -947,7 +988,7 @@
           const { data, error } = await sb.rpc(candidate.fn, candidate.args);
           if (error) continue;
 
-          const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+          const row = normalizeRpcPayload(data);
           if (row){
             saveCache(cleaned, row);
             return row;
@@ -958,10 +999,11 @@
       return null;
     }
 
-    async function loadByCode(code){
-      const cleaned = safeUpper(code);
+    async function loadByCode(rawCode){
+      const cleaned = normalizeCode(rawCode);
       clearUi();
       els.codeInput.value = cleaned;
+      updateUrlCode(cleaned);
 
       if (!cleaned){
         setNeutral();
@@ -974,7 +1016,7 @@
 
         const row = await fetchPublicWalletRow(cleaned);
 
-        show(els.autoMsg, false);
+        showMsg("");
 
         if (!row){
           els.proName.textContent = "Code introuvable";
@@ -989,22 +1031,10 @@
           return;
         }
 
-        const businessName =
-          row.business_name ||
-          row.display_name ||
-          row.public_label ||
-          cleaned;
-
-        const phone = normalizePhone(
-          row.wave_phone ||
-          row.phone ||
-          row.business_phone ||
-          row.whatsapp ||
-          ""
-        );
+        const phone = pickPhone(row);
 
         if (phone.length < 12){
-          els.proName.textContent = businessName;
+          els.proName.textContent = pickBusinessName(row, cleaned);
           els.proHint.textContent = "Compte incomplet.";
           showErr("Ce professionnel n’a pas encore de numéro de paiement valide.");
           return;
@@ -1014,7 +1044,7 @@
         els.btnSubscribeTop.href = subscribeUrl;
         els.btnSubscribeLocked.href = subscribeUrl;
 
-        showPayCard(businessName, phone, cleaned, row);
+        showPayCard(row, cleaned);
       }catch(e){
         console.error("DIGIY PAY public load error:", e);
         els.proName.textContent = "Service indisponible";
@@ -1051,22 +1081,13 @@
     });
 
     const params = new URLSearchParams(location.search);
-    const bootCode = safeUpper(params.get("pro") || "");
+    const bootCode = normalizeCode(params.get("pro") || "");
 
-    els.btnSubscribeTop.href = SUBSCRIBE_BASE + "?module=" + MODULE;
-    els.btnSubscribeLocked.href = SUBSCRIBE_BASE + "?module=" + MODULE;
-    els.btnPinTop.href = PIN_URL;
-    els.btnCockpitTop.href = COCKPIT_URL;
-    els.btnPinLocked.href = PIN_URL;
-    els.btnCockpitLocked.href = COCKPIT_URL;
-    els.btnPinInline.href = PIN_URL;
-    els.btnCockpitInline.href = COCKPIT_URL;
+    setNeutral();
 
     if (bootCode){
       els.codeInput.value = bootCode;
       loadByCode(bootCode);
-    } else {
-      setNeutral();
     }
   </script>
 </body>
