@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>DIGIY PAY — Cockpit financier terrain</title>
+  <meta name="description" content="DIGIY PAY — le cockpit financier terrain de DIGIYLYFE. Voir ses flux utiles, piloter ses entrées, dépenses pro et épargne, sans commission et sans devenir une banque.">
+  <meta name="theme-color" content="#04130d">
+  <meta name="robots" content="index,follow">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#04130d;
+      --bg2:#081d15;
+      --bg3:#0c281d;
+      --card:#0d261c;
+      --card2:#123126;
+      --line:rgba(255,255,255,.10);
+      --text:#f8f5ef;
+      --muted:rgba(248,245,239,.72);
+
+      --gold:#f4dfb5;
+      --gold-2:#d8b56a;
+      --green:#22c55e;
+      --green-2:#16a34a;
+
+      --gold-soft:rgba(216,181,106,.14);
+      --green-soft:rgba(34,197,94,.12);
+
+      --radius:26px;
+      --shadow:0 22px 58px rgba(0,0,0,.28);
+      --max:1180px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:'Nunito',system-ui,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,.11), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(216,181,106,.11), transparent 34%),
+        linear-gradient(180deg,var(--bg),#061812 45%, #081d15 100%);
+    }
+
+    a{text-decoration:none;color:inherit}
+
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:60;
+      backdrop-filter:blur(16px);
+      background:rgba(4,19,13,.76);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:15px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;font-weight:900;color:#072413;
+      background:linear-gradient(135deg,var(--gold),var(--gold-2));
+      box-shadow:0 12px 28px rgba(216,181,106,.22);
+    }
+    .brand-title{
+      font-family:'Cormorant Garamond',serif;
+      font-size:29px;
+      line-height:1;
+      color:var(--gold);
+      font-weight:700;
+      letter-spacing:.03em;
+    }
+    .brand-sub{
+      margin-top:3px;
+      font-size:11px;
+      font-weight:900;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .nav-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:11px 16px;
+      font-size:13px;
+      font-weight:900;
+      transition:.18s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn-primary{
+      background:linear-gradient(135deg,var(--green),var(--green-2));
+      color:#082313;
+      box-shadow:0 12px 28px rgba(34,197,94,.22);
+    }
+    .btn-secondary{
+      background:rgba(216,181,106,.08);
+      border:1px solid rgba(216,181,106,.24);
+      color:var(--gold);
+    }
+    .btn-ghost{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      color:var(--muted);
+    }
+
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:24px 16px 44px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:16px;
+      align-items:stretch;
+      margin-bottom:18px;
+    }
+    @media (max-width:920px){
+      .hero{grid-template-columns:1fr}
+    }
+
+    .hero-main,
+    .hero-side,
+    .card{
+      border:1px solid var(--line);
+      border-radius:32px;
+      background:linear-gradient(180deg,rgba(18,49,38,.72),rgba(13,38,28,.96));
+      box-shadow:var(--shadow);
+    }
+
+    .hero-main{
+      padding:28px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-main::after{
+      content:"";
+      position:absolute;
+      right:-80px;
+      bottom:-100px;
+      width:280px;
+      height:280px;
+      border-radius:50%;
+      background:radial-gradient(circle,var(--gold-soft),transparent 70%);
+      pointer-events:none;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--green-soft);
+      border:1px solid rgba(34,197,94,.2);
+      color:#86efac;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    h1{
+      margin:16px 0 0;
+      font-family:'Cormorant Garamond',serif;
+      font-size:56px;
+      line-height:.92;
+      color:var(--gold);
+      font-weight:700;
+      max-width:760px;
+    }
+    .lead{
+      margin-top:16px;
+      font-size:17px;
+      line-height:1.8;
+      color:var(--text);
+      max-width:760px;
+    }
+    .hero-bullets{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:18px;
+    }
+    @media (max-width:720px){
+      .hero-bullets{grid-template-columns:1fr}
+      h1{font-size:42px}
+    }
+    .bullet{
+      padding:13px 14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+    }
+    .bullet span{
+      color:#86efac;
+      margin-right:6px;
+    }
+
+    .hero-cta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:22px;
+    }
+
+    .hero-side{
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .mini-title{
+      font-size:11px;
+      font-weight:900;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .big-number{
+      margin-top:8px;
+      font-family:'Cormorant Garamond',serif;
+      font-size:54px;
+      line-height:1;
+      color:var(--gold);
+      font-weight:700;
+    }
+    .mini-copy{
+      margin-top:8px;
+      font-size:14px;
+      line-height:1.7;
+      color:var(--text);
+    }
+    .side-stack{
+      display:grid;
+      gap:10px;
+    }
+    .side-chip{
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:13px;
+      font-weight:800;
+      color:var(--text);
+    }
+    .side-chip small{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.6;
+    }
+
+    .section-title{
+      margin:22px 0 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-family:'Cormorant Garamond',serif;
+      font-size:27px;
+      color:var(--gold);
+      font-weight:700;
+    }
+    .section-title::after{
+      content:"";
+      height:1px;
+      flex:1;
+      background:linear-gradient(90deg,rgba(216,181,106,.32),transparent);
+    }
+
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width:920px){
+      .grid-3{grid-template-columns:1fr}
+    }
+
+    .card{
+      padding:22px;
+    }
+    .card .kicker{
+      font-size:11px;
+      font-weight:900;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .card .title{
+      margin-top:8px;
+      font-family:'Cormorant Garamond',serif;
+      font-size:30px;
+      line-height:1;
+      color:var(--gold);
+      font-weight:700;
+    }
+    .card .txt{
+      margin-top:12px;
+      font-size:14px;
+      line-height:1.8;
+      color:var(--text);
+    }
+
+    .pricing{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+    @media (max-width:980px){
+      .pricing{grid-template-columns:1fr}
+    }
+
+    .price{
+      padding:24px;
+      border-radius:28px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(18,49,38,.72),rgba(13,38,28,.96));
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .price.featured{
+      border-color:rgba(216,181,106,.34);
+      background:
+        radial-gradient(circle at top right, rgba(216,181,106,.14), transparent 32%),
+        linear-gradient(180deg,rgba(18,49,38,.82),rgba(13,38,28,.98));
+    }
+    .ribbon{
+      position:absolute;
+      top:16px;
+      right:-34px;
+      transform:rotate(34deg);
+      background:linear-gradient(135deg,var(--gold),var(--gold-2));
+      color:#082313;
+      font-size:10px;
+      font-weight:900;
+      padding:6px 42px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .price-name{
+      font-family:'Cormorant Garamond',serif;
+      font-size:28px;
+      color:var(--gold);
+      font-weight:700;
+    }
+    .price-desc{
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.7;
+    }
+    .price-amount{
+      margin-top:16px;
+      font-family:'Cormorant Garamond',serif;
+      font-size:52px;
+      line-height:1;
+      color:var(--text);
+      font-weight:700;
+    }
+    .price-amount small{
+      font-size:16px;
+      color:var(--muted);
+      font-family:'Nunito',sans-serif;
+      font-weight:900;
+    }
+    .price-period{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+    }
+    .features{
+      list-style:none;
+      padding:0;
+      margin:18px 0 0;
+      display:grid;
+      gap:10px;
+    }
+    .features li{
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:13px;
+      color:var(--text);
+      font-weight:800;
+      line-height:1.7;
+    }
+    .features li:last-child{border-bottom:none}
+    .features span{
+      color:#86efac;
+      margin-right:8px;
+    }
+
+    .foot{
+      margin-top:26px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      line-height:1.9;
+      padding-bottom:14px;
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo">∞</div>
+        <div>
+          <div class="brand-title">DIGIY PAY</div>
+          <div class="brand-sub">Cockpit financier terrain</div>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="https://pay.digiylyfe.com/pin.html">🔐 Entrée PIN</a>
+        <a class="btn btn-secondary" href="https://pay.digiylyfe.com/cockpit.html">📊 Cockpit</a>
+        <a class="btn btn-primary" href="https://commencer-a-payer.digiylyfe.com/">💳 Activer mon module</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-main">
+        <div class="tag">DIGIYLYFE — outil terrain</div>
+        <h1>Le cockpit qui aide le pro à voir clair dans ses flux.</h1>
+        <p class="lead">
+          DIGIY PAY ne remplace ni Wave, ni Orange Money, ni le cash, ni les habitudes du terrain.
+          Il vient au-dessus pour donner une vue simple, propre et utile des entrées, des dépenses pro,
+          de l’épargne et du net, module par module.
+        </p>
+
+        <div class="hero-bullets">
+          <div class="bullet"><span>✓</span> Paiement direct entre client et professionnel</div>
+          <div class="bullet"><span>✓</span> 0% commission DIGIY</div>
+          <div class="bullet"><span>✓</span> Vision claire des flux utiles</div>
+          <div class="bullet"><span>✓</span> Pilotage mobile simple et rapide</div>
+        </div>
+
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="https://commencer-a-payer.digiylyfe.com/">💳 Activer mon accès</a>
+          <a class="btn btn-secondary" href="https://pay.digiylyfe.com/pin.html">🔐 Entrer avec mon PIN</a>
+          <a class="btn btn-ghost" href="https://pay.digiylyfe.com/cockpit.html">📊 Voir le cockpit</a>
+        </div>
+      </div>
+
+      <aside class="hero-side">
+        <div>
+          <div class="mini-title">Positionnement</div>
+          <div class="big-number">0%</div>
+          <div class="mini-copy">
+            Pas de commission DIGIY sur les paiements. L’argent reste dans les rails du professionnel.
+            Le cockpit sert à mieux voir, mieux suivre et mieux décider.
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="side-chip">
+            🌊 Wave, Orange Money, cash, flux terrain
+            <small>DIGIY PAY ne casse pas le terrain. Il le structure.</small>
+          </div>
+          <div class="side-chip">
+            🧾 Entrées, dépenses pro, épargne, net
+            <small>Lecture claire de l’activité au lieu de chiffres dispersés.</small>
+          </div>
+          <div class="side-chip">
+            ♾️ Connecté à l’écosystème DIGIYLYFE
+            <small>DRIVER, LOC, COMMERCE, MARKET, BUILD et les autres wagons.</small>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="section-title">Pourquoi DIGIY PAY</div>
+    <section class="grid-3">
+      <div class="card">
+        <div class="kicker">Vision</div>
+        <div class="title">Voir l’argent utile</div>
+        <div class="txt">
+          Beaucoup de pros encaissent déjà. Le vrai manque, ce n’est pas toujours un autre moyen de paiement.
+          Le vrai manque, c’est la lecture simple de ce qui entre, ce qui sort et ce qui reste.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="kicker">Terrain</div>
+        <div class="title">Rester simple</div>
+        <div class="txt">
+          Pas besoin de machine lourde, pas besoin de discours compliqué. Un cockpit propre, mobile,
+          rapide, qui respecte les habitudes locales et parle vrai.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="kicker">Doctrine</div>
+        <div class="title">Piloter, pas garder l’argent</div>
+        <div class="txt">
+          DIGIY PAY n’est pas une banque, n’est pas un wallet custodial et ne retient pas les fonds.
+          C’est une couche de visibilité, d’orchestration et de pilotage.
+        </div>
+      </div>
+    </section>
+
+    <div class="section-title">Plans DIGIY PAY</div>
+    <section class="pricing">
+      <article class="price">
+        <div class="price-name">STARTER</div>
+        <div class="price-desc">Pour démarrer proprement avec une vue simple sur son activité.</div>
+        <div class="price-amount">4 900 <small>F CFA / mois</small></div>
+        <div class="price-period">Environ 163 F CFA / jour</div>
+        <ul class="features">
+          <li><span>✓</span> Cockpit PAY de base</li>
+          <li><span>✓</span> Lecture jour / mois / net</li>
+          <li><span>✓</span> 1 module DIGIY connecté</li>
+          <li><span>✓</span> Vue mobile simple</li>
+          <li><span>✓</span> Paiement manuel uniquement</li>
+        </ul>
+      </article>
+
+      <article class="price featured">
+        <div class="ribbon">Recommandé</div>
+        <div class="price-name">PRO</div>
+        <div class="price-desc">Pour le pro actif qui veut un vrai cockpit financier terrain.</div>
+        <div class="price-amount">9 900 <small>F CFA / mois</small></div>
+        <div class="price-period">Environ 330 F CFA / jour</div>
+        <ul class="features">
+          <li><span>✓</span> Tous les modules DIGIY connectés</li>
+          <li><span>✓</span> Vue élargie entrées / sorties / épargne</li>
+          <li><span>✓</span> Lecture par module et par canal</li>
+          <li><span>✓</span> Cockpit terrain optimisé mobile</li>
+          <li><span>✓</span> Paiement manuel uniquement</li>
+        </ul>
+      </article>
+
+      <article class="price">
+        <div class="price-name">BUSINESS</div>
+        <div class="price-desc">Pour activité plus large, équipe ou plusieurs points de présence.</div>
+        <div class="price-amount">24 900 <small>F CFA / mois</small></div>
+        <div class="price-period">Pilotage renforcé</div>
+        <ul class="features">
+          <li><span>✓</span> Vue multi-activité</li>
+          <li><span>✓</span> Consolidation plus large</li>
+          <li><span>✓</span> Lecture globale plus profonde</li>
+          <li><span>✓</span> Support prioritaire</li>
+          <li><span>✓</span> Paiement manuel uniquement</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="foot">
+      DIGIY PAY fait partie de l’écosystème DIGIYLYFE.<br>
+      Les paiements restent directs entre le client et le professionnel.<br>
+      0% commission · pensée terrain · souveraineté africaine ♾️
+    </div>
+  </main>
+</body>
+</html>
