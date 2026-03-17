@@ -4,7 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>MON ARGENT PRO — Accès sécurisé</title>
-  <meta name="theme-color" content="#020617">
+  <meta name="theme-color" content="#04110d">
+  <meta
+    name="description"
+    content="MON ARGENT PRO by DIGIY — entrée sécurisée par téléphone et PIN pour ouvrir le cockpit financier."
+  >
 
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1">
@@ -15,260 +19,471 @@
     window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
     window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
     window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
+    window.DIGIY_MODULE = "PAY";
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg:#020617;
-      --ok:#22c55e;
+      --bg:#04110d;
+      --bg2:#071a13;
+      --card:#0b1f18;
+      --line:rgba(255,255,255,.08);
+      --line-strong:rgba(34,197,94,.28);
+      --text:#f3fff7;
+      --muted:rgba(243,255,247,.72);
+      --green:#22c55e;
+      --green2:#16a34a;
       --gold:#facc15;
-      --text:#fff;
-      --muted:#cbd5f5;
-      --line:rgba(148,163,184,.22);
-      --soft:rgba(2,6,23,.75);
+      --gold-soft:rgba(250,204,21,.10);
       --danger:#f87171;
+      --danger-soft:rgba(248,113,113,.10);
+      --shadow:0 18px 50px rgba(0,0,0,.32);
+      --radius:24px;
+      --max:760px;
     }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:0}
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
     body{
       min-height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:14px;
-      background:
-        radial-gradient(circle at top,rgba(34,197,94,.18),transparent 60%),
-        radial-gradient(circle at bottom,rgba(250,204,21,.16),transparent 55%),
-        linear-gradient(135deg,var(--bg),#064e3b);
       color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(250,204,21,.06), transparent 28%),
+        linear-gradient(180deg, var(--bg), #061710 55%, #04110d);
+      padding:14px;
     }
-    .card{
-      width:min(560px,96vw);
-      background:rgba(2,8,24,.96);
-      border:1px solid rgba(19,78,74,.9);
-      border-radius:22px;
-      padding:18px;
-      box-shadow:0 18px 45px rgba(0,0,0,.45);
-    }
-    .top{text-align:center}
-    h1{font-weight:950;color:var(--ok);letter-spacing:.04em}
-    .sub{margin-top:6px;color:#e5e7eb;font-weight:850;line-height:1.45}
-    .pill{
+
+    .site-back-float{
+      position:fixed;
+      top:calc(env(safe-area-inset-top, 0px) + 12px);
+      left:calc(env(safe-area-inset-left, 0px) + 12px);
+      z-index:9999;
       display:inline-flex;
-      gap:8px;
       align-items:center;
-      margin-top:10px;
-      padding:7px 12px;
+      justify-content:center;
+      gap:8px;
+      min-height:44px;
+      padding:10px 14px;
       border-radius:999px;
-      border:1px solid rgba(250,204,21,.55);
-      background:rgba(250,204,21,.10);
-      color:#fde68a;
+      text-decoration:none;
       font-weight:950;
-      font-size:13px;
+      font-size:14px;
+      color:#e5e7eb;
+      background:rgba(4,17,13,.82);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      box-shadow:0 14px 30px rgba(0,0,0,.28);
+      transition:transform .18s ease,background .18s ease,border-color .18s ease;
     }
-    .name{
-      margin-top:14px;
-      font-size:22px;
-      font-weight:980;
-      color:var(--gold);
+    .site-back-float:hover{
+      transform:translateY(-1px);
+      background:rgba(8,24,18,.96);
+      border-color:rgba(250,204,21,.30);
+    }
+
+    .wrap{
+      width:min(var(--max), 100%);
+      margin:0 auto;
+      padding-top:62px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(11,31,24,.98), rgba(9,24,19,.98));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .top{
+      padding:20px 18px 10px;
       text-align:center;
     }
+
+    .brand-mark{
+      width:58px;
+      height:58px;
+      margin:0 auto 10px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,var(--green),var(--green2));
+      color:#032215;
+      font-size:28px;
+      font-weight:1000;
+      box-shadow:var(--shadow);
+    }
+
+    h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.08;
+      font-weight:1000;
+      color:var(--gold);
+    }
+
+    .sub{
+      margin-top:8px;
+      color:var(--muted);
+      font-weight:850;
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+      margin-top:14px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:12px;
+      font-weight:900;
+      color:var(--text);
+    }
+
+    .chip.ok{
+      border-color:rgba(34,197,94,.28);
+      background:rgba(34,197,94,.10);
+      color:#bbf7d0;
+    }
+
+    .chip.gold{
+      border-color:rgba(250,204,21,.28);
+      background:rgba(250,204,21,.10);
+      color:#fde68a;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+      padding:10px 18px 0;
+    }
+
+    .nav-mini{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      padding:14px 18px 0;
+    }
+
+    .nav-card{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      padding:12px 12px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      text-decoration:none;
+      color:var(--text);
+      min-height:78px;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease;
+    }
+    .nav-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(250,204,21,.24);
+      background:rgba(255,255,255,.04);
+    }
+    .nav-card strong{
+      font-size:13px;
+      font-weight:1000;
+      color:var(--gold);
+      line-height:1.2;
+    }
+    .nav-card span{
+      font-size:11px;
+      line-height:1.45;
+      color:var(--muted);
+      font-weight:850;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:46px;
+      padding:12px 15px;
+      border-radius:999px;
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-weight:950;
+      cursor:pointer;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn.primary{
+      border:none;
+      background:linear-gradient(135deg,var(--green),var(--green2));
+      color:#032215;
+    }
+    .btn.gold{
+      border:1px solid rgba(250,204,21,.34);
+      background:rgba(250,204,21,.12);
+      color:#fde68a;
+    }
+    .btn.ghost{
+      background:rgba(255,255,255,.02);
+    }
+    .btn.warn{
+      border:1px solid rgba(250,204,21,.34);
+      background:rgba(250,204,21,.12);
+      color:#fde68a;
+    }
+
+    .name{
+      margin-top:16px;
+      font-size:24px;
+      font-weight:1000;
+      color:var(--gold);
+      text-align:center;
+      padding:0 18px;
+      word-break:break-word;
+    }
+
     .hint{
-      margin-top:6px;
+      margin-top:8px;
       color:var(--muted);
       font-weight:850;
       font-size:13px;
       line-height:1.55;
       text-align:center;
+      padding:0 18px;
     }
+
     .panel{
-      margin-top:14px;
-      padding:14px;
-      border-radius:18px;
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:20px;
       border:1px solid var(--line);
-      background:rgba(2,6,23,.55);
+      background:rgba(255,255,255,.025);
     }
+
     .panel h2{
+      margin:0 0 10px;
       font-size:13px;
-      letter-spacing:.05em;
+      letter-spacing:.08em;
       text-transform:uppercase;
       color:#bbf7d0;
-      font-weight:950;
+      font-weight:1000;
     }
+
     .grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:10px;
       margin-top:10px;
     }
-    @media(max-width:560px){
-      .grid{grid-template-columns:1fr}
-    }
+
     input{
       width:100%;
-      padding:12px 12px;
-      border-radius:14px;
+      min-height:48px;
+      padding:12px 14px;
+      border-radius:16px;
       border:1px solid var(--line);
-      background:var(--soft);
-      color:#fff;
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font:inherit;
       font-weight:900;
       outline:none;
     }
     input::placeholder{
-      color:#a8b3cf;
+      color:rgba(243,255,247,.45);
     }
+
     small{
       display:block;
-      margin-top:6px;
+      margin-top:8px;
       color:var(--muted);
-      font-weight:850;
       font-size:12px;
-      line-height:1.4;
+      line-height:1.5;
+      font-weight:800;
     }
+
     .btnrow{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       margin-top:12px;
     }
-    .btn{
-      flex:1;
-      min-width:160px;
-      padding:12px 14px;
-      border-radius:999px;
-      font-weight:980;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      border:1px solid rgba(34,197,94,.55);
-      background:rgba(34,197,94,.18);
-      color:#bbf7d0;
-      cursor:pointer;
-      user-select:none;
-      text-decoration:none;
-      transition:transform .16s ease,opacity .16s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
-    .btn.primary{
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      color:#022c22;
-      border:none;
-    }
-    .btn.ghost{
-      background:rgba(2,6,23,.65);
-      border:1px solid var(--line);
-      color:#e5e7eb;
-    }
-    .btn.warn{
-      background:rgba(250,204,21,.12);
-      border:1px solid rgba(250,204,21,.35);
-      color:#fde68a;
-    }
-    .msg{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px solid rgba(250,204,21,.35);
-      background:rgba(250,204,21,.08);
-      color:#fde68a;
-      font-weight:950;
-      font-size:13px;
-      line-height:1.55;
-    }
-    .err{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px solid rgba(248,113,113,.45);
-      background:rgba(248,113,113,.10);
-      color:#fecaca;
-      font-weight:950;
-      font-size:13px;
-      line-height:1.55;
-    }
+
+    .msg,
+    .err,
     .okbox{
       margin-top:12px;
-      padding:10px 12px;
+      padding:12px 14px;
       border-radius:16px;
-      border:1px solid rgba(34,197,94,.45);
-      background:rgba(34,197,94,.10);
-      color:#dcfce7;
-      font-weight:950;
       font-size:13px;
       line-height:1.55;
+      font-weight:900;
+      display:none;
     }
+    .msg{
+      border:1px solid rgba(250,204,21,.28);
+      background:rgba(250,204,21,.10);
+      color:#fde68a;
+    }
+    .err{
+      border:1px solid rgba(248,113,113,.26);
+      background:rgba(248,113,113,.10);
+      color:#fecaca;
+    }
+    .okbox{
+      border:1px solid rgba(34,197,94,.32);
+      background:rgba(34,197,94,.09);
+      color:#dcfce7;
+    }
+
     .mini{
       margin-top:10px;
       font-size:12px;
       color:var(--muted);
       text-align:center;
       line-height:1.45;
+      font-weight:850;
     }
+
     .foot{
-      margin-top:12px;
+      padding:16px 18px 20px;
       font-size:12px;
       color:var(--muted);
       font-weight:850;
       text-align:center;
-      line-height:1.45;
+      line-height:1.7;
     }
+
     .mono{
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+
+    @media (max-width:700px){
+      .nav-mini{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
+    @media (max-width:640px){
+      body{padding:10px}
+      .wrap{padding-top:58px}
+      .grid{grid-template-columns:1fr}
+      h1{font-size:24px}
+      .name{font-size:22px}
+      .site-back-float{
+        font-size:13px;
+        min-height:42px;
+        padding:10px 12px;
+      }
+      .actions .btn,
+      .btnrow .btn{
+        flex:1;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="top">
-      <h1>MON ARGENT PRO</h1>
-      <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY</div>
-      <div class="pill">🔐 Accès sécurisé • Wallet pro</div>
-    </div>
 
-    <div id="screenName" class="name">Accès wallet</div>
-    <div id="screenHint" class="hint">Entre ton téléphone et ton PIN pour ouvrir ton cockpit MON ARGENT PRO.</div>
+  <a class="site-back-float" href="https://digiylyfe.com/" target="_blank" rel="noopener">
+    ← Retour au site
+  </a>
 
-    <div class="panel">
-      <h2>Connexion sécurisée</h2>
-
-      <div class="grid">
-        <div>
-          <input id="phoneInput" type="tel" inputmode="numeric" placeholder="Téléphone (ex: 221771234567)" autocomplete="tel">
-          <small>Entre ton numéro en digits uniquement. Le <span class="mono">221</span> au début est recommandé.</small>
+  <main class="wrap">
+    <section class="card">
+      <div class="top">
+        <div class="brand-mark">🔐</div>
+        <h1>MON ARGENT PRO</h1>
+        <div class="sub">
+          Entrée sécurisée par téléphone et PIN pour ouvrir ton cockpit financier DIGIY PAY
         </div>
-        <div>
-          <input id="pinInput" type="password" inputmode="numeric" placeholder="PIN (ex: 2889)" maxlength="8" autocomplete="one-time-code">
-          <small>Le PIN protège l’accès admin de ton wallet.</small>
+
+        <div class="chips">
+          <div class="chip ok">✅ Accès protégé</div>
+          <div class="chip gold">💳 PAY actif requis</div>
+          <div class="chip">♾️ DIGIYLYFE</div>
         </div>
       </div>
 
-      <div class="btnrow">
-        <button id="btnLogin" class="btn primary" type="button">✅ Entrer dans MON ARGENT PRO</button>
+      <div class="actions">
+        <button id="btnLogin" class="btn primary" type="button">✅ Ouvrir mon cockpit</button>
         <button id="btnSession" class="btn ghost" type="button">↩︎ Reprendre ma session</button>
+        <a id="btnInstallTop" class="btn gold" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
       </div>
 
-      <div class="btnrow">
-        <a id="btnInstall" class="btn warn" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">➕ Installer / créer MON ARGENT PRO</a>
-        <a id="btnPublic" class="btn ghost" href="https://pay.digiylyfe.com/">💳 Wallet public</a>
+      <div class="nav-mini">
+        <a class="nav-card" href="./index.html">
+          <strong>Wallet public</strong>
+          <span>Vue publique du moyen de paiement</span>
+        </a>
+        <a class="nav-card" href="./cockpit.html">
+          <strong>Cockpit</strong>
+          <span>Vue financière pro</span>
+        </a>
+        <a class="nav-card" href="./admin.html">
+          <strong>Admin</strong>
+          <span>Outils internes plus profonds</span>
+        </a>
+        <a class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
+          <strong>Activation</strong>
+          <span>Abonnement et renouvellement</span>
+        </a>
       </div>
 
-      <div class="btnrow">
-        <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
+      <div id="screenName" class="name">Accès wallet</div>
+      <div id="screenHint" class="hint">
+        Entre ton téléphone et ton PIN pour ouvrir ton cockpit MON ARGENT PRO.
       </div>
 
-      <div id="infoBox" class="msg" style="display:none"></div>
-      <div id="errorBox" class="err" style="display:none"></div>
-      <div id="okBox" class="okbox" style="display:none"></div>
+      <div class="panel">
+        <h2>Connexion sécurisée</h2>
 
-      <div id="slugHint" class="mini"></div>
-    </div>
+        <div class="grid">
+          <div>
+            <input id="phoneInput" type="tel" inputmode="numeric" placeholder="Téléphone (ex: 221771234567)" autocomplete="tel">
+            <small>Entre ton numéro en digits uniquement. Le <span class="mono">221</span> devant est recommandé.</small>
+          </div>
+          <div>
+            <input id="pinInput" type="password" inputmode="numeric" placeholder="PIN (ex: 2889)" maxlength="8" autocomplete="one-time-code">
+            <small>Le PIN protège l’accès pro à ton cockpit financier.</small>
+          </div>
+        </div>
 
-    <div class="foot">
-      Usage ouvert côté public, gestion fermée côté pro.<br>
-      Après validation PIN, redirection vers <span class="mono">admin.html</span>.
-    </div>
-  </div>
+        <div class="btnrow">
+          <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
+          <a id="btnPublic" class="btn ghost" href="./index.html">💳 Wallet public</a>
+          <a id="btnCockpitGhost" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
+        </div>
+
+        <div id="infoBox" class="msg"></div>
+        <div id="errorBox" class="err"></div>
+        <div id="okBox" class="okbox"></div>
+
+        <div id="slugHint" class="mini"></div>
+      </div>
+
+      <div class="foot">
+        Usage ouvert côté public, accès fermé côté pro.<br>
+        Après validation PIN, redirection vers <span class="mono">cockpit.html</span> avec le slug PAY.
+      </div>
+    </section>
+  </main>
 
 <script>
 (function () {
@@ -284,7 +499,8 @@
     "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
 
   const MODULE_CODE = "PAY";
-  const ADMIN_URL = "https://pay.digiylyfe.com/admin.html";
+  const COCKPIT_URL = "./cockpit.html";
+  const ADMIN_URL = "./admin.html";
   const SUPPORT_WA = "+221771342889";
 
   const LS_PHONE = "digiy_phone";
@@ -314,6 +530,7 @@
   const btnLogin = $("btnLogin");
   const btnSession = $("btnSession");
   const btnSupport = $("btnSupport");
+  const btnCockpitGhost = $("btnCockpitGhost");
   const infoBox = $("infoBox");
   const errorBox = $("errorBox");
   const okBox = $("okBox");
@@ -324,6 +541,11 @@
   const qs = new URLSearchParams(location.search);
   let phoneQ = normPhone(qs.get("phone") || "");
   let slugQ = normSlug(qs.get("slug") || "");
+  const codeQ = safeUpper(qs.get("code") || "");
+
+  function safeUpper(v){
+    return String(v || "").trim().toUpperCase();
+  }
 
   function normPhone(v) {
     let s = String(v || "").trim();
@@ -443,18 +665,35 @@
     }
   }
 
-  function buildAdminUrl(phone, slug) {
-    const u = new URL(ADMIN_URL);
+  function buildCockpitUrl(phone, slug, code = "") {
+    const u = new URL(COCKPIT_URL, window.location.href);
     const p = digitsOnly(phone || "");
     const s = normSlug(slug || "");
+    const c = safeUpper(code || "");
+
     if (p) u.searchParams.set("phone", p);
     if (s) u.searchParams.set("slug", s);
+    if (c) u.searchParams.set("code", c);
+
     return u.toString();
   }
 
-  function goAdmin(phone, slug) {
+  function buildAdminUrl(phone, slug, code = "") {
+    const u = new URL(ADMIN_URL, window.location.href);
+    const p = digitsOnly(phone || "");
+    const s = normSlug(slug || "");
+    const c = safeUpper(code || "");
+
+    if (p) u.searchParams.set("phone", p);
+    if (s) u.searchParams.set("slug", s);
+    if (c) u.searchParams.set("code", c);
+
+    return u.toString();
+  }
+
+  function goCockpit(phone, slug) {
     saveSession({ phone, slug });
-    location.href = buildAdminUrl(phone, slug);
+    location.href = buildCockpitUrl(phone, slug, codeQ);
   }
 
   async function resolvePhoneFromSlug(slug) {
@@ -604,9 +843,16 @@
         slug = await resolveSlugFromPhone(parsed.phone || phone);
       }
 
-      setOk("Accès validé. Redirection vers MON ARGENT PRO…");
+      const finalPhone = parsed.phone || phone;
+      const finalSlug = parsed.slug || slug;
+
+      if (!finalSlug) {
+        throw new Error("Slug PAY introuvable pour ce compte.");
+      }
+
+      setOk("Accès validé. Redirection vers le cockpit…");
       setTimeout(() => {
-        goAdmin(parsed.phone || phone, parsed.slug || slug);
+        goCockpit(finalPhone, finalSlug);
       }, 300);
     } catch (e) {
       setError(String(e?.message || e || "Connexion impossible."));
@@ -620,6 +866,7 @@
     let msg = "DIGIY — MON ARGENT PRO\n\n";
     if (p) msg += "Téléphone: " + p + "\n";
     if (slugQ) msg += "Slug: " + slugQ + "\n";
+    if (codeQ) msg += "Code: " + codeQ + "\n";
     msg += "J'ai besoin d'aide pour accéder à MON ARGENT PRO.";
     return msg;
   }
@@ -639,10 +886,12 @@
 
     if (slugQ) {
       screenName.textContent = "Accès wallet détecté";
-      screenHint.textContent = "Un slug wallet a été transmis. Il sera utilisé pour retrouver ton accès.";
+      screenHint.textContent = "Un slug PAY a été détecté. Il sera utilisé pour ouvrir le cockpit.";
       slugHint.textContent = "Slug détecté : " + slugQ;
+      btnCockpitGhost.href = buildCockpitUrl(phoneQ, slugQ, codeQ);
     } else {
       slugHint.textContent = "Aucun slug transmis. Le téléphone + PIN suffisent.";
+      btnCockpitGhost.href = COCKPIT_URL;
     }
   }
 
@@ -689,9 +938,14 @@
       return;
     }
 
-    setOk("Session trouvée. Redirection…");
+    if (!slug) {
+      setError("Session incomplète. Slug PAY introuvable.");
+      return;
+    }
+
+    setOk("Session trouvée. Redirection vers le cockpit…");
     setTimeout(() => {
-      goAdmin(phone, slug);
+      goCockpit(phone, slug);
     }, 250);
   });
 
@@ -702,4 +956,3 @@
 </script>
 </body>
 </html>
-
