@@ -1,670 +1,920 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>MON ARGENT by DIGIY ♾️</title>
-  <meta name="theme-color" content="#020617">
+  <meta name="theme-color" content="#04110d" />
+  <meta
+    name="description"
+    content="MON ARGENT by DIGIY — paiement direct au professionnel, lecture simple, 0% commission."
+  />
 
-  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1">
-  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
-  <link rel="manifest" href="./site.webmanifest?v=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1" />
+  <link rel="manifest" href="./site.webmanifest?v=1" />
 
   <script>
     window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
     window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
     window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
+    window.DIGIY_MODULE = "PAY";
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-:root{
-  --bg:#020617;
-  --ok:#22c55e;
-  --gold:#facc15;
-  --text:#fff;
-  --muted:#cbd5f5;
-  --line:rgba(148,163,184,.22);
-  --soft:rgba(2,6,23,.75);
-}
-*{
-  box-sizing:border-box;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  margin:0;
-  padding:0;
-}
-body{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:
-    radial-gradient(circle at top,rgba(34,197,94,.18),transparent 60%),
-    radial-gradient(circle at bottom,rgba(250,204,21,.16),transparent 55%),
-    linear-gradient(135deg,var(--bg),#064e3b);
-  color:var(--text);
-  padding:14px;
-}
-.site-back-float{
-  position:fixed;
-  top:calc(env(safe-area-inset-top, 0px) + 12px);
-  left:calc(env(safe-area-inset-left, 0px) + 12px);
-  z-index:9999;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  min-height:46px;
-  padding:11px 15px;
-  border-radius:999px;
-  text-decoration:none;
-  font-weight:950;
-  font-size:14px;
-  color:#e5e7eb;
-  background:rgba(2,8,24,.82);
-  border:1px solid rgba(148,163,184,.28);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  box-shadow:0 14px 30px rgba(0,0,0,.28);
-  transition:transform .18s ease,background .18s ease,border-color .18s ease;
-}
-.site-back-float:hover{
-  transform:translateY(-1px);
-  background:rgba(15,23,42,.95);
-  border-color:rgba(250,204,21,.34);
-}
-.site-back-float:active{
-  transform:translateY(0);
-}
-.card{
-  width:min(560px,96vw);
-  background:rgba(2,8,24,.96);
-  border:1px solid rgba(19,78,74,.9);
-  border-radius:22px;
-  padding:18px;
-  box-shadow:0 18px 45px rgba(0,0,0,.45);
-}
-.top{text-align:center}
-h1{
-  font-weight:950;
-  color:var(--ok);
-  letter-spacing:.04em;
-}
-.sub{
-  margin-top:6px;
-  color:#e5e7eb;
-  font-weight:850;
-  line-height:1.45;
-}
-.pill{
-  display:inline-flex;
-  gap:8px;
-  align-items:center;
-  margin-top:10px;
-  padding:7px 12px;
-  border-radius:999px;
-  border:1px solid rgba(250,204,21,.55);
-  background:rgba(250,204,21,.10);
-  color:#fde68a;
-  font-weight:950;
-  font-size:13px;
-}
-.topActions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-top:14px;
-}
-.name{
-  margin-top:14px;
-  font-size:22px;
-  font-weight:980;
-  color:var(--gold);
-  text-align:center;
-}
-.hint{
-  margin-top:6px;
-  color:var(--muted);
-  font-weight:850;
-  font-size:13px;
-  line-height:1.55;
-  text-align:center;
-}
-.panel{
-  margin-top:14px;
-  padding:14px;
-  border-radius:18px;
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-}
-.panel h2{
-  font-size:13px;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-  color:#bbf7d0;
-  font-weight:950;
-}
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-@media(max-width:560px){
-  .grid{grid-template-columns:1fr}
-}
-input{
-  width:100%;
-  padding:12px 12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:var(--soft);
-  color:#fff;
-  font-weight:900;
-  outline:none;
-}
-input::placeholder{
-  color:#a8b3cf;
-}
-small{
-  display:block;
-  margin-top:6px;
-  color:var(--muted);
-  font-weight:850;
-  font-size:12px;
-  line-height:1.4;
-}
-.btnrow{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-.btn{
-  flex:1;
-  padding:12px 14px;
-  border-radius:999px;
-  font-weight:980;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  border:1px solid rgba(34,197,94,.55);
-  background:rgba(34,197,94,.18);
-  color:#bbf7d0;
-  cursor:pointer;
-  user-select:none;
-  text-decoration:none;
-  transition:transform .16s ease, opacity .16s ease, background .16s ease, border-color .16s ease;
-}
-.btn:hover{
-  transform:translateY(-1px);
-}
-.btn:active{
-  transform:translateY(0);
-}
-.btn.primary{
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  color:#022c22;
-  border:none;
-}
-.btn.ghost{
-  background:rgba(2,6,23,.65);
-  border:1px solid var(--line);
-  color:#e5e7eb;
-}
-.btn.warn{
-  background:rgba(250,204,21,.12);
-  border:1px solid rgba(250,204,21,.38);
-  color:#fde68a;
-}
-.paybox{
-  margin-top:14px;
-  padding:14px;
-  border-radius:18px;
-  border:1px solid rgba(34,197,94,.55);
-  background:rgba(34,197,94,.10);
-}
-.lbl{
-  font-size:12px;
-  color:#bbf7d0;
-  font-weight:950;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-}
-.big{
-  margin-top:8px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:flex-end;
-}
-.nm{
-  font-size:20px;
-  font-weight:980;
-  color:var(--gold);
-}
-code{
-  font-family:ui-monospace,monospace;
-  background:rgba(2,6,23,.55);
-  border:1px solid rgba(148,163,184,.22);
-  padding:6px 10px;
-  border-radius:12px;
-  font-size:16px;
-  font-weight:950;
-  color:#ecfdf5;
-}
-.msg{
-  margin-top:12px;
-  padding:10px 12px;
-  border-radius:16px;
-  border:1px solid rgba(250,204,21,.35);
-  background:rgba(250,204,21,.08);
-  color:#fde68a;
-  font-weight:950;
-  font-size:13px;
-  line-height:1.55;
-}
-.err{
-  margin-top:12px;
-  padding:10px 12px;
-  border-radius:16px;
-  border:1px solid rgba(248,113,113,.45);
-  background:rgba(248,113,113,.10);
-  color:#fecaca;
-  font-weight:950;
-  font-size:13px;
-  line-height:1.55;
-}
-.foot{
-  margin-top:12px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:850;
-  text-align:center;
-  line-height:1.5;
-}
+  <style>
+    :root{
+      --bg:#04110d;
+      --bg2:#071a13;
+      --card:#0b1f18;
+      --line:rgba(255,255,255,.08);
+      --line-strong:rgba(34,197,94,.28);
+      --text:#f3fff7;
+      --muted:rgba(243,255,247,.72);
+      --green:#22c55e;
+      --green2:#16a34a;
+      --gold:#facc15;
+      --gold-soft:rgba(250,204,21,.10);
+      --danger:#f87171;
+      --danger-soft:rgba(248,113,113,.10);
+      --shadow:0 18px 50px rgba(0,0,0,.32);
+      --radius:24px;
+      --max:700px;
+    }
 
-@media(max-width:640px){
-  body{
-    padding:12px;
-  }
-  .site-back-float{
-    top:calc(env(safe-area-inset-top, 0px) + 10px);
-    left:calc(env(safe-area-inset-left, 0px) + 10px);
-    min-height:42px;
-    padding:10px 13px;
-    font-size:13px;
-  }
-  .card{
-    margin-top:54px;
-  }
-}
-</style>
-</head>
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      min-height:100vh;
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(250,204,21,.06), transparent 28%),
+        linear-gradient(180deg, var(--bg), #061710 55%, #04110d);
+      padding:14px;
+    }
 
-<body>
+    .site-back-float{
+      position:fixed;
+      top:calc(env(safe-area-inset-top, 0px) + 12px);
+      left:calc(env(safe-area-inset-left, 0px) + 12px);
+      z-index:9999;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:44px;
+      padding:10px 14px;
+      border-radius:999px;
+      text-decoration:none;
+      font-weight:950;
+      font-size:14px;
+      color:#e5e7eb;
+      background:rgba(4,17,13,.82);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      box-shadow:0 14px 30px rgba(0,0,0,.28);
+      transition:transform .18s ease,background .18s ease,border-color .18s ease;
+    }
+    .site-back-float:hover{
+      transform:translateY(-1px);
+      background:rgba(8,24,18,.96);
+      border-color:rgba(250,204,21,.30);
+    }
 
-<a class="site-back-float" href="https://digiylyfe.com/" target="_blank" rel="noopener">← Retour au site</a>
+    .wrap{
+      width:min(var(--max), 100%);
+      margin:0 auto;
+      padding-top:62px;
+    }
 
-<div class="card">
+    .card{
+      background:linear-gradient(180deg, rgba(11,31,24,.98), rgba(9,24,19,.98));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-  <div class="top">
-    <h1>MON ARGENT by DIGIY ♾️</h1>
-    <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • Paiement Wave direct au commerçant • 0% commission</div>
-    <div class="pill">✅ Simple • Direct • Souverain</div>
+    .top{
+      padding:20px 18px 10px;
+      text-align:center;
+    }
 
-    <div class="topActions">
-      <button id="btnInstallApp" class="btn ghost" type="button">📲 Installer l’app</button>
-      <a id="btnAdmin" class="btn warn" href="https://pay.digiylyfe.com/pin.html">🔐 Accès admin</a>
-    </div>
-  </div>
+    .brand-mark{
+      width:58px;
+      height:58px;
+      margin:0 auto 10px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,var(--green),var(--green2));
+      color:#032215;
+      font-size:28px;
+      font-weight:1000;
+      box-shadow:var(--shadow);
+    }
 
-  <div id="proName" class="name">MON ARGENT by DIGIY</div>
-  <div id="proHint" class="hint">Scanne un QR ou entre un code pro.</div>
+    h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.08;
+      font-weight:1000;
+      color:var(--gold);
+    }
 
-  <div class="panel">
-    <h2>Charger (code / QR)</h2>
-    <div class="grid">
-      <div>
-        <input id="codeInput" placeholder="Entre un code pro (ex : JBBEAUVILLE)" autocomplete="off">
-        <small>QR attendu : <b>?pro=CODE</b></small>
-      </div>
-      <div class="btnrow" style="margin-top:0">
-        <button id="btnLoad" class="btn ghost" type="button">🔎 Charger</button>
-        <button id="btnManual" class="btn" type="button">✍️ Saisie manuelle</button>
-      </div>
-    </div>
-    <div id="autoMsg" class="msg" style="display:none" aria-live="polite"></div>
-    <div id="autoErr" class="err" style="display:none" aria-live="polite"></div>
-  </div>
+    .sub{
+      margin-top:8px;
+      color:var(--muted);
+      font-weight:850;
+      line-height:1.55;
+      font-size:14px;
+    }
 
-  <div id="manualPanel" class="panel" style="display:none">
-    <h2>Nom + Numéro Wave (manuel)</h2>
-    <div class="grid">
-      <div>
-        <input id="nameInput" placeholder="Nom du commerçant" autocomplete="off">
-      </div>
-      <div>
-        <input id="phoneInput" placeholder="Numéro Wave (22177...)" autocomplete="off" inputmode="numeric">
-      </div>
-    </div>
-    <div class="btnrow">
-      <button id="btnShow" class="btn primary" type="button">✅ Afficher</button>
-      <button id="btnHide" class="btn ghost" type="button">↩︎ Retour</button>
-    </div>
-    <div id="manualErr" class="err" style="display:none" aria-live="polite"></div>
-  </div>
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+      margin-top:14px;
+    }
 
-  <div id="paybox" class="paybox" style="display:none">
-    <div class="lbl">Paiement direct via Wave</div>
-    <div class="big">
-      <div>
-        <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Nom</div>
-        <div id="payName" class="nm">—</div>
-      </div>
-      <div>
-        <div style="font-size:12px;color:#bbf7d0;font-weight:950;margin-bottom:4px">Numéro Wave</div>
-        <code id="payPhone">—</code>
-      </div>
-    </div>
-    <div class="btnrow">
-      <button id="btnCopy" class="btn" type="button">📋 Copier</button>
-      <a id="btnCall" class="btn ghost" href="#" style="text-decoration:none">📞 Appeler</a>
-    </div>
-    <div id="howto" class="msg" style="display:none"></div>
-  </div>
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:12px;
+      font-weight:900;
+      color:var(--text);
+    }
 
-  <div class="foot">
-    DIGIY n’est pas une banque.<br>
-    Le paiement affiché ici est actuellement un paiement <b>Wave direct au commerçant</b>.<br>
-    Pour installer ton espace ou administrer ton wallet, utilise le bouton <b>Accès admin</b>.
-  </div>
-</div>
+    .chip.ok{
+      border-color:rgba(34,197,94,.28);
+      background:rgba(34,197,94,.10);
+      color:#bbf7d0;
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* CONFIG */
-const ADMIN_URL = "https://pay.digiylyfe.com/pin.html";
-const SUPABASE_URL =
-  window.DIGIY_SUPABASE_URL ||
-  "https://wesqmwjjtsefyjnluosj.supabase.co";
-const SUPABASE_ANON_KEY =
-  window.DIGIY_SUPABASE_ANON_KEY ||
-  window.DIGIY_SUPABASE_ANON ||
-  "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+    .chip.gold{
+      border-color:rgba(250,204,21,.28);
+      background:rgba(250,204,21,.10);
+      color:#fde68a;
+    }
 
-/* UI */
-const proName = document.getElementById("proName");
-const proHint = document.getElementById("proHint");
-const codeInput = document.getElementById("codeInput");
-const btnLoad = document.getElementById("btnLoad");
-const btnManual = document.getElementById("btnManual");
-const btnInstallApp = document.getElementById("btnInstallApp");
-const btnAdmin = document.getElementById("btnAdmin");
-const autoMsg = document.getElementById("autoMsg");
-const autoErr = document.getElementById("autoErr");
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+      padding:10px 18px 0;
+    }
 
-const manualPanel = document.getElementById("manualPanel");
-const nameInput = document.getElementById("nameInput");
-const phoneInput = document.getElementById("phoneInput");
-const btnShow = document.getElementById("btnShow");
-const btnHide = document.getElementById("btnHide");
-const manualErr = document.getElementById("manualErr");
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:46px;
+      padding:12px 15px;
+      border-radius:999px;
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-weight:950;
+      cursor:pointer;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn.primary{
+      border:none;
+      background:linear-gradient(135deg,var(--green),var(--green2));
+      color:#032215;
+    }
+    .btn.gold{
+      border:1px solid rgba(250,204,21,.34);
+      background:rgba(250,204,21,.12);
+      color:#fde68a;
+    }
+    .btn.ghost{
+      background:rgba(255,255,255,.02);
+    }
 
-const paybox = document.getElementById("paybox");
-const payName = document.getElementById("payName");
-const payPhone = document.getElementById("payPhone");
-const btnCopy = document.getElementById("btnCopy");
-const btnCall = document.getElementById("btnCall");
-const howto = document.getElementById("howto");
+    .name{
+      margin-top:16px;
+      font-size:24px;
+      font-weight:1000;
+      color:var(--gold);
+      text-align:center;
+      padding:0 18px;
+      word-break:break-word;
+    }
 
-btnAdmin.href = ADMIN_URL;
+    .hint{
+      margin-top:8px;
+      color:var(--muted);
+      font-weight:850;
+      font-size:13px;
+      line-height:1.55;
+      text-align:center;
+      padding:0 18px;
+    }
 
-let deferredInstallPrompt = null;
-let sb = null;
+    .panel{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.025);
+    }
 
-if (window.supabase && typeof window.supabase.createClient === "function") {
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-      storage: {
-        getItem: () => null,
-        setItem: () => {},
-        removeItem: () => {}
+    .panel h2{
+      margin:0 0 10px;
+      font-size:13px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#bbf7d0;
+      font-weight:1000;
+    }
+
+    .search-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:start;
+    }
+
+    input{
+      width:100%;
+      min-height:48px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font:inherit;
+      font-weight:900;
+      outline:none;
+    }
+
+    input::placeholder{
+      color:rgba(243,255,247,.45);
+    }
+
+    .helper{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+      font-weight:800;
+    }
+
+    .msg,
+    .err{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:16px;
+      font-size:13px;
+      line-height:1.55;
+      font-weight:900;
+      display:none;
+    }
+
+    .msg{
+      border:1px solid rgba(250,204,21,.28);
+      background:rgba(250,204,21,.10);
+      color:#fde68a;
+    }
+
+    .err{
+      border:1px solid rgba(248,113,113,.26);
+      background:rgba(248,113,113,.10);
+      color:#fecaca;
+    }
+
+    .locked{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:20px;
+      border:1px solid rgba(250,204,21,.28);
+      background:rgba(250,204,21,.08);
+      display:none;
+    }
+
+    .locked-title{
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#fde68a;
+      font-weight:1000;
+      margin-bottom:8px;
+    }
+
+    .locked-text{
+      color:#fef3c7;
+      font-weight:850;
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .locked .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .paybox{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:20px;
+      border:1px solid rgba(34,197,94,.32);
+      background:rgba(34,197,94,.09);
+      display:none;
+    }
+
+    .lbl{
+      font-size:12px;
+      color:#bbf7d0;
+      font-weight:1000;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .big{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+
+    .box{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(4,17,13,.35);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .box .small{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:1000;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+
+    .nm{
+      font-size:22px;
+      font-weight:1000;
+      color:var(--gold);
+      word-break:break-word;
+    }
+
+    code{
+      display:inline-block;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      padding:8px 10px;
+      border-radius:14px;
+      font-size:18px;
+      font-weight:1000;
+      color:#ecfdf5;
+      word-break:break-word;
+    }
+
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .foot{
+      padding:16px 18px 20px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:850;
+      text-align:center;
+      line-height:1.7;
+    }
+
+    .hidden{display:none !important}
+
+    @media (max-width:640px){
+      body{padding:10px}
+      .wrap{padding-top:58px}
+      .search-row{
+        grid-template-columns:1fr;
+      }
+      h1{font-size:24px}
+      .name{font-size:22px}
+      .site-back-float{
+        font-size:13px;
+        min-height:42px;
+        padding:10px 12px;
+      }
+      .actions .btn{
+        flex:1;
       }
     }
-  });
-}
+  </style>
+</head>
+<body>
 
-function show(el, on = true) {
-  if (!el) return;
-  el.style.display = on ? "" : "none";
-}
+  <a class="site-back-float" href="https://digiylyfe.com/" target="_blank" rel="noopener">
+    ← Retour au site
+  </a>
 
-function digitsOnly(v) {
-  return String(v || "").replace(/\D/g, "");
-}
+  <main class="wrap">
+    <section class="card">
+      <div class="top">
+        <div class="brand-mark">₣</div>
+        <h1>MON ARGENT by DIGIY ♾️</h1>
+        <div class="sub">
+          Paiement direct au professionnel • 0% commission • lecture simple côté client
+        </div>
 
-function resetMessages() {
-  autoMsg.textContent = "";
-  autoErr.textContent = "";
-  manualErr.textContent = "";
-  show(autoMsg, false);
-  show(autoErr, false);
-  show(manualErr, false);
-}
+        <div class="chips">
+          <div class="chip ok">✅ Paiement direct</div>
+          <div class="chip gold">💳 PAY actif requis</div>
+          <div class="chip">♾️ DIGIYLYFE</div>
+        </div>
+      </div>
 
-function setNeutralState() {
-  resetMessages();
-  show(paybox, false);
-  show(manualPanel, false);
-  show(howto, false);
+      <div class="actions">
+        <button id="btnInstallApp" class="btn ghost" type="button">📲 Installer l’app</button>
+        <a id="btnAdmin" class="btn gold" href="https://pay.digiylyfe.com/pin.html">🔐 Accès admin</a>
+        <a id="btnSubscribeTop" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
+      </div>
 
-  proName.textContent = "MON ARGENT by DIGIY";
-  proHint.textContent = "Scanne un QR ou entre un code pro.";
-  payName.textContent = "—";
-  payPhone.textContent = "—";
-  btnCall.href = "#";
-  btnCopy.textContent = "📋 Copier";
-}
+      <div id="proName" class="name">MON ARGENT by DIGIY</div>
+      <div id="proHint" class="hint">
+        Scanne un QR ou entre un code pro actif pour afficher la carte de paiement.
+      </div>
 
-function showAutoError(message) {
-  autoErr.textContent = message;
-  show(autoErr, true);
-}
+      <div class="panel">
+        <h2>Charger un pro</h2>
 
-function showAutoMsg(message) {
-  autoMsg.textContent = message;
-  show(autoMsg, true);
-}
+        <div class="search-row">
+          <div>
+            <input
+              id="codeInput"
+              type="text"
+              placeholder="Entre un code pro actif (ex : JBBEAUVILLE)"
+              autocomplete="off"
+            />
+            <div class="helper">
+              QR attendu : <b>?pro=CODE</b>
+            </div>
+          </div>
 
-function normalizePhone(phoneDigits) {
-  const raw = digitsOnly(phoneDigits);
-  if (!raw) return "";
+          <button id="btnLoad" class="btn ghost" type="button">🔎 Charger</button>
+        </div>
 
-  if (raw.startsWith("221") && raw.length >= 12) return raw;
-  if (raw.length === 9) return "221" + raw;
-  return raw;
-}
+        <div id="autoMsg" class="msg" aria-live="polite"></div>
+        <div id="autoErr" class="err" aria-live="polite"></div>
+      </div>
 
-function showPayCard(name, phoneDigits) {
-  const cleanName = String(name || "").trim();
-  const cleanPhone = normalizePhone(phoneDigits);
+      <div id="lockedBox" class="locked">
+        <div class="locked-title">Abonnement requis</div>
+        <div id="lockedText" class="locked-text">
+          Ce code existe, mais l’affichage public PAY n’est pas actif.
+        </div>
+        <div class="btnrow">
+          <a id="btnSubscribeLocked" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
+          <a id="btnAdminLocked" class="btn ghost" href="https://pay.digiylyfe.com/pin.html">🔐 Ouvrir l’admin</a>
+        </div>
+      </div>
 
-  if (!cleanName || cleanPhone.length < 12) {
-    show(paybox, false);
-    return;
-  }
+      <div id="paybox" class="paybox">
+        <div class="lbl">Paiement direct</div>
 
-  const phone = "+" + cleanPhone;
+        <div class="big">
+          <div class="box">
+            <div class="small">Nom</div>
+            <div id="payName" class="nm">—</div>
+          </div>
 
-  proName.textContent = cleanName;
-  proHint.textContent = "Paiement Wave direct au commerçant • 0% commission";
+          <div class="box">
+            <div class="small">Numéro</div>
+            <code id="payPhone">—</code>
+          </div>
+        </div>
 
-  payName.textContent = cleanName;
-  payPhone.textContent = phone;
-  btnCall.href = "tel:" + phone;
+        <div class="btnrow">
+          <button id="btnCopy" class="btn" type="button">📋 Copier</button>
+          <a id="btnCall" class="btn ghost" href="#">📞 Appeler</a>
+        </div>
 
-  btnCopy.onclick = async () => {
-    const original = btnCopy.textContent;
-    try {
-      await navigator.clipboard.writeText(phone);
-      btnCopy.textContent = "✅ Copié";
-      setTimeout(() => {
-        btnCopy.textContent = original;
-      }, 1400);
-    } catch (e) {
-      window.prompt("Copie :", phone);
-    }
-  };
+        <div id="howto" class="msg" style="display:none;"></div>
+      </div>
 
-  howto.innerHTML = "👉 Ouvre Wave → Payer → colle le numéro <b>" + phone + "</b>";
-  show(howto, true);
-  show(paybox, true);
-}
+      <div class="foot">
+        DIGIY n’est pas une banque et ne garde pas l’argent.<br />
+        Cette page affiche seulement le moyen de paiement direct du professionnel.<br />
+        Le cockpit PAY et l’administration restent côté pro.
+      </div>
+    </section>
+  </main>
 
-function openManual(prefillName = "", prefillPhone = "") {
-  resetMessages();
-  show(paybox, false);
-  show(manualPanel, true);
-  show(howto, false);
+  <script>
+    const ADMIN_URL = "https://pay.digiylyfe.com/pin.html";
+    const SUBSCRIBE_BASE = "https://commencer-a-payer.digiylyfe.com/";
+    const MODULE = "PAY";
+    const CACHE_TTL_MS = 5 * 60 * 1000;
 
-  nameInput.value = prefillName;
-  phoneInput.value = prefillPhone;
-  nameInput.focus();
-}
+    const SUPABASE_URL =
+      window.DIGIY_SUPABASE_URL ||
+      "https://wesqmwjjtsefyjnluosj.supabase.co";
 
-btnManual.onclick = () => openManual("", "");
+    const SUPABASE_ANON_KEY =
+      window.DIGIY_SUPABASE_ANON_KEY ||
+      window.DIGIY_SUPABASE_ANON ||
+      "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
 
-btnHide.onclick = () => {
-  show(manualPanel, false);
-  show(manualErr, false);
-};
-
-btnShow.onclick = () => {
-  const n = (nameInput.value || "").trim();
-  const p = normalizePhone(phoneInput.value);
-
-  show(manualErr, false);
-
-  if (!n) {
-    manualErr.textContent = "Entre un nom de commerçant.";
-    show(manualErr, true);
-    return;
-  }
-
-  if (p.length < 12) {
-    manualErr.textContent = "Entre un numéro Wave valide.";
-    show(manualErr, true);
-    return;
-  }
-
-  show(manualPanel, false);
-  showPayCard(n, p);
-};
-
-async function loadByCode(code) {
-  const cleaned = String(code || "").trim().toUpperCase();
-
-  resetMessages();
-  show(paybox, false);
-  show(howto, false);
-  codeInput.value = cleaned;
-
-  if (!cleaned) {
-    setNeutralState();
-    showAutoMsg("Aucun commerçant chargé pour le moment.");
-    return;
-  }
-
-  if (!sb) {
-    proName.textContent = "Service indisponible";
-    proHint.textContent = "Le moteur de chargement n’est pas prêt.";
-    showAutoError("Supabase n’a pas pu être initialisé.");
-    return;
-  }
-
-  try {
-    showAutoMsg("Chargement du commerçant...");
-
-    const { data, error } = await sb.rpc("digiy_pay_lookup_public", {
-      p_code: cleaned
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storage: {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {}
+        }
+      }
     });
 
-    if (error) throw error;
+    const els = {
+      codeInput: document.getElementById("codeInput"),
+      btnLoad: document.getElementById("btnLoad"),
+      btnInstallApp: document.getElementById("btnInstallApp"),
+      btnAdmin: document.getElementById("btnAdmin"),
+      btnSubscribeTop: document.getElementById("btnSubscribeTop"),
 
-    show(autoMsg, false);
+      proName: document.getElementById("proName"),
+      proHint: document.getElementById("proHint"),
 
-    const row = Array.isArray(data) ? data[0] : data;
+      autoMsg: document.getElementById("autoMsg"),
+      autoErr: document.getElementById("autoErr"),
 
-    if (!row) {
-      proName.textContent = "Commerçant introuvable";
-      proHint.textContent = "Vérifie le code ou scanne un QR valide.";
-      showAutoError("Aucun commerçant actif trouvé pour ce code.");
-      return;
+      lockedBox: document.getElementById("lockedBox"),
+      lockedText: document.getElementById("lockedText"),
+      btnSubscribeLocked: document.getElementById("btnSubscribeLocked"),
+      btnAdminLocked: document.getElementById("btnAdminLocked"),
+
+      paybox: document.getElementById("paybox"),
+      payName: document.getElementById("payName"),
+      payPhone: document.getElementById("payPhone"),
+      btnCopy: document.getElementById("btnCopy"),
+      btnCall: document.getElementById("btnCall"),
+      howto: document.getElementById("howto")
+    };
+
+    els.btnAdmin.href = ADMIN_URL;
+    els.btnAdminLocked.href = ADMIN_URL;
+
+    let deferredInstallPrompt = null;
+
+    function show(el, on = true){
+      if (!el) return;
+      el.style.display = on ? "" : "none";
     }
 
-    const phone = normalizePhone(row.wave_phone);
-    if (phone.length < 12) {
-      proName.textContent = row.business_name || cleaned;
-      proHint.textContent = "Compte incomplet.";
-      showAutoError("Ce commerçant n’a pas encore de numéro Wave valide.");
-      return;
+    function digitsOnly(v){
+      return String(v || "").replace(/\D/g, "");
     }
 
-    showPayCard(row.business_name || cleaned, phone);
-  } catch (e) {
-    console.error("DIGIY PAY loadByCode error:", e);
-    proName.textContent = "Service indisponible";
-    proHint.textContent = "Impossible de charger ce commerçant pour le moment.";
-    showAutoError("Erreur de chargement. Réessaie plus tard.");
-  }
-}
+    function normalizePhone(v){
+      const raw = digitsOnly(v);
+      if (!raw) return "";
+      if (raw.startsWith("221") && raw.length >= 12) return raw;
+      if (raw.length === 9) return "221" + raw;
+      return raw;
+    }
 
-btnLoad.onclick = () => loadByCode(codeInput.value);
+    function safeUpper(v){
+      return String(v || "").trim().toUpperCase();
+    }
 
-codeInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    loadByCode(codeInput.value);
-  }
-});
+    function cacheKey(code){
+      return "digiy_pay_public_" + safeUpper(code);
+    }
 
-/* INSTALL APP */
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-});
+    function saveCache(code, payload){
+      try{
+        localStorage.setItem(cacheKey(code), JSON.stringify({
+          ts: Date.now(),
+          data: payload
+        }));
+      }catch(_){}
+    }
 
-btnInstallApp.onclick = async () => {
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    try {
-      await deferredInstallPrompt.userChoice;
-    } catch (_) {}
-    deferredInstallPrompt = null;
-    return;
-  }
+    function readCache(code){
+      try{
+        const raw = localStorage.getItem(cacheKey(code));
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.ts || !parsed.data) return null;
+        if ((Date.now() - parsed.ts) > CACHE_TTL_MS) return null;
+        return parsed.data;
+      }catch(_){
+        return null;
+      }
+    }
 
-  alert("Pour installer l’app, utilise l’option « Ajouter à l’écran d’accueil » de ton navigateur.");
-};
+    function clearUi(){
+      els.autoMsg.textContent = "";
+      els.autoErr.textContent = "";
+      show(els.autoMsg, false);
+      show(els.autoErr, false);
+      show(els.lockedBox, false);
+      show(els.paybox, false);
+      show(els.howto, false);
+    }
 
-/* BOOT */
-const params = new URLSearchParams(location.search);
-const boot = String(params.get("pro") || "").trim().toUpperCase();
+    function setNeutral(){
+      clearUi();
+      els.proName.textContent = "MON ARGENT by DIGIY";
+      els.proHint.textContent = "Scanne un QR ou entre un code pro actif pour afficher la carte de paiement.";
+      els.payName.textContent = "—";
+      els.payPhone.textContent = "—";
+      els.btnCall.href = "#";
+      els.btnCopy.textContent = "📋 Copier";
+    }
 
-codeInput.value = boot;
+    function showMsg(text){
+      els.autoMsg.textContent = text;
+      show(els.autoMsg, true);
+    }
 
-if (boot) {
-  loadByCode(boot);
-} else {
-  setNeutralState();
-}
-</script>
+    function showErr(text){
+      els.autoErr.textContent = text;
+      show(els.autoErr, true);
+    }
 
+    function buildSubscribeUrl(row, code){
+      const params = new URLSearchParams();
+      params.set("module", MODULE);
+
+      const phone = normalizePhone(
+        row?.phone ||
+        row?.wave_phone ||
+        row?.business_phone ||
+        row?.whatsapp ||
+        ""
+      );
+
+      if (phone) params.set("phone", phone);
+      if (code) params.set("code", safeUpper(code));
+
+      return SUBSCRIBE_BASE + "?" + params.toString();
+    }
+
+    function isTruthyStatus(v){
+      return v === true || v === 1 || v === "1" || String(v || "").toLowerCase() === "true";
+    }
+
+    function isActiveStatus(v){
+      const s = String(v || "").trim().toLowerCase();
+      return s === "active" || s === "paid" || s === "ok" || s === "enabled" || s === "published";
+    }
+
+    function rowHasActiveSubscription(row){
+      if (!row || typeof row !== "object") return false;
+
+      const boolCandidates = [
+        row.subscription_active,
+        row.access_ok,
+        row.is_active,
+        row.active,
+        row.enabled,
+        row.has_access
+      ];
+
+      if (boolCandidates.some(isTruthyStatus)) return true;
+
+      const statusCandidates = [
+        row.subscription_status,
+        row.status,
+        row.access_status,
+        row.plan_status
+      ];
+
+      if (statusCandidates.some(isActiveStatus)) return true;
+
+      return false;
+    }
+
+    function showLocked(row, code){
+      const businessName =
+        String(
+          row?.business_name ||
+          row?.display_name ||
+          row?.public_label ||
+          code ||
+          "ce professionnel"
+        ).trim();
+
+      els.proName.textContent = businessName;
+      els.proHint.textContent = "Affichage public PAY non actif.";
+
+      els.lockedText.innerHTML =
+        "<b>" + escapeHtml(businessName) + "</b> existe, mais l’affichage public PAY n’est pas encore actif.<br>" +
+        "Active le module pour remettre la carte de paiement sur les rails.";
+
+      const url = buildSubscribeUrl(row, code);
+      els.btnSubscribeLocked.href = url;
+      els.btnSubscribeTop.href = url;
+
+      show(els.lockedBox, true);
+    }
+
+    function showPayCard(name, phoneDigits, code = ""){
+      const cleanName = String(name || "").trim();
+      const cleanPhone = normalizePhone(phoneDigits);
+
+      if (!cleanName || cleanPhone.length < 12){
+        show(els.paybox, false);
+        return;
+      }
+
+      const phone = "+" + cleanPhone;
+
+      els.proName.textContent = cleanName;
+      els.proHint.textContent = "Paiement direct au professionnel • PAY actif";
+
+      els.payName.textContent = cleanName;
+      els.payPhone.textContent = phone;
+      els.btnCall.href = "tel:" + phone;
+
+      els.btnCopy.onclick = async () => {
+        const original = els.btnCopy.textContent;
+        try{
+          await navigator.clipboard.writeText(phone);
+          els.btnCopy.textContent = "✅ Copié";
+          setTimeout(() => {
+            els.btnCopy.textContent = original;
+          }, 1400);
+        }catch(_){
+          window.prompt("Copie :", phone);
+        }
+      };
+
+      els.howto.innerHTML =
+        "👉 Ouvre ton moyen de paiement direct puis utilise le numéro <b>" + phone + "</b>" +
+        (code ? "<br><b>Code pro :</b> " + escapeHtml(code) : "");
+
+      show(els.howto, true);
+      show(els.paybox, true);
+    }
+
+    function escapeHtml(value){
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    async function fetchPublicWalletRow(code){
+      const cleaned = safeUpper(code);
+      if (!cleaned) return null;
+
+      const cached = readCache(cleaned);
+      if (cached) return cached;
+
+      const candidates = [
+        { fn: "digiy_pay_lookup_public", args: { p_code: cleaned } },
+        { fn: "digiy_pay_lookup_code", args: { p_code: cleaned } },
+        { fn: "digiy_pay_public_check", args: { p_code: cleaned } }
+      ];
+
+      for (const candidate of candidates){
+        try{
+          const { data, error } = await sb.rpc(candidate.fn, candidate.args);
+          if (error) continue;
+
+          const row = Array.isArray(data) ? (data[0] || null) : (data || null);
+          if (row){
+            saveCache(cleaned, row);
+            return row;
+          }
+        }catch(_){}
+      }
+
+      return null;
+    }
+
+    async function loadByCode(code){
+      const cleaned = safeUpper(code);
+      clearUi();
+      els.codeInput.value = cleaned;
+
+      if (!cleaned){
+        setNeutral();
+        showMsg("Aucun professionnel chargé pour le moment.");
+        return;
+      }
+
+      try{
+        showMsg("Chargement du professionnel…");
+
+        const row = await fetchPublicWalletRow(cleaned);
+
+        show(els.autoMsg, false);
+
+        if (!row){
+          els.proName.textContent = "Code introuvable";
+          els.proHint.textContent = "Vérifie le code ou scanne un QR valide.";
+          showErr("Aucun professionnel trouvé pour ce code.");
+          return;
+        }
+
+        if (!rowHasActiveSubscription(row)){
+          showLocked(row, cleaned);
+          showErr("Ce code existe, mais PAY n’est pas actif sur l’affichage public.");
+          return;
+        }
+
+        const businessName =
+          row.business_name ||
+          row.display_name ||
+          row.public_label ||
+          cleaned;
+
+        const phone = normalizePhone(
+          row.wave_phone ||
+          row.phone ||
+          row.business_phone ||
+          row.whatsapp ||
+          ""
+        );
+
+        if (phone.length < 12){
+          els.proName.textContent = businessName;
+          els.proHint.textContent = "Compte incomplet.";
+          showErr("Ce professionnel n’a pas encore de numéro de paiement valide.");
+          return;
+        }
+
+        showPayCard(businessName, phone, cleaned);
+      }catch(e){
+        console.error("DIGIY PAY public load error:", e);
+        els.proName.textContent = "Service indisponible";
+        els.proHint.textContent = "Impossible de charger ce professionnel pour le moment.";
+        showErr("Erreur de chargement. Réessaie plus tard.");
+      }
+    }
+
+    els.btnLoad.addEventListener("click", () => loadByCode(els.codeInput.value));
+
+    els.codeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        loadByCode(els.codeInput.value);
+      }
+    });
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    els.btnInstallApp.addEventListener("click", async () => {
+      if (deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        try{
+          await deferredInstallPrompt.userChoice;
+        }catch(_){}
+        deferredInstallPrompt = null;
+        return;
+      }
+
+      alert("Pour installer l’app, utilise l’option « Ajouter à l’écran d’accueil » de ton navigateur.");
+    });
+
+    const params = new URLSearchParams(location.search);
+    const bootCode = safeUpper(params.get("pro") || "");
+
+    els.btnSubscribeTop.href = SUBSCRIBE_BASE + "?module=" + MODULE;
+    els.btnSubscribeLocked.href = SUBSCRIBE_BASE + "?module=" + MODULE;
+
+    if (bootCode){
+      els.codeInput.value = bootCode;
+      loadByCode(bootCode);
+    } else {
+      setNeutral();
+    }
+  </script>
 </body>
 </html>
