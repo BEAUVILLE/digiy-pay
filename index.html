@@ -445,8 +445,6 @@
       line-height:1.7;
     }
 
-    .hidden{display:none !important}
-
     @media (max-width:700px){
       .nav-mini{
         grid-template-columns:repeat(2,minmax(0,1fr));
@@ -456,9 +454,7 @@
     @media (max-width:640px){
       body{padding:10px}
       .wrap{padding-top:58px}
-      .search-row{
-        grid-template-columns:1fr;
-      }
+      .search-row{grid-template-columns:1fr}
       h1{font-size:24px}
       .name{font-size:22px}
       .site-back-float{
@@ -466,9 +462,7 @@
         min-height:42px;
         padding:10px 12px;
       }
-      .actions .btn{
-        flex:1;
-      }
+      .actions .btn{flex:1}
     }
   </style>
 </head>
@@ -506,15 +500,15 @@
           <strong>Site DIGIY</strong>
           <span>Retour vers la maison mère</span>
         </a>
-        <a class="nav-card" href="./pin.html">
+        <a id="navPin" class="nav-card" href="./pin.html">
           <strong>PIN PAY</strong>
           <span>Entrée pro protégée</span>
         </a>
-        <a class="nav-card" href="./cockpit.html">
+        <a id="navCockpit" class="nav-card" href="./cockpit.html">
           <strong>Cockpit</strong>
           <span>Vue financière pro</span>
         </a>
-        <a class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
+        <a id="navActivate" class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
           <strong>Activation</strong>
           <span>Abonnement et renouvellement</span>
         </a>
@@ -631,6 +625,10 @@
       btnCockpitTop: document.getElementById("btnCockpitTop"),
       btnSubscribeTop: document.getElementById("btnSubscribeTop"),
 
+      navPin: document.getElementById("navPin"),
+      navCockpit: document.getElementById("navCockpit"),
+      navActivate: document.getElementById("navActivate"),
+
       proName: document.getElementById("proName"),
       proHint: document.getElementById("proHint"),
 
@@ -678,6 +676,16 @@
         .toUpperCase()
         .replace(/\s+/g, "")
         .replace(/[^A-Z0-9_-]/g, "");
+    }
+
+    function normalizeSlug(v){
+      return String(v || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
     }
 
     function escapeHtml(value){
@@ -740,6 +748,10 @@
       els.btnPinInline.href = PIN_URL;
       els.btnCockpitInline.href = COCKPIT_URL;
 
+      els.navPin.href = PIN_URL;
+      els.navCockpit.href = COCKPIT_URL;
+      els.navActivate.href = SUBSCRIBE_BASE + "?module=" + MODULE;
+
       els.btnSubscribeTop.href = SUBSCRIBE_BASE + "?module=" + MODULE;
       els.btnSubscribeLocked.href = SUBSCRIBE_BASE + "?module=" + MODULE;
     }
@@ -758,11 +770,8 @@
       try{
         const url = new URL(window.location.href);
         const cleaned = normalizeCode(code);
-        if (cleaned){
-          url.searchParams.set("pro", cleaned);
-        } else {
-          url.searchParams.delete("pro");
-        }
+        if (cleaned) url.searchParams.set("pro", cleaned);
+        else url.searchParams.delete("pro");
         history.replaceState({}, "", url.toString());
       }catch(_){}
     }
@@ -792,13 +801,13 @@
     }
 
     function pickSlug(row){
-      return String(
+      return normalizeSlug(
         row?.slug ||
         row?.pay_slug ||
         row?.subscription_slug ||
         row?.module_slug ||
         ""
-      ).trim();
+      );
     }
 
     function buildSubscribeUrl(row, code){
@@ -840,44 +849,9 @@
       return params.toString() ? (COCKPIT_URL + "?" + params.toString()) : COCKPIT_URL;
     }
 
-    function isTruthyStatus(v){
-      return v === true || v === 1 || v === "1" || String(v || "").toLowerCase() === "true";
-    }
-
-    function isActiveStatus(v){
-      const s = String(v || "").trim().toLowerCase();
-      return s === "active" || s === "paid" || s === "ok" || s === "enabled" || s === "published";
-    }
-
     function rowHasActiveSubscription(row){
       if (!row || typeof row !== "object") return false;
-
-      const boolCandidates = [
-        row.subscription_active,
-        row.access_ok,
-        row.is_active,
-        row.active,
-        row.enabled,
-        row.has_access,
-        row.public_active,
-        row.pay_active,
-        row.found && row.ok
-      ];
-
-      if (boolCandidates.some(isTruthyStatus)) return true;
-
-      const statusCandidates = [
-        row.subscription_status,
-        row.status,
-        row.access_status,
-        row.plan_status,
-        row.public_status,
-        row.pay_status
-      ];
-
-      if (statusCandidates.some(isActiveStatus)) return true;
-
-      return false;
+      return row?.is_active !== false;
     }
 
     function showLocked(row, code){
@@ -902,6 +876,10 @@
       els.btnCockpitTop.href = cockpitUrl;
       els.btnPinInline.href = pinUrl;
       els.btnCockpitInline.href = cockpitUrl;
+
+      els.navPin.href = pinUrl;
+      els.navCockpit.href = cockpitUrl;
+      els.navActivate.href = subscribeUrl;
 
       show(els.lockedBox, true);
     }
@@ -931,6 +909,9 @@
       els.btnPinInline.href = pinUrl;
       els.btnCockpitInline.href = cockpitUrl;
 
+      els.navPin.href = pinUrl;
+      els.navCockpit.href = cockpitUrl;
+
       els.btnCopy.onclick = async () => {
         const original = els.btnCopy.textContent;
         try{
@@ -953,47 +934,61 @@
       show(els.paybox, true);
     }
 
-    function normalizeRpcPayload(data){
-      if (!data) return null;
-
-      const first = Array.isArray(data) ? (data[0] || null) : data;
-      if (!first || typeof first !== "object") return null;
-
-      if (first.row && typeof first.row === "object"){
-        return { ...first.row, __meta: first };
-      }
-
-      if (first.data && typeof first.data === "object"){
-        return { ...first.data, __meta: first };
-      }
-
-      return first;
-    }
-
-    async function fetchPublicWalletRow(code){
+    async function fetchDirectByCode(code){
       const cleaned = normalizeCode(code);
       if (!cleaned) return null;
 
       const cached = readCache(cleaned);
       if (cached) return cached;
 
-      const candidates = [
-        { fn: "digiy_pay_lookup_public", args: { p_code: cleaned } },
-        { fn: "digiy_pay_lookup_code", args: { p_code: cleaned } },
-        { fn: "digiy_pay_public_check", args: { p_code: cleaned } }
-      ];
+      const tries = [cleaned];
 
-      for (const candidate of candidates){
-        try{
-          const { data, error } = await sb.rpc(candidate.fn, candidate.args);
-          if (error) continue;
+      for (const candidate of tries){
+        const { data, error } = await sb
+          .from("digiy_pay_pro")
+          .select("business_name,business_code,wave_phone,is_active")
+          .eq("business_code", candidate)
+          .limit(1)
+          .maybeSingle();
 
-          const row = normalizeRpcPayload(data);
-          if (row){
-            saveCache(cleaned, row);
-            return row;
+        if (!error && data){
+          const row = {
+            ...data,
+            business_code: normalizeCode(data.business_code || candidate)
+          };
+
+          const phoneDigits = pickPhone(row);
+          if (phoneDigits){
+            try{
+              const sub = await sb
+                .from("digiy_subscriptions_public")
+                .select("phone,slug,module")
+                .eq("phone", phoneDigits)
+                .eq("module", "PAY")
+                .limit(1)
+                .maybeSingle();
+
+              if (!sub.error && sub.data?.slug){
+                row.slug = normalizeSlug(sub.data.slug);
+              } else {
+                const subPlus = await sb
+                  .from("digiy_subscriptions_public")
+                  .select("phone,slug,module")
+                  .eq("phone", "+" + phoneDigits)
+                  .eq("module", "PAY")
+                  .limit(1)
+                  .maybeSingle();
+
+                if (!subPlus.error && subPlus.data?.slug){
+                  row.slug = normalizeSlug(subPlus.data.slug);
+                }
+              }
+            }catch(_){}
           }
-        }catch(_){}
+
+          saveCache(cleaned, row);
+          return row;
+        }
       }
 
       return null;
@@ -1014,8 +1009,7 @@
       try{
         showMsg("Chargement du professionnel…");
 
-        const row = await fetchPublicWalletRow(cleaned);
-
+        const row = await fetchDirectByCode(cleaned);
         showMsg("");
 
         if (!row){
@@ -1043,6 +1037,7 @@
         const subscribeUrl = buildSubscribeUrl(row, cleaned);
         els.btnSubscribeTop.href = subscribeUrl;
         els.btnSubscribeLocked.href = subscribeUrl;
+        els.navActivate.href = subscribeUrl;
 
         showPayCard(row, cleaned);
       }catch(e){
