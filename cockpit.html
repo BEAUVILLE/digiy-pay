@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>MON ARGENT PRO — Cockpit</title>
+  <title>MON ARGENT PRO — Cockpit financier</title>
   <meta name="theme-color" content="#04110d">
   <meta
     name="description"
-    content="MON ARGENT PRO by DIGIY — cockpit wallet sécurisé, QR Wave, carte PNG, lien public et pilotage PAY."
+    content="MON ARGENT PRO by DIGIY — cockpit financier sécurisé, QR de paiement, carte PNG, lien public et pilotage PAY."
   >
 
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
@@ -544,13 +544,13 @@
         <div class="topLeft">
           <h1>MON ARGENT PRO</h1>
           <div class="sub">MON ARGENT ELECTRONIQUE BY DIGIY • Paiement direct via Wave</div>
-          <div class="pill">🔐 Cockpit wallet sécurisé</div>
+          <div class="pill">🔐 Cockpit financier sécurisé</div>
         </div>
 
         <div class="topBtns">
-          <a id="btnPublicTop" class="btn ghost" href="./index.html">💳 Wallet public</a>
+          <a id="btnPublicTop" class="btn ghost" href="./index.html">💳 Page publique</a>
           <a id="btnPinTop" class="btn ghost" href="./pin.html">🔐 PIN</a>
-          <a id="btnAdminTop" class="btn ghost" href="./admin.html">🛠 Admin</a>
+          <a id="btnAdminTop" class="btn ghost" href="./admin.html">🛠 Admin PAY</a>
           <a id="btnActivateTop" class="btn warn" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
           <button id="btnLogout" class="btn bad" type="button">Déconnexion</button>
         </div>
@@ -558,16 +558,16 @@
 
       <div class="nav-mini">
         <a id="navPublic" class="nav-card" href="./index.html">
-          <strong>Wallet public</strong>
-          <span>Vue client du moyen de paiement</span>
+          <strong>Page publique</strong>
+          <span>Vue client du paiement direct</span>
         </a>
         <a id="navPin" class="nav-card" href="./pin.html">
           <strong>PIN PAY</strong>
           <span>Entrée sécurisée du module</span>
         </a>
         <a id="navAdmin" class="nav-card" href="./admin.html">
-          <strong>Admin</strong>
-          <span>Outils internes plus profonds</span>
+          <strong>Admin PAY</strong>
+          <span>Réglages rapides et gestion légère</span>
         </a>
         <a id="navActivate" class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
           <strong>Activation</strong>
@@ -579,7 +579,7 @@
 
       <div class="grid">
         <div class="panel">
-          <h2>Fiche wallet</h2>
+          <h2>Fiche pro</h2>
 
           <div class="formGrid">
             <div>
@@ -595,9 +595,9 @@
             </div>
 
             <div>
-              <label for="walletPhone">Numéro Wave</label>
+              <label for="walletPhone">Numéro de paiement</label>
               <input id="walletPhone" type="tel" placeholder="Ex: 221771342889">
-              <div class="hint">Numéro Wave sur lequel le client envoie le paiement.</div>
+              <div class="hint">Numéro direct sur lequel le client envoie son paiement.</div>
             </div>
 
             <div>
@@ -610,8 +610,8 @@
           <div class="switch">
             <input id="walletActive" type="checkbox">
             <div>
-              <div style="font-weight:950">Wallet actif</div>
-              <div class="mini">Si décoché, le wallet public n’est plus servi comme actif.</div>
+              <div style="font-weight:950">Accès PAY actif</div>
+              <div class="mini">Si décoché, la page publique ne doit plus être considérée comme active.</div>
             </div>
           </div>
 
@@ -639,7 +639,7 @@
               <div class="statValue mono" id="sessionSlug">—</div>
             </div>
             <div class="stat">
-              <div class="statLabel">Numéro Wave commerçant</div>
+              <div class="statLabel">Numéro de paiement</div>
               <div class="statValue mono" id="merchantWave">—</div>
             </div>
             <div class="stat">
@@ -657,13 +657,13 @@
           </div>
 
           <div class="btnrow">
-            <a id="btnOpenPublic" class="btn" href="./index.html" target="_blank" rel="noopener">🌍 Ouvrir public</a>
+            <a id="btnOpenPublic" class="btn" href="./index.html" target="_blank" rel="noopener">🌍 Ouvrir la page publique</a>
             <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
           </div>
 
           <div class="mini" style="margin-top:14px;">
             DIGIY n'est pas une banque.
-            Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le commerçant.
+            Le paiement affiché dans MON ARGENT passe actuellement par <b>Wave</b>, en direct vers le professionnel.
           </div>
         </div>
       </div>
@@ -671,12 +671,12 @@
       <div class="sep"></div>
 
       <div class="panel">
-        <h2>Mon QR Wave</h2>
+        <h2>Mon QR de paiement</h2>
 
         <div class="qrBlock">
           <div class="qrPreviewBox">
             <div class="mini" style="margin-top:0;">
-              Ici tu génères le <b>QR seul</b> du wallet actif.
+              Ici tu génères le <b>QR seul</b> du code pro actif.
             </div>
 
             <div class="qrCanvasWrap">
@@ -692,7 +692,7 @@
 
           <div class="qrMeta">
             <div class="mini" style="margin-top:0;">
-              Le QR suit toujours le <b>code pro actif</b> de ce wallet.
+              Le QR suit toujours le <b>code pro actif</b> de cette page de paiement.
             </div>
 
             <div class="qrMetaLine">
@@ -701,7 +701,7 @@
             </div>
 
             <div class="qrMetaLine">
-              <b>Numéro Wave actif :</b><br>
+              <b>Numéro de paiement actif :</b><br>
               <span id="qrActiveWave" class="mono">—</span>
             </div>
 
@@ -726,7 +726,7 @@
 
         <div class="cardMaker">
           <div class="mini" style="margin-top:0;">
-            La carte PNG est régénérée à chaque clic, sans garder l'ancienne identité d'un autre wallet.
+            La carte PNG est régénérée à chaque clic, sans garder l'ancienne identité d'un autre pro.
           </div>
 
           <div class="canvasWrap">
@@ -1120,14 +1120,14 @@
         return normPhone(data.phone);
       }
 
-      async function ensureWallet(phoneDigits) {
+      async function ensurePayProfile(phoneDigits) {
         if (!phoneDigits) return;
         try {
           await sb.rpc("rpc_wallet_ensure", { p_phone: phoneDigits });
         } catch (_) {}
       }
 
-      async function fetchByWavePhone(phoneDigits) {
+      async function fetchByPhone(phoneDigits) {
         if (!phoneDigits) return null;
 
         let { data, error } = await sb
@@ -1149,7 +1149,7 @@
         return null;
       }
 
-      async function fetchByBusinessCode(code) {
+      async function fetchByCode(code) {
         const clean = makeCode(code);
         if (!clean) return null;
 
@@ -1229,22 +1229,22 @@
         sessionSlug.textContent = currentSlug || "—";
         syncNavLinks();
 
-        setInfo("Chargement du wallet…");
+        setInfo("Chargement du profil PAY…");
 
         const phoneDigits = digitsOnly(currentPhone);
-        await ensureWallet(phoneDigits);
+        await ensurePayProfile(phoneDigits);
 
-        let profile = await fetchByWavePhone(phoneDigits);
+        let profile = await fetchByPhone(phoneDigits);
 
         if (!profile && currentCodeFromQuery) {
-          profile = await fetchByBusinessCode(currentCodeFromQuery);
+          profile = await fetchByCode(currentCodeFromQuery);
         }
 
         fillForm(profile);
         resetBoxes();
 
         if (profile) {
-          setOk("Wallet chargé.");
+          setOk("Profil PAY chargé.");
         } else {
           walletPhone.value = phoneDigits;
           updatePreview();
@@ -1261,7 +1261,7 @@
         const isActive = !!walletActive.checked;
 
         if (!phoneDigits) {
-          setError("Numéro Wave obligatoire.");
+          setError("Numéro de paiement obligatoire.");
           walletPhone.focus();
           return;
         }
@@ -1334,7 +1334,7 @@
 
           fillForm(loadedProfile);
           resetBoxes();
-          setOk("Fiche wallet sauvegardée.");
+          setOk("Fiche PAY sauvegardée.");
         } catch (e) {
           setError(
             "Sauvegarde refusée ou bloquée par la base. Détail: " +
@@ -1369,7 +1369,7 @@
         const phoneDigits = digitsOnly(walletPhone.value || currentPhone || "");
         const code = getEffectiveCode();
         let msg = "DIGIY — MON ARGENT PRO\n\n";
-        if (phoneDigits) msg += "Numéro Wave: " + phoneDigits + "\n";
+        if (phoneDigits) msg += "Numéro de paiement: " + phoneDigits + "\n";
         if (code) msg += "Code: " + code + "\n";
         if (currentSlug) msg += "Slug: " + currentSlug + "\n";
         msg += "J'ai besoin d'aide pour MON ARGENT PRO.";
@@ -1474,7 +1474,7 @@
 
             qrCtx.fillStyle = "#6b7280";
             qrCtx.font = "700 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-            qrCtx.fillText("Scanne pour ouvrir le wallet", W / 2, 675);
+            qrCtx.fillText("Scanne pour ouvrir la page de paiement", W / 2, 675);
           } catch (_) {
             if (myToken !== qrRenderToken) return "";
             qrCtx.fillStyle = "#f3f4f6";
@@ -1574,7 +1574,7 @@
 
         ctx.fillStyle = "#fde68a";
         ctx.font = "900 18px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("QR WALLET ACTIF", 660, 120);
+        ctx.fillText("QR ACTIF", 675, 120);
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 42px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
@@ -1590,7 +1590,7 @@
 
         ctx.fillStyle = "#4b5563";
         ctx.font = "800 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-        ctx.fillText("Numéro Wave", 90, 560);
+        ctx.fillText("Numéro de paiement", 90, 560);
 
         ctx.fillStyle = "#111827";
         ctx.font = "900 38px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
@@ -1683,7 +1683,7 @@
 
       function buildQrFilename() {
         const code = getEffectiveCode();
-        return "qr-wave-" + (code ? code.toLowerCase() : "wallet") + ".png";
+        return "qr-paiement-" + (code ? code.toLowerCase() : "pay") + ".png";
       }
 
       async function ensureFreshCard() {
@@ -1815,7 +1815,7 @@
 
           openPreviewWithDataUrl(
             dataUrl,
-            "Mon QR Wave est prêt",
+            "Mon QR de paiement est prêt",
             "Sur ordi, tu peux aussi le télécharger directement dans Téléchargements."
           );
           setOk("QR ouvert.");
