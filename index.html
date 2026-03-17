@@ -40,7 +40,7 @@
       --danger-soft:rgba(248,113,113,.10);
       --shadow:0 18px 50px rgba(0,0,0,.32);
       --radius:24px;
-      --max:700px;
+      --max:760px;
     }
 
     *{box-sizing:border-box}
@@ -173,6 +173,44 @@
       gap:10px;
       justify-content:center;
       padding:10px 18px 0;
+    }
+
+    .nav-mini{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      padding:14px 18px 0;
+    }
+
+    .nav-card{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      padding:12px 12px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      text-decoration:none;
+      color:var(--text);
+      min-height:78px;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease;
+    }
+    .nav-card:hover{
+      transform:translateY(-1px);
+      border-color:rgba(250,204,21,.24);
+      background:rgba(255,255,255,.04);
+    }
+    .nav-card strong{
+      font-size:13px;
+      font-weight:1000;
+      color:var(--gold);
+      line-height:1.2;
+    }
+    .nav-card span{
+      font-size:11px;
+      line-height:1.45;
+      color:var(--muted);
+      font-weight:850;
     }
 
     .btn{
@@ -409,6 +447,12 @@
 
     .hidden{display:none !important}
 
+    @media (max-width:700px){
+      .nav-mini{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+
     @media (max-width:640px){
       body{padding:10px}
       .wrap{padding-top:58px}
@@ -452,8 +496,28 @@
 
       <div class="actions">
         <button id="btnInstallApp" class="btn ghost" type="button">📲 Installer l’app</button>
-        <a id="btnAdmin" class="btn gold" href="https://pay.digiylyfe.com/pin.html">🔐 Accès admin</a>
+        <a id="btnPinTop" class="btn gold" href="./pin.html">🔐 Entrée PIN</a>
+        <a id="btnCockpitTop" class="btn ghost" href="./cockpit.html">📊 Cockpit pro</a>
         <a id="btnSubscribeTop" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
+      </div>
+
+      <div class="nav-mini">
+        <a class="nav-card" href="https://digiylyfe.com/" target="_blank" rel="noopener">
+          <strong>Site DIGIY</strong>
+          <span>Retour vers la maison mère</span>
+        </a>
+        <a class="nav-card" href="./pin.html">
+          <strong>PIN PAY</strong>
+          <span>Entrée pro protégée</span>
+        </a>
+        <a class="nav-card" href="./cockpit.html">
+          <strong>Cockpit</strong>
+          <span>Vue financière pro</span>
+        </a>
+        <a class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
+          <strong>Activation</strong>
+          <span>Abonnement et renouvellement</span>
+        </a>
       </div>
 
       <div id="proName" class="name">MON ARGENT by DIGIY</div>
@@ -491,7 +555,8 @@
         </div>
         <div class="btnrow">
           <a id="btnSubscribeLocked" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
-          <a id="btnAdminLocked" class="btn ghost" href="https://pay.digiylyfe.com/pin.html">🔐 Ouvrir l’admin</a>
+          <a id="btnPinLocked" class="btn ghost" href="./pin.html">🔐 Ouvrir le PIN</a>
+          <a id="btnCockpitLocked" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
         </div>
       </div>
 
@@ -513,6 +578,8 @@
         <div class="btnrow">
           <button id="btnCopy" class="btn" type="button">📋 Copier</button>
           <a id="btnCall" class="btn ghost" href="#">📞 Appeler</a>
+          <a id="btnPinInline" class="btn ghost" href="./pin.html">🔐 PIN pro</a>
+          <a id="btnCockpitInline" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
         </div>
 
         <div id="howto" class="msg" style="display:none;"></div>
@@ -527,7 +594,8 @@
   </main>
 
   <script>
-    const ADMIN_URL = "https://pay.digiylyfe.com/pin.html";
+    const PIN_URL = "./pin.html";
+    const COCKPIT_URL = "./cockpit.html";
     const SUBSCRIBE_BASE = "https://commencer-a-payer.digiylyfe.com/";
     const MODULE = "PAY";
     const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -558,7 +626,9 @@
       codeInput: document.getElementById("codeInput"),
       btnLoad: document.getElementById("btnLoad"),
       btnInstallApp: document.getElementById("btnInstallApp"),
-      btnAdmin: document.getElementById("btnAdmin"),
+
+      btnPinTop: document.getElementById("btnPinTop"),
+      btnCockpitTop: document.getElementById("btnCockpitTop"),
       btnSubscribeTop: document.getElementById("btnSubscribeTop"),
 
       proName: document.getElementById("proName"),
@@ -570,18 +640,18 @@
       lockedBox: document.getElementById("lockedBox"),
       lockedText: document.getElementById("lockedText"),
       btnSubscribeLocked: document.getElementById("btnSubscribeLocked"),
-      btnAdminLocked: document.getElementById("btnAdminLocked"),
+      btnPinLocked: document.getElementById("btnPinLocked"),
+      btnCockpitLocked: document.getElementById("btnCockpitLocked"),
 
       paybox: document.getElementById("paybox"),
       payName: document.getElementById("payName"),
       payPhone: document.getElementById("payPhone"),
       btnCopy: document.getElementById("btnCopy"),
       btnCall: document.getElementById("btnCall"),
+      btnPinInline: document.getElementById("btnPinInline"),
+      btnCockpitInline: document.getElementById("btnCockpitInline"),
       howto: document.getElementById("howto")
     };
-
-    els.btnAdmin.href = ADMIN_URL;
-    els.btnAdminLocked.href = ADMIN_URL;
 
     let deferredInstallPrompt = null;
 
@@ -650,6 +720,12 @@
       els.payPhone.textContent = "—";
       els.btnCall.href = "#";
       els.btnCopy.textContent = "📋 Copier";
+      els.btnPinTop.href = PIN_URL;
+      els.btnCockpitTop.href = COCKPIT_URL;
+      els.btnPinLocked.href = PIN_URL;
+      els.btnCockpitLocked.href = COCKPIT_URL;
+      els.btnPinInline.href = PIN_URL;
+      els.btnCockpitInline.href = COCKPIT_URL;
     }
 
     function showMsg(text){
@@ -678,6 +754,56 @@
       if (code) params.set("code", safeUpper(code));
 
       return SUBSCRIBE_BASE + "?" + params.toString();
+    }
+
+    function buildPinUrl(row, code){
+      const params = new URLSearchParams();
+
+      const slug = String(
+        row?.slug ||
+        row?.pay_slug ||
+        row?.subscription_slug ||
+        ""
+      ).trim();
+
+      const phone = normalizePhone(
+        row?.phone ||
+        row?.wave_phone ||
+        row?.business_phone ||
+        row?.whatsapp ||
+        ""
+      );
+
+      if (slug) params.set("slug", slug);
+      if (phone) params.set("phone", phone);
+      if (code) params.set("code", safeUpper(code));
+
+      return params.toString() ? (PIN_URL + "?" + params.toString()) : PIN_URL;
+    }
+
+    function buildCockpitUrl(row, code){
+      const params = new URLSearchParams();
+
+      const slug = String(
+        row?.slug ||
+        row?.pay_slug ||
+        row?.subscription_slug ||
+        ""
+      ).trim();
+
+      const phone = normalizePhone(
+        row?.phone ||
+        row?.wave_phone ||
+        row?.business_phone ||
+        row?.whatsapp ||
+        ""
+      );
+
+      if (slug) params.set("slug", slug);
+      if (phone) params.set("phone", phone);
+      if (code) params.set("code", safeUpper(code));
+
+      return params.toString() ? (COCKPIT_URL + "?" + params.toString()) : COCKPIT_URL;
     }
 
     function isTruthyStatus(v){
@@ -732,14 +858,23 @@
         "<b>" + escapeHtml(businessName) + "</b> existe, mais l’affichage public PAY n’est pas encore actif.<br>" +
         "Active le module pour remettre la carte de paiement sur les rails.";
 
-      const url = buildSubscribeUrl(row, code);
-      els.btnSubscribeLocked.href = url;
-      els.btnSubscribeTop.href = url;
+      const subscribeUrl = buildSubscribeUrl(row, code);
+      const pinUrl = buildPinUrl(row, code);
+      const cockpitUrl = buildCockpitUrl(row, code);
+
+      els.btnSubscribeLocked.href = subscribeUrl;
+      els.btnSubscribeTop.href = subscribeUrl;
+      els.btnPinLocked.href = pinUrl;
+      els.btnCockpitLocked.href = cockpitUrl;
+      els.btnPinTop.href = pinUrl;
+      els.btnCockpitTop.href = cockpitUrl;
+      els.btnPinInline.href = pinUrl;
+      els.btnCockpitInline.href = cockpitUrl;
 
       show(els.lockedBox, true);
     }
 
-    function showPayCard(name, phoneDigits, code = ""){
+    function showPayCard(name, phoneDigits, code = "", row = null){
       const cleanName = String(name || "").trim();
       const cleanPhone = normalizePhone(phoneDigits);
 
@@ -749,6 +884,8 @@
       }
 
       const phone = "+" + cleanPhone;
+      const pinUrl = buildPinUrl(row, code);
+      const cockpitUrl = buildCockpitUrl(row, code);
 
       els.proName.textContent = cleanName;
       els.proHint.textContent = "Paiement direct au professionnel • PAY actif";
@@ -756,6 +893,11 @@
       els.payName.textContent = cleanName;
       els.payPhone.textContent = phone;
       els.btnCall.href = "tel:" + phone;
+
+      els.btnPinTop.href = pinUrl;
+      els.btnCockpitTop.href = cockpitUrl;
+      els.btnPinInline.href = pinUrl;
+      els.btnCockpitInline.href = cockpitUrl;
 
       els.btnCopy.onclick = async () => {
         const original = els.btnCopy.textContent;
@@ -772,7 +914,8 @@
 
       els.howto.innerHTML =
         "👉 Ouvre ton moyen de paiement direct puis utilise le numéro <b>" + phone + "</b>" +
-        (code ? "<br><b>Code pro :</b> " + escapeHtml(code) : "");
+        (code ? "<br><b>Code pro :</b> " + escapeHtml(code) : "") +
+        "<br><br>🔐 Côté professionnel, l’entrée protégée se fait par le PIN PAY.";
 
       show(els.howto, true);
       show(els.paybox, true);
@@ -867,7 +1010,11 @@
           return;
         }
 
-        showPayCard(businessName, phone, cleaned);
+        const subscribeUrl = buildSubscribeUrl(row, cleaned);
+        els.btnSubscribeTop.href = subscribeUrl;
+        els.btnSubscribeLocked.href = subscribeUrl;
+
+        showPayCard(businessName, phone, cleaned, row);
       }catch(e){
         console.error("DIGIY PAY public load error:", e);
         els.proName.textContent = "Service indisponible";
@@ -908,6 +1055,12 @@
 
     els.btnSubscribeTop.href = SUBSCRIBE_BASE + "?module=" + MODULE;
     els.btnSubscribeLocked.href = SUBSCRIBE_BASE + "?module=" + MODULE;
+    els.btnPinTop.href = PIN_URL;
+    els.btnCockpitTop.href = COCKPIT_URL;
+    els.btnPinLocked.href = PIN_URL;
+    els.btnCockpitLocked.href = COCKPIT_URL;
+    els.btnPinInline.href = PIN_URL;
+    els.btnCockpitInline.href = COCKPIT_URL;
 
     if (bootCode){
       els.codeInput.value = bootCode;
