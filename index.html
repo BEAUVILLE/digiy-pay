@@ -463,6 +463,7 @@
         padding:10px 12px;
       }
       .actions .btn{flex:1}
+      .btnrow .btn{flex:1}
     }
   </style>
 </head>
@@ -572,6 +573,10 @@
         <div class="btnrow">
           <button id="btnCopy" class="btn" type="button">📋 Copier</button>
           <a id="btnCall" class="btn ghost" href="#">📞 Appeler</a>
+          <a id="btnPayNow" class="btn primary" href="#">💳 Payer maintenant</a>
+        </div>
+
+        <div class="btnrow">
           <a id="btnPinInline" class="btn ghost" href="./pin.html">🔐 PIN pro</a>
           <a id="btnCockpitInline" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
         </div>
@@ -590,6 +595,7 @@
   <script>
     const PIN_URL = "./pin.html";
     const COCKPIT_URL = "./cockpit.html";
+    const PAYER_URL = "./payer.html";
     const SUBSCRIBE_BASE = "https://commencer-a-payer.digiylyfe.com/";
     const MODULE = "PAY";
     const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -646,6 +652,7 @@
       payPhone: document.getElementById("payPhone"),
       btnCopy: document.getElementById("btnCopy"),
       btnCall: document.getElementById("btnCall"),
+      btnPayNow: document.getElementById("btnPayNow"),
       btnPinInline: document.getElementById("btnPinInline"),
       btnCockpitInline: document.getElementById("btnCockpitInline"),
       howto: document.getElementById("howto")
@@ -739,6 +746,7 @@
       els.payName.textContent = "—";
       els.payPhone.textContent = "—";
       els.btnCall.href = "#";
+      els.btnPayNow.href = "#";
       els.btnCopy.textContent = "📋 Copier";
 
       els.btnPinTop.href = PIN_URL;
@@ -849,6 +857,24 @@
       return params.toString() ? (COCKPIT_URL + "?" + params.toString()) : COCKPIT_URL;
     }
 
+    function buildPayerUrl(row, code){
+      const params = new URLSearchParams();
+      const slug = pickSlug(row);
+      const phone = pickPhone(row);
+      const cleanedCode = normalizeCode(code);
+      const businessName = pickBusinessName(row, code);
+
+      params.set("module", "PAY");
+      params.set("base_module", "PAY");
+      params.set("public_label", businessName);
+      params.set("plan", "payment");
+      if (cleanedCode) params.set("code", cleanedCode);
+      if (phone) params.set("phone", phone);
+      if (slug) params.set("slug", slug);
+
+      return PAYER_URL + "?" + params.toString();
+    }
+
     function rowHasActiveSubscription(row){
       if (!row || typeof row !== "object") return false;
       return row?.is_active !== false;
@@ -896,6 +922,7 @@
       const phone = "+" + cleanPhone;
       const pinUrl = buildPinUrl(row, code);
       const cockpitUrl = buildCockpitUrl(row, code);
+      const payerUrl = buildPayerUrl(row, code);
 
       els.proName.textContent = businessName;
       els.proHint.textContent = "Paiement direct au professionnel • PAY actif";
@@ -903,6 +930,7 @@
       els.payName.textContent = businessName;
       els.payPhone.textContent = phone;
       els.btnCall.href = "tel:" + cleanPhone;
+      els.btnPayNow.href = payerUrl;
 
       els.btnPinTop.href = pinUrl;
       els.btnCockpitTop.href = cockpitUrl;
@@ -926,9 +954,12 @@
       };
 
       els.howto.innerHTML =
-        "👉 Ouvre ton moyen de paiement direct puis utilise le numéro <b>" + escapeHtml(phone) + "</b>" +
-        (code ? "<br><b>Code pro :</b> " + escapeHtml(code) : "") +
-        "<br><br>🔐 Côté professionnel, l’entrée protégée se fait par le PIN PAY.";
+        "💳 Étapes simples :<br><br>" +
+        "1️⃣ Ouvre Wave<br>" +
+        "2️⃣ Envoie au numéro : <b>" + escapeHtml(phone) + "</b><br>" +
+        "3️⃣ Clique sur <b>“Payer maintenant”</b> pour confirmer et envoyer la preuve<br><br>" +
+        (code ? "<b>Code pro :</b> " + escapeHtml(code) + "<br><br>" : "") +
+        "DIGIY ne garde pas l’argent.";
 
       show(els.howto, true);
       show(els.paybox, true);
