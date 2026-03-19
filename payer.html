@@ -333,21 +333,24 @@
           POS: "POS",
           POS_PRO: "POS",
           MON_COMMERCE: "POS",
+
           DRIVER: "DRIVER",
+
           LOC: "LOC",
-          RESTO: "RESTO",
+
+          JOB: "JOBS",
+          JOBS: "JOBS",
+          DIGIY_JOBS: "JOBS",
+
           RESA: "RESA",
           RESA_TABLE: "RESA",
           RESTO_RESA: "RESA",
+
           PAY: "PAY",
           MARKET: "MARKET",
           BUILD: "BUILD",
           MULTI_SERVICE: "BUILD",
           EXPLORE: "EXPLORE",
-          FRET_PRO: "FRET_PRO",
-          FRET_CHAUF: "FRET_PRO",
-          FRET_CLIENT: "FRET_CLIENT_PRO",
-          FRET_CLIENT_PRO: "FRET_CLIENT_PRO"
         };
         return alias[raw] || raw || "";
       }
@@ -359,13 +362,11 @@
           PAY: "MON ARGENT by DIGIY",
           DRIVER: "DRIVER AMBASSADEUR",
           LOC: "LOC",
-          RESTO: "RESTO",
+          JOBS: "DIGIY JOBS",
           RESA: "RÉSA MULTI-BUSINESS",
           MARKET: "MARKET",
           BUILD: "MULTI-SERVICE",
           EXPLORE: "EXPLORE",
-          FRET_PRO: "FRET PRO",
-          FRET_CLIENT_PRO: "FRET CLIENT"
         };
         return labels[mod] || mod || "—";
       }
@@ -377,13 +378,11 @@
           PAY: "pay",
           DRIVER: "driver",
           LOC: "loc",
+          JOBS: "jobs",
           RESA: "resa",
-          RESTO: "resto",
           MARKET: "market",
           BUILD: "build",
           EXPLORE: "explore",
-          FRET_PRO: "fret-pro",
-          FRET_CLIENT_PRO: "fret-client"
         };
         return map[m] || "digiy";
       }
