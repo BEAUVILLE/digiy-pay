@@ -236,36 +236,29 @@ window.DIGIY_PAY_PROOF_READY = true;
     };
   }
 
-  async function persistIfConfigured(payload) {
-    const rpcName = String(window.DIGIY_PAY_PROOF_RPC || "").trim();
-    const tableName = String(window.DIGIY_PAY_PROOF_TABLE || "").trim();
-
+  async function persist(payload) {
     if (!sb) {
       return { ok: false, skipped: true, mode: "no_supabase" };
     }
 
-    if (rpcName) {
-      const { data, error } = await sb.rpc(rpcName, { p_payload: payload });
-      if (error) return { ok: false, skipped: false, mode: "rpc", error: error.message || "rpc_failed" };
-      return { ok: true, skipped: false, mode: "rpc", data };
+    const rpcName = String(window.DIGIY_PAY_PROOF_RPC || "digiy_pay_public_proof_submit").trim();
+    const { data, error } = await sb.rpc(rpcName, { p_payload: payload });
+
+    if (error) {
+      return { ok: false, skipped: false, mode: "rpc", error: error.message || "rpc_failed" };
     }
 
-    if (tableName) {
-      const { data, error } = await sb.from(tableName).insert(payload).select().limit(1);
-      if (error) return { ok: false, skipped: false, mode: "table", error: error.message || "insert_failed" };
-      return { ok: true, skipped: false, mode: "table", data };
-    }
-
-    return { ok: false, skipped: true, mode: "no_backend_config" };
+    return { ok: true, skipped: false, mode: "rpc", data };
   }
 
   function saveLocal(payload) {
     try {
       localStorage.setItem(LAST_PROOF_KEY, JSON.stringify(payload));
+      sessionStorage.setItem(LAST_PROOF_KEY, JSON.stringify(payload));
       if (payload.ref) {
         localStorage.setItem(LAST_PROOF_BY_REF_PREFIX + payload.ref, JSON.stringify(payload));
+        sessionStorage.setItem(LAST_PROOF_BY_REF_PREFIX + payload.ref, JSON.stringify(payload));
       }
-      sessionStorage.setItem(LAST_PROOF_KEY, JSON.stringify(payload));
     } catch {}
   }
 
@@ -313,6 +306,7 @@ window.DIGIY_PAY_PROOF_READY = true;
       note_text: `Preuve publique DIGIY PAY ${st.code || ""}`.trim(),
       status: "pending_proof",
       created_at: new Date().toISOString(),
+      return_url: st.returnUrl || "",
       proof_file: getFileMeta(file)
     };
 
@@ -325,24 +319,23 @@ window.DIGIY_PAY_PROOF_READY = true;
         basePayload.proof_upload_error = upload.error || "upload_failed";
       }
 
+      saveLocal(basePayload);
       setMsg("Enregistrement de la preuve…", "muted");
 
-      const persist = await persistIfConfigured(basePayload);
+      const persistResult = await persist(basePayload);
 
-      basePayload.persist_mode = persist.mode || "";
-      basePayload.persisted = !!persist.ok;
-      if (persist.error) {
-        basePayload.persist_error = persist.error;
-      }
+      basePayload.persist_mode = persistResult.mode || "";
+      basePayload.persisted = !!persistResult.ok;
+      if (persistResult.error) basePayload.persist_error = persistResult.error;
 
       saveLocal(basePayload);
 
-      if (persist.ok) {
+      if (persistResult.ok) {
         setMsg("Preuve envoyée. Redirection…", "ok");
-      } else if (persist.skipped) {
+      } else if (persistResult.skipped) {
         setMsg("Preuve préparée localement. Redirection…", "ok");
       } else {
-        setMsg("Preuve préparée, mais écriture backend refusée. Redirection…", "bad");
+        setMsg("Preuve enregistrée localement, mais backend refusé. Redirection…", "bad");
       }
 
       setTimeout(() => {
