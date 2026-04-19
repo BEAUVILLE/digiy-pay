@@ -50,15 +50,33 @@
     .hr{height:1px;background:var(--line);margin:14px 0}
     .box{border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(0,0,0,.12)}
     .btn{
-      width:100%;min-height:50px;border-radius:16px;cursor:pointer;
-      border:1px solid rgba(34,197,94,.45);background:rgba(34,197,94,.10);color:var(--text);
-      padding:12px 14px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;
+      width:100%;
+      min-height:50px;
+      border-radius:16px;
+      cursor:pointer;
+      border:1px solid rgba(34,197,94,.45);
+      background:rgba(34,197,94,.10);
+      color:var(--text);
+      padding:12px 14px;
+      font-weight:900;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-family:inherit;
     }
     .btn.ghost{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04)}
     .btn.gold{border:1px solid rgba(250,204,21,.45);background:rgba(250,204,21,.10);color:#fde68a}
     .in{
-      width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.12);color:var(--text);font-size:15px;font-family:inherit;
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.12);
+      color:var(--text);
+      font-size:15px;
+      font-family:inherit;
     }
     .mono{font-family:ui-monospace, Menlo, Consolas, monospace}
     .msg{margin-top:10px;font-size:13px;white-space:pre-wrap;line-height:1.55;font-weight:800}
@@ -66,26 +84,66 @@
     .bad{color:var(--bad)}
     .muted{color:var(--muted)}
     .status{
-      padding:12px;border-radius:16px;border:1px solid rgba(250,204,21,.35);
-      background:rgba(250,204,21,.06);font-weight:800;color:#fff3bf;line-height:1.55;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(250,204,21,.35);
+      background:rgba(250,204,21,.06);
+      font-weight:800;
+      color:#fff3bf;
+      line-height:1.55;
     }
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     @media (max-width:640px){.grid{grid-template-columns:1fr}}
-    .label{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
-    .value{font-size:14px;font-weight:900;line-height:1.5;word-break:break-word}
+    .label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .value{
+      font-size:14px;
+      font-weight:900;
+      line-height:1.5;
+      word-break:break-word;
+    }
     .pill{
-      display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.12);font-size:12px;color:var(--muted);margin-top:6px;margin-right:6px;font-weight:900;
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.12);
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+      margin-right:6px;
+      font-weight:900;
     }
     .pill.gold{border-color:rgba(250,204,21,.45);color:#fde68a}
     .pill.ok{border-color:rgba(34,197,94,.45);color:#bbf7d0}
     .top-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .top-actions .btn{width:auto;min-height:42px;padding:10px 14px}
     .steps{
-      margin-top:12px;padding:14px;border-radius:16px;border:1px solid rgba(250,204,21,.22);
-      background:rgba(250,204,21,.08);color:#fef3c7;font-size:14px;line-height:1.65;font-weight:800;
+      margin-top:12px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(250,204,21,.22);
+      background:rgba(250,204,21,.08);
+      color:#fef3c7;
+      font-size:14px;
+      line-height:1.65;
+      font-weight:800;
     }
-    .foot{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.7;text-align:center;font-weight:800}
+    .foot{
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.7;
+      text-align:center;
+      font-weight:800;
+    }
   </style>
 </head>
 
@@ -254,7 +312,7 @@
       }
 
       function normPhone(v){
-        const raw = String(v || "").trim().replace(/[^\\d]/g, "");
+        const raw = String(v || "").trim().replace(/[^\d]/g, "");
         if(!raw) return "";
         if(raw.startsWith("221") && raw.length >= 12) return raw;
         if(raw.length === 9) return "221" + raw;
@@ -262,20 +320,34 @@
       }
 
       function normSlug(v){
-        return String(v || "").trim().toLowerCase().replace(/\\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+        return String(v || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
       }
 
       function normCode(v){
-        return String(v || "").trim().toUpperCase().replace(/\\s+/g, "").replace(/[^A-Z0-9_-]/g, "");
+        return String(v || "").trim().toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9_-]/g, "");
       }
 
       function normModuleRaw(v){
         const raw = String(v || "").trim().toUpperCase();
         const alias = {
-          CAISSE: "POS", CAISSE_BOUTIQUE: "POS", POS: "POS", POS_PRO: "POS", MON_COMMERCE: "POS",
-          DRIVER: "DRIVER", LOC: "LOC", JOB: "JOBS", JOBS: "JOBS", DIGIY_JOBS: "JOBS",
-          RESA: "RESA", RESA_TABLE: "RESA", RESTO_RESA: "RESA",
-          PAY: "PAY", MARKET: "MARKET", BUILD: "BUILD", MULTI_SERVICE: "BUILD", EXPLORE: "EXPLORE"
+          CAISSE: "POS",
+          CAISSE_BOUTIQUE: "POS",
+          POS: "POS",
+          POS_PRO: "POS",
+          MON_COMMERCE: "POS",
+          DRIVER: "DRIVER",
+          LOC: "LOC",
+          JOB: "JOBS",
+          JOBS: "JOBS",
+          DIGIY_JOBS: "JOBS",
+          RESA: "RESA",
+          RESA_TABLE: "RESA",
+          RESTO_RESA: "RESA",
+          PAY: "PAY",
+          MARKET: "MARKET",
+          BUILD: "BUILD",
+          MULTI_SERVICE: "BUILD",
+          EXPLORE: "EXPLORE"
         };
         return alias[raw] || raw || "";
       }
@@ -298,12 +370,22 @@
 
       function slugPrefixForModule(module){
         const m = normModuleRaw(module);
-        const map = { POS:"pos", PAY:"pay", DRIVER:"driver", LOC:"loc", JOBS:"jobs", RESA:"resa", MARKET:"market", BUILD:"build", EXPLORE:"explore" };
+        const map = {
+          POS:"pos",
+          PAY:"pay",
+          DRIVER:"driver",
+          LOC:"loc",
+          JOBS:"jobs",
+          RESA:"resa",
+          MARKET:"market",
+          BUILD:"build",
+          EXPLORE:"explore"
+        };
         return map[m] || "digiy";
       }
 
       function fmtFcfa(n){
-        const x = Number(String(n || "").replace(/[^\\d]/g, "") || 0);
+        const x = Number(String(n || "").replace(/[^\d]/g, "") || 0);
         return x ? x.toLocaleString("fr-FR") + " FCFA" : "—";
       }
 
@@ -353,13 +435,20 @@
         }catch(_){}
       }
 
+      function setInfo(message, kind){
+        const box = $("payMsg");
+        if(!box) return;
+        box.className = "msg " + (kind || "");
+        box.textContent = message || "";
+      }
+
       function getState(){
         return {
           module: normModuleRaw(q.get("base_module") || q.get("module") || ""),
           publicLabel: String(q.get("public_label") || "").trim(),
           plan: String(q.get("plan") || "").trim(),
           code: normCode(q.get("code") || ""),
-          amount: String($("payAmount")?.value || q.get("amount") || "").replace(/[^\\d]/g, ""),
+          amount: String($("payAmount")?.value || q.get("amount") || "").replace(/[^\d]/g, ""),
           phone: normPhone($("payPhone")?.value || resolvedPhone || q.get("phone") || ""),
           slug: normSlug($("paySlug")?.value || resolvedSlug || q.get("slug") || ""),
           returnUrl: safeUrl(q.get("return")) || ""
@@ -399,11 +488,16 @@
         $("btnBack").href = st.returnUrl || ("./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : ""));
       }
 
-      function setInfo(message, kind){
-        const box = $("payMsg");
-        if(!box) return;
-        box.className = "msg " + (kind || "");
-        box.textContent = message || "";
+      function refreshUiState(){
+        const st = getState();
+        renderRecap();
+
+        const currentMsg = $("payMsg")?.textContent || "";
+        const hasValidPhone = st.phone && st.phone.length >= 12;
+
+        if(hasValidPhone && /numéro Wave absent|Recherche du numéro Wave|Code trouvé, mais numéro Wave absent/i.test(currentMsg)){
+          setInfo("", "");
+        }
       }
 
       async function resolveByCode(){
@@ -415,7 +509,7 @@
           resolvedName = String(cached.business_name || "").trim();
           resolvedPhone = normPhone(cached.wave_phone || "");
           resolvedSlug = normSlug(cached.slug || "");
-          renderRecap();
+          refreshUiState();
           return;
         }
 
@@ -433,7 +527,7 @@
 
         if(error || !data){
           setInfo("Impossible de retrouver automatiquement le numéro Wave avec ce code.", "bad");
-          renderRecap();
+          refreshUiState();
           return;
         }
 
@@ -442,7 +536,7 @@
 
         if(!resolvedPhone){
           setInfo("Code trouvé, mais numéro Wave absent pour le moment.", "bad");
-          renderRecap();
+          refreshUiState();
           return;
         }
 
@@ -487,13 +581,16 @@
         });
 
         setInfo("Numéro Wave retrouvé automatiquement à partir du code.", "ok");
-        renderRecap();
+        refreshUiState();
       }
 
-      renderRecap();
-      $("payAmount")?.addEventListener("input", renderRecap);
-      $("payPhone")?.addEventListener("input", renderRecap);
-      $("paySlug")?.addEventListener("input", renderRecap);
+      refreshUiState();
+
+      ["input","change","blur"].forEach((evt) => {
+        $("payAmount")?.addEventListener(evt, refreshUiState);
+        $("payPhone")?.addEventListener(evt, refreshUiState);
+        $("paySlug")?.addEventListener(evt, refreshUiState);
+      });
 
       resolveByCode().catch((e) => {
         console.error("payer resolveByCode error", e);
@@ -503,6 +600,5 @@
   </script>
 
   <script src="./pay-proof.js?v=5"></script>
-
 </body>
 </html>
