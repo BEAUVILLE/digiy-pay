@@ -570,11 +570,10 @@
         .replace(/"/g, "&quot;");
     }
 
-    function show(el, on = true){
-      if (!el) return;
-      el.style.display = on ? "" : "none";
-    }
-
+   function show(el, on = true){
+  if (!el) return;
+  el.style.display = on ? "block" : "none";
+}
     function withTimeout(promise, ms, label = "timeout"){
       return Promise.race([
         promise,
