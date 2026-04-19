@@ -598,7 +598,16 @@
       });
     })();
   </script>
-
-  <script src="./pay-proof.js?v=5"></script>
+<script src="./pay-proof.js?v=7"></script>
+<script>
+  setTimeout(() => {
+    const msg = document.getElementById("payMsg");
+    if (!window.DIGIY_PAY_PROOF_READY && msg) {
+      msg.className = "msg bad";
+      msg.textContent = "Le moteur preuve n’est pas chargé. Vérifie pay-proof.js ou vide le cache.";
+    }
+  }, 400);
+</script>
+ 
 </body>
 </html>
