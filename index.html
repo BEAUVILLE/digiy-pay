@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="fr">
 <head>
@@ -69,7 +70,7 @@
       padding:10px 14px;
       border-radius:999px;
       text-decoration:none;
-      font-weight:950;
+      font-weight:900;
       font-size:14px;
       color:#e5e7eb;
       background:rgba(4,17,13,.82);
@@ -114,7 +115,7 @@
       background:linear-gradient(135deg,var(--green),var(--green2));
       color:#032215;
       font-size:28px;
-      font-weight:1000;
+      font-weight:900;
       box-shadow:var(--shadow);
     }
 
@@ -122,14 +123,14 @@
       margin:0;
       font-size:28px;
       line-height:1.08;
-      font-weight:1000;
+      font-weight:900;
       color:var(--gold);
     }
 
     .sub{
       margin-top:8px;
       color:var(--muted);
-      font-weight:850;
+      font-weight:800;
       line-height:1.55;
       font-size:14px;
     }
@@ -202,7 +203,7 @@
     }
     .nav-card strong{
       font-size:13px;
-      font-weight:1000;
+      font-weight:900;
       color:var(--gold);
       line-height:1.2;
     }
@@ -210,7 +211,7 @@
       font-size:11px;
       line-height:1.45;
       color:var(--muted);
-      font-weight:850;
+      font-weight:800;
     }
 
     .btn{
@@ -225,7 +226,7 @@
       border:1px solid var(--line);
       background:rgba(255,255,255,.03);
       color:var(--text);
-      font-weight:950;
+      font-weight:900;
       cursor:pointer;
       transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;
     }
@@ -248,7 +249,7 @@
     .name{
       margin-top:16px;
       font-size:24px;
-      font-weight:1000;
+      font-weight:900;
       color:var(--gold);
       text-align:center;
       padding:0 18px;
@@ -258,7 +259,7 @@
     .hint{
       margin-top:8px;
       color:var(--muted);
-      font-weight:850;
+      font-weight:800;
       font-size:13px;
       line-height:1.55;
       text-align:center;
@@ -279,7 +280,7 @@
       letter-spacing:.08em;
       text-transform:uppercase;
       color:#bbf7d0;
-      font-weight:1000;
+      font-weight:900;
     }
 
     .search-row{
@@ -351,13 +352,13 @@
       letter-spacing:.08em;
       text-transform:uppercase;
       color:#fde68a;
-      font-weight:1000;
+      font-weight:900;
       margin-bottom:8px;
     }
 
     .locked-text{
       color:#fef3c7;
-      font-weight:850;
+      font-weight:800;
       line-height:1.55;
       font-size:14px;
     }
@@ -381,7 +382,7 @@
     .lbl{
       font-size:12px;
       color:#bbf7d0;
-      font-weight:1000;
+      font-weight:900;
       letter-spacing:.08em;
       text-transform:uppercase;
     }
@@ -403,7 +404,7 @@
     .box .small{
       font-size:11px;
       color:var(--muted);
-      font-weight:1000;
+      font-weight:900;
       letter-spacing:.08em;
       text-transform:uppercase;
       margin-bottom:6px;
@@ -411,7 +412,7 @@
 
     .nm{
       font-size:22px;
-      font-weight:1000;
+      font-weight:900;
       color:var(--gold);
       word-break:break-word;
     }
@@ -424,7 +425,7 @@
       padding:8px 10px;
       border-radius:14px;
       font-size:18px;
-      font-weight:1000;
+      font-weight:900;
       color:#ecfdf5;
       word-break:break-word;
     }
@@ -440,7 +441,7 @@
       padding:16px 18px 20px;
       font-size:12px;
       color:var(--muted);
-      font-weight:850;
+      font-weight:800;
       text-align:center;
       line-height:1.7;
     }
@@ -599,6 +600,9 @@
     const SUBSCRIBE_BASE = "https://commencer-a-payer.digiylyfe.com/";
     const MODULE = "PAY";
     const CACHE_TTL_MS = 5 * 60 * 1000;
+    const FETCH_TIMEOUT_MS = 8000;
+    const SLOW_HINT_MS = 4000;
+    const PUBLIC_CTX_KEY = "DIGIY_PAY_PUBLIC_CTX";
 
     const SUPABASE_URL =
       window.DIGIY_SUPABASE_URL ||
@@ -703,6 +707,71 @@
         .replace(/"/g, "&quot;");
     }
 
+    function withTimeout(promise, ms, label = "timeout"){
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error(label)), ms);
+        })
+      ]);
+    }
+
+    function queryWithTimeout(query, label){
+      return withTimeout(query, FETCH_TIMEOUT_MS, label || "timeout");
+    }
+
+    function storePrivateRouteContext(row, code){
+      try{
+        const payload = {
+          module: MODULE,
+          code: normalizeCode(code),
+          slug: pickSlug(row),
+          phone: pickPhone(row),
+          business_name: pickBusinessName(row, code),
+          ts: Date.now()
+        };
+
+        sessionStorage.setItem(PUBLIC_CTX_KEY, JSON.stringify(payload));
+      }catch(_){}
+    }
+
+    function clearPrivateRouteContext(){
+      try{
+        sessionStorage.removeItem(PUBLIC_CTX_KEY);
+      }catch(_){}
+    }
+
+    async function copyTextSafe(text){
+      const value = String(text || "");
+      if (!value) return false;
+
+      if (navigator.clipboard?.writeText){
+        try{
+          await navigator.clipboard.writeText(value);
+          return true;
+        }catch(_){}
+      }
+
+      try{
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = value;
+        input.setAttribute("readonly", "");
+        input.style.position = "fixed";
+        input.style.left = "-9999px";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+        const ok = document.execCommand("copy");
+        input.remove();
+        return !!ok;
+      }catch(_){
+        return false;
+      }
+    }
+
     function cacheKey(code){
       return "digiy_pay_public_" + normalizeCode(code);
     }
@@ -741,6 +810,7 @@
 
     function setNeutral(){
       clearUi();
+      clearPrivateRouteContext();
       els.proName.textContent = "MON ARGENT by DIGIY";
       els.proHint.textContent = "Scanne un QR ou entre un code pro actif pour afficher la carte de paiement.";
       els.payName.textContent = "—";
@@ -834,11 +904,9 @@
     function buildPinUrl(row, code){
       const params = new URLSearchParams();
       const slug = pickSlug(row);
-      const phone = pickPhone(row);
       const cleanedCode = normalizeCode(code);
 
       if (slug) params.set("slug", slug);
-      if (phone) params.set("phone", phone);
       if (cleanedCode) params.set("code", cleanedCode);
 
       return params.toString() ? (PIN_URL + "?" + params.toString()) : PIN_URL;
@@ -847,11 +915,9 @@
     function buildCockpitUrl(row, code){
       const params = new URLSearchParams();
       const slug = pickSlug(row);
-      const phone = pickPhone(row);
       const cleanedCode = normalizeCode(code);
 
       if (slug) params.set("slug", slug);
-      if (phone) params.set("phone", phone);
       if (cleanedCode) params.set("code", cleanedCode);
 
       return params.toString() ? (COCKPIT_URL + "?" + params.toString()) : COCKPIT_URL;
@@ -881,6 +947,8 @@
     }
 
     function showLocked(row, code){
+      storePrivateRouteContext(row, code);
+
       const businessName = pickBusinessName(row, code);
       const subscribeUrl = buildSubscribeUrl(row, code);
       const pinUrl = buildPinUrl(row, code);
@@ -911,6 +979,8 @@
     }
 
     function showPayCard(row, code){
+      storePrivateRouteContext(row, code);
+
       const businessName = pickBusinessName(row, code);
       const cleanPhone = pickPhone(row);
 
@@ -942,21 +1012,27 @@
 
       els.btnCopy.onclick = async () => {
         const original = els.btnCopy.textContent;
-        try{
-          await navigator.clipboard.writeText(phone);
+        const copied = await copyTextSafe(phone);
+
+        if (copied){
           els.btnCopy.textContent = "✅ Copié";
           setTimeout(() => {
             els.btnCopy.textContent = original;
           }, 1400);
-        }catch(_){
-          window.prompt("Copie :", phone);
+          return;
         }
+
+        els.btnCopy.textContent = "📋 Numéro affiché";
+        showMsg("Numéro à copier : " + phone);
+        setTimeout(() => {
+          els.btnCopy.textContent = original;
+        }, 1800);
       };
 
       els.howto.innerHTML =
         "💳 Étapes simples :<br><br>" +
         "1️⃣ Ouvre Wave<br>" +
-        "2️⃣ Envoie au numéro : <b>" + escapeHtml(phone) + "</b><br>" +
+        "2️⃣ Envoie au numéro : <b>" + phone + "</b><br>" +
         "3️⃣ Clique sur <b>“Payer maintenant”</b> pour confirmer et envoyer la preuve<br><br>" +
         (code ? "<b>Code pro :</b> " + escapeHtml(code) + "<br><br>" : "") +
         "DIGIY ne garde pas l’argent.";
@@ -975,12 +1051,15 @@
       const tries = [cleaned];
 
       for (const candidate of tries){
-        const { data, error } = await sb
-          .from("digiy_pay_pro")
-          .select("business_name,business_code,wave_phone,is_active")
-          .eq("business_code", candidate)
-          .limit(1)
-          .maybeSingle();
+        const { data, error } = await queryWithTimeout(
+          sb
+            .from("digiy_pay_pro")
+            .select("business_name,business_code,wave_phone,is_active")
+            .eq("business_code", candidate)
+            .limit(1)
+            .maybeSingle(),
+          "pay_public_lookup_timeout"
+        );
 
         if (!error && data){
           const row = {
@@ -991,28 +1070,36 @@
           const phoneDigits = pickPhone(row);
           if (phoneDigits){
             try{
-              const sub = await sb
-                .from("digiy_subscriptions_public")
-                .select("phone,slug,module")
-                .eq("phone", phoneDigits)
-                .eq("module", "PAY")
-                .limit(1)
-                .maybeSingle();
+              const [sub, subPlus] = await Promise.allSettled([
+                queryWithTimeout(
+                  sb
+                    .from("digiy_subscriptions_public")
+                    .select("phone,slug,module")
+                    .eq("phone", phoneDigits)
+                    .eq("module", "PAY")
+                    .limit(1)
+                    .maybeSingle(),
+                  "pay_subscription_lookup_timeout"
+                ),
+                queryWithTimeout(
+                  sb
+                    .from("digiy_subscriptions_public")
+                    .select("phone,slug,module")
+                    .eq("phone", "+" + phoneDigits)
+                    .eq("module", "PAY")
+                    .limit(1)
+                    .maybeSingle(),
+                  "pay_subscription_lookup_timeout"
+                )
+              ]);
 
-              if (!sub.error && sub.data?.slug){
-                row.slug = normalizeSlug(sub.data.slug);
-              } else {
-                const subPlus = await sb
-                  .from("digiy_subscriptions_public")
-                  .select("phone,slug,module")
-                  .eq("phone", "+" + phoneDigits)
-                  .eq("module", "PAY")
-                  .limit(1)
-                  .maybeSingle();
+              const first = sub.status === "fulfilled" ? sub.value : null;
+              const second = subPlus.status === "fulfilled" ? subPlus.value : null;
 
-                if (!subPlus.error && subPlus.data?.slug){
-                  row.slug = normalizeSlug(subPlus.data.slug);
-                }
+              if (!first?.error && first?.data?.slug){
+                row.slug = normalizeSlug(first.data.slug);
+              } else if (!second?.error && second?.data?.slug){
+                row.slug = normalizeSlug(second.data.slug);
               }
             }catch(_){}
           }
@@ -1028,6 +1115,7 @@
     async function loadByCode(rawCode){
       const cleaned = normalizeCode(rawCode);
       clearUi();
+      clearPrivateRouteContext();
       els.codeInput.value = cleaned;
       updateUrlCode(cleaned);
 
@@ -1037,10 +1125,20 @@
         return;
       }
 
+      let slowTimer = null;
+
       try{
         showMsg("Chargement du professionnel…");
+        slowTimer = setTimeout(() => {
+          showMsg("Chargement lent… réseau terrain en cours.");
+        }, SLOW_HINT_MS);
 
         const row = await fetchDirectByCode(cleaned);
+
+        if (slowTimer){
+          clearTimeout(slowTimer);
+          slowTimer = null;
+        }
         showMsg("");
 
         if (!row){
@@ -1072,10 +1170,20 @@
 
         showPayCard(row, cleaned);
       }catch(e){
+        if (slowTimer){
+          clearTimeout(slowTimer);
+          slowTimer = null;
+        }
+
         console.error("DIGIY PAY public load error:", e);
         els.proName.textContent = "Service indisponible";
         els.proHint.textContent = "Impossible de charger ce professionnel pour le moment.";
-        showErr("Erreur de chargement. Réessaie plus tard.");
+
+        if (String(e?.message || "").includes("timeout")){
+          showErr("Chargement trop long. Réseau lent ou indisponible. Réessaie dans un instant.");
+        } else {
+          showErr("Erreur de chargement. Réessaie plus tard.");
+        }
       }
     }
 
