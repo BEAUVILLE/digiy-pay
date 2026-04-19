@@ -45,7 +45,7 @@
     h1{
       margin:0;
       font-size:18px;
-      font-weight:1100;
+      font-weight:900;
     }
     p{
       margin:8px 0 0;
@@ -61,7 +61,7 @@
       padding:12px;
       border-radius:16px;
       border:1px solid var(--line);
-      font-weight:1100;
+      font-weight:900;
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -92,7 +92,7 @@
       background:rgba(0,0,0,.10);
       color:var(--text);
       padding:12px 14px;
-      font-weight:1100;
+      font-weight:900;
     }
     .btn:disabled{
       opacity:.6;
@@ -134,7 +134,7 @@
     }
     .value{
       font-size:14px;
-      font-weight:1000;
+      font-weight:900;
       line-height:1.4;
       word-break:break-word;
     }
@@ -159,7 +159,7 @@
 
       <div class="flow">
         Parcours actif :
-        <span class="mono">commencer-a-payer → payer.html → wait.html → destination finale</span>
+        <span class="mono">carte publique DIGIY → payer.html → wait.html → destination finale</span>
       </div>
 
       <div class="hr"></div>
@@ -236,6 +236,8 @@
     const SUPPORT_WA = "+221771342889";
     const MAX_TRIES = 150;
     const DELAY_MS = 2000;
+    const LOCAL_KEY = "DIGIY_PAY_LAST_PROOF";
+    const LOCAL_REF_PREFIX = "DIGIY_PAY_PROOF_REF_";
 
     const MODULE_URLS = {
       DRIVER: "https://beauville.github.io/digiy-driver/?slug=",
@@ -396,18 +398,42 @@
       ).trim();
     }
 
-    function getUrlState(data){
+    function readLocalPayload(){
+      try{
+        const byRef = localStorage.getItem(LOCAL_REF_PREFIX + ref) || sessionStorage.getItem(LOCAL_REF_PREFIX + ref);
+        if(byRef){
+          const parsed = JSON.parse(byRef);
+          if(parsed && typeof parsed === "object") return parsed;
+        }
+      }catch(_){}
+
+      try{
+        const raw = localStorage.getItem(LOCAL_KEY) || sessionStorage.getItem(LOCAL_KEY);
+        if(!raw) return null;
+        const parsed = JSON.parse(raw);
+        if(parsed && typeof parsed === "object" && String(parsed.ref || "").trim() === ref){
+          return parsed;
+        }
+      }catch(_){}
+
+      return null;
+    }
+
+    function getState(data){
+      const local = readLocalPayload() || {};
+
       return {
-        module: normalizeModule(data?.module || qp.get("module") || qp.get("base_module") || ""),
-        publicLabel: getPublicLabel(data),
-        plan: String(data?.plan || qp.get("plan") || "").trim(),
-        boost: String(data?.boost_code || qp.get("boost_code") || qp.get("boost") || "").trim(),
-        phone: displayPhone(data?.phone || data?.pro_phone || qp.get("phone") || ""),
-        slug: normalizeSlug(data?.slug || qp.get("slug") || ""),
-        amount: fmtFcfa(data?.amount || qp.get("amount") || ""),
-        url: safeRedirectUrl(data?.url || data?.redirect_url || ""),
-        returnUrl: safeRedirectUrl(data?.return_url || qp.get("return") || ""),
-        ref: ref
+        ref: ref,
+        module: normalizeModule(data?.module || local.module || qp.get("module") || qp.get("base_module") || ""),
+        publicLabel: getPublicLabel(data) || String(local.public_label || "").trim(),
+        plan: String(data?.plan || local.plan || qp.get("plan") || "").trim(),
+        boost: String(data?.boost_code || local.boost_code || qp.get("boost_code") || qp.get("boost") || "").trim(),
+        phone: displayPhone(data?.phone || data?.pro_phone || local.phone || qp.get("phone") || ""),
+        slug: normalizeSlug(data?.slug || local.slug || qp.get("slug") || ""),
+        amount: fmtFcfa(data?.amount || data?.amount_xof || local.amount || local.amount_xof || qp.get("amount") || ""),
+        url: safeRedirectUrl(data?.url || data?.redirect_url || local.url || local.redirect_url || ""),
+        returnUrl: safeRedirectUrl(data?.return_url || local.returnUrl || qp.get("return") || ""),
+        status: String(data?.status || local.status || qp.get("status") || "").trim().toLowerCase()
       };
     }
 
@@ -422,10 +448,11 @@
     }
 
     function hydrateFromData(data){
-      const st = getUrlState(data);
+      const st = getState(data);
       const modDisplay = displayModule(st.module, st.publicLabel);
       const finalUrl = resolveFinalUrl(st);
 
+      setField("refBox", st.ref || "—");
       setField("moduleBox", modDisplay);
       setField("planBox", st.plan || "—");
       setField("boostBox", st.module === "PAY" ? "—" : (st.boost || "—"));
@@ -443,13 +470,14 @@
         phone: st.phone,
         slug: st.slug,
         amount: st.amount,
+        status: st.status,
         finalUrl
       };
     }
 
     function isConfirmedStatus(raw){
       const s = String(raw || "").trim().toLowerCase();
-      return ["active","confirmed","validated","paid","approved","ok","success"].includes(s);
+      return ["active","confirmed","validated","paid","approved","ok","success","posted"].includes(s);
     }
 
     function isRejectedStatus(raw){
@@ -459,7 +487,7 @@
 
     function isPendingStatus(raw){
       const s = String(raw || "").trim().toLowerCase();
-      return ["pending","processing","review","waiting","queued","hold","manual_review"].includes(s);
+      return ["pending","processing","review","waiting","queued","hold","manual_review","pending_proof"].includes(s);
     }
 
     const SUPABASE_URL = (window.DIGIY_SUPABASE_URL || "").trim();
@@ -474,7 +502,6 @@
       return;
     }
 
-    $("refBox").textContent = ref;
     hydrateFromData({});
 
     if(!window.supabase){
@@ -505,8 +532,14 @@
       stopRequested = false;
       $("btnRetry").disabled = true;
 
-      setText("⏳ Validation en cours…");
-      setTag("warn","EN COURS");
+      const local = readLocalPayload();
+      if(local){
+        setText("🧾 Preuve reçue. Vérification backend en cours…");
+        setTag("gold","PREUVE");
+      } else {
+        setText("⏳ Validation en cours…");
+        setTag("warn","EN COURS");
+      }
 
       try{
         while(tries < MAX_TRIES && !stopRequested){
@@ -518,8 +551,14 @@
             const status = String(data?.status || "").trim().toLowerCase();
 
             if(!data?.ok){
-              setText("⏳ Paiement pas encore confirmé… (" + tries + "/" + MAX_TRIES + ")");
-              setTag("warn","PENDING");
+              const localPayload = readLocalPayload();
+              if(localPayload){
+                setText("🧾 Preuve enregistrée localement… en attente de validation (" + tries + "/" + MAX_TRIES + ")");
+                setTag("gold","PREUVE");
+              } else {
+                setText("⏳ Paiement pas encore confirmé… (" + tries + "/" + MAX_TRIES + ")");
+                setTag("warn","PENDING");
+              }
             } else if(isConfirmedStatus(status || "active")){
               const finalUrl = hydrated.finalUrl;
 
@@ -531,7 +570,7 @@
                 return;
               }
 
-              setText("✅ Confirmé mais URL manquante. Contacte support.");
+              setText("✅ Confirmé mais URL finale manquante. Contacte support.");
               setTag("bad","URL ?");
               return;
             } else if(isRejectedStatus(status)){
@@ -539,8 +578,14 @@
               setTag("bad","REFUSÉ");
               return;
             } else if(isPendingStatus(status) || !status){
-              setText("⏳ En attente… (" + tries + "/" + MAX_TRIES + ")");
-              setTag("warn","PENDING");
+              const localPayload = readLocalPayload();
+              if(localPayload){
+                setText("🧾 Preuve reçue. Validation manuelle en attente… (" + tries + "/" + MAX_TRIES + ")");
+                setTag("gold","PREUVE");
+              } else {
+                setText("⏳ En attente… (" + tries + "/" + MAX_TRIES + ")");
+                setTag("warn","PENDING");
+              }
             } else {
               setText("⏳ Statut reçu : " + status + " (" + tries + "/" + MAX_TRIES + ")");
               setTag("warn","EN ATTENTE");
@@ -549,7 +594,13 @@
           } catch(e){
             console.error("WAIT RPC error:", e);
 
-            if(tries <= 3){
+            const localPayload = readLocalPayload();
+            hydrateFromData({});
+
+            if(localPayload){
+              setText("🧾 Preuve reçue. Backend encore en attente… nouvelle tentative.");
+              setTag("gold","PREUVE");
+            } else if(tries <= 3){
               setText("⏳ Vérification réseau… nouvelle tentative.");
               setTag("warn","RETRY");
             } else {
@@ -562,8 +613,14 @@
         }
 
         if(!stopRequested){
-          setText("⏳ Toujours en attente. Contacte le support si besoin.");
-          setTag("warn","ATTENTE");
+          const localPayload = readLocalPayload();
+          if(localPayload){
+            setText("🧾 Preuve reçue, mais validation toujours en attente. Contacte le support si besoin.");
+            setTag("gold","PREUVE");
+          } else {
+            setText("⏳ Toujours en attente. Contacte le support si besoin.");
+            setTag("warn","ATTENTE");
+          }
         }
 
       } finally {
@@ -582,12 +639,13 @@
     $("btnSupport").addEventListener("click", ()=>{
       wa(
         "DIGIY — Support validation\n\n" +
-        "Référence: " + ref + "\n" +
+        "Référence: " + $("refBox").textContent + "\n" +
         "Module: " + $("moduleBox").textContent + "\n" +
         "Plan: " + $("planBox").textContent + "\n" +
         "Boost: " + $("boostBox").textContent + "\n" +
         "Slug: " + $("slugBox").textContent + "\n" +
         "Téléphone: " + $("phoneBox").textContent + "\n" +
+        "Montant: " + $("amountBox").textContent + "\n" +
         "Merci de vérifier et confirmer si OK."
       );
     });
