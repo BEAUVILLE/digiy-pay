@@ -1,6 +1,6 @@
-from pathlib import Path
+window.DIGIY_PAY_PROOF_READY = true;
 
-js = r"""(() => {
+(() => {
   "use strict";
 
   const WAIT_URL = "./wait.html";
@@ -18,7 +18,7 @@ js = r"""(() => {
     proofFile: document.getElementById("proofFile"),
     btnSendProof: document.getElementById("btnSendProof"),
     payMsg: document.getElementById("payMsg"),
-    btnBack: document.getElementById("btnBack"),
+    btnBack: document.getElementById("btnBack")
   };
 
   const SUPABASE_URL =
@@ -40,9 +40,9 @@ js = r"""(() => {
             storage: {
               getItem: () => null,
               setItem: () => {},
-              removeItem: () => {},
-            },
-          },
+              removeItem: () => {}
+            }
+          }
         })
       : null;
 
@@ -96,7 +96,7 @@ js = r"""(() => {
       MARKET: "MARKET",
       BUILD: "BUILD",
       MULTI_SERVICE: "BUILD",
-      EXPLORE: "EXPLORE",
+      EXPLORE: "EXPLORE"
     };
     return alias[raw] || raw || DEFAULT_MODULE;
   }
@@ -136,7 +136,7 @@ js = r"""(() => {
       name: file.name || "",
       size: Number(file.size || 0),
       type: file.type || "",
-      last_modified: file.lastModified || null,
+      last_modified: file.lastModified || null
     };
   }
 
@@ -167,7 +167,7 @@ js = r"""(() => {
       phone,
       slug,
       plan: String(q.get("plan") || "payment").trim() || "payment",
-      returnUrl,
+      returnUrl
     };
   }
 
@@ -214,7 +214,7 @@ js = r"""(() => {
     const { error } = await sb.storage.from(bucket).upload(path, file, {
       upsert: true,
       cacheControl: "3600",
-      contentType: file.type || "image/jpeg",
+      contentType: file.type || "image/jpeg"
     });
 
     if (error) {
@@ -223,7 +223,7 @@ js = r"""(() => {
         skipped: false,
         error: error.message || "storage_upload_failed",
         proof_path: "",
-        proof_url: "",
+        proof_url: ""
       };
     }
 
@@ -232,7 +232,7 @@ js = r"""(() => {
       ok: true,
       skipped: false,
       proof_path: path,
-      proof_url: pub?.data?.publicUrl || "",
+      proof_url: pub?.data?.publicUrl || ""
     };
   }
 
@@ -313,7 +313,7 @@ js = r"""(() => {
       note_text: `Preuve publique DIGIY PAY ${st.code || ""}`.trim(),
       status: "pending_proof",
       created_at: new Date().toISOString(),
-      proof_file: getFileMeta(file),
+      proof_file: getFileMeta(file)
     };
 
     try {
@@ -365,9 +365,4 @@ js = r"""(() => {
   if (!sb) {
     setMsg("Supabase indisponible. La preuve sera préparée localement si tu continues.", "bad");
   }
-})();"""
-
-path = Path("/mnt/data/pay-proof.js")
-path.write_text(js, encoding="utf-8")
-print(path)
-
+})();
