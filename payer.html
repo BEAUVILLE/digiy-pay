@@ -23,10 +23,8 @@
       --text:#eafff1;
       --muted:rgba(234,255,241,.75);
       --ok:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
       --gold:#facc15;
-      --radius:18px;
+      --bad:#ef4444;
       --shadow:0 18px 50px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
@@ -39,11 +37,7 @@
         linear-gradient(180deg, #04110d, #061b14 55%, #04110d);
       color:var(--text);
     }
-    .wrap{
-      max-width:760px;
-      margin:0 auto;
-      padding:16px;
-    }
+    .wrap{max-width:760px;margin:0 auto;padding:16px}
     .card{
       background:linear-gradient(180deg, rgba(11,42,31,.98), rgba(8,29,21,.98));
       border:1px solid var(--line);
@@ -51,176 +45,47 @@
       padding:16px;
       box-shadow:var(--shadow);
     }
-    h1{
-      margin:0;
-      font-size:22px;
-      font-weight:900;
-      color:var(--gold);
-      line-height:1.15;
-    }
-    p{
-      margin:8px 0 0;
-      color:var(--muted);
-      line-height:1.5;
-      font-weight:700;
-    }
-    .hr{
-      height:1px;
-      background:var(--line);
-      margin:14px 0;
-    }
-    .box{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      background:rgba(0,0,0,.12);
-    }
+    h1{margin:0;font-size:22px;font-weight:900;color:var(--gold);line-height:1.15}
+    p{margin:8px 0 0;color:var(--muted);line-height:1.5;font-weight:700}
+    .hr{height:1px;background:var(--line);margin:14px 0}
+    .box{border:1px solid var(--line);border-radius:18px;padding:14px;background:rgba(0,0,0,.12)}
     .btn{
-      width:100%;
-      min-height:50px;
-      border-radius:16px;
-      cursor:pointer;
-      border:1px solid rgba(34,197,94,.45);
-      background:rgba(34,197,94,.10);
-      color:var(--text);
-      padding:12px 14px;
-      font-weight:900;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      font-family:inherit;
-      transition:transform .15s ease,opacity .15s ease;
+      width:100%;min-height:50px;border-radius:16px;cursor:pointer;
+      border:1px solid rgba(34,197,94,.45);background:rgba(34,197,94,.10);color:var(--text);
+      padding:12px 14px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;
     }
-    .btn:hover{ transform:translateY(-1px); }
-    .btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-    }
-    .btn.ghost{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.04);
-    }
-    .btn.gold{
-      border:1px solid rgba(250,204,21,.45);
-      background:rgba(250,204,21,.10);
-      color:#fde68a;
-    }
+    .btn.ghost{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04)}
+    .btn.gold{border:1px solid rgba(250,204,21,.45);background:rgba(250,204,21,.10);color:#fde68a}
     .in{
-      width:100%;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.12);
-      color:var(--text);
-      font-size:15px;
-      font-family:inherit;
+      width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.12);color:var(--text);font-size:15px;font-family:inherit;
     }
-    .in::placeholder{ color:rgba(234,255,241,.42); }
-    .mono{
-      font-family:ui-monospace, Menlo, Consolas, monospace;
-    }
-    .msg{
-      margin-top:10px;
-      font-size:13px;
-      white-space:pre-wrap;
-      line-height:1.55;
-      font-weight:800;
-    }
-    .ok{ color:var(--ok); }
-    .bad{ color:var(--bad); }
-    .muted{ color:var(--muted); }
-
+    .mono{font-family:ui-monospace, Menlo, Consolas, monospace}
+    .msg{margin-top:10px;font-size:13px;white-space:pre-wrap;line-height:1.55;font-weight:800}
+    .ok{color:var(--ok)}
+    .bad{color:var(--bad)}
+    .muted{color:var(--muted)}
     .status{
-      padding:12px;
-      border-radius:16px;
-      border:1px solid rgba(250,204,21,.35);
-      background:rgba(250,204,21,.06);
-      font-weight:800;
-      color:#fff3bf;
-      line-height:1.55;
+      padding:12px;border-radius:16px;border:1px solid rgba(250,204,21,.35);
+      background:rgba(250,204,21,.06);font-weight:800;color:#fff3bf;line-height:1.55;
     }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width:640px){
-      .grid{ grid-template-columns:1fr; }
-    }
-
-    .label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:900;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-
-    .value{
-      font-size:14px;
-      font-weight:900;
-      line-height:1.5;
-      word-break:break-word;
-    }
-
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:640px){.grid{grid-template-columns:1fr}}
+    .label{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+    .value{font-size:14px;font-weight:900;line-height:1.5;word-break:break-word}
     .pill{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.12);
-      font-size:12px;
-      color:var(--muted);
-      margin-top:6px;
-      margin-right:6px;
-      font-weight:900;
+      display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.12);font-size:12px;color:var(--muted);margin-top:6px;margin-right:6px;font-weight:900;
     }
-    .pill.gold{
-      border-color:rgba(250,204,21,.45);
-      color:#fde68a;
-    }
-    .pill.ok{
-      border-color:rgba(34,197,94,.45);
-      color:#bbf7d0;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-    .top-actions .btn{
-      width:auto;
-      min-height:42px;
-      padding:10px 14px;
-    }
-
+    .pill.gold{border-color:rgba(250,204,21,.45);color:#fde68a}
+    .pill.ok{border-color:rgba(34,197,94,.45);color:#bbf7d0}
+    .top-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .top-actions .btn{width:auto;min-height:42px;padding:10px 14px}
     .steps{
-      margin-top:12px;
-      padding:14px;
-      border-radius:16px;
-      border:1px solid rgba(250,204,21,.22);
-      background:rgba(250,204,21,.08);
-      color:#fef3c7;
-      font-size:14px;
-      line-height:1.65;
-      font-weight:800;
+      margin-top:12px;padding:14px;border-radius:16px;border:1px solid rgba(250,204,21,.22);
+      background:rgba(250,204,21,.08);color:#fef3c7;font-size:14px;line-height:1.65;font-weight:800;
     }
-
-    .foot{
-      margin-top:14px;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.7;
-      text-align:center;
-      font-weight:800;
-    }
+    .foot{margin-top:14px;font-size:12px;color:var(--muted);line-height:1.7;text-align:center;font-weight:800}
   </style>
 </head>
 
@@ -239,7 +104,7 @@
       <div class="hr"></div>
 
       <div class="status" id="flowInfo">
-        Parcours : <span class="mono">carte publique DIGIY → confirmation → preuve → attente de traitement</span>
+        Parcours : <span class="mono">carte publique DIGIY → preuve → attente de traitement</span>
       </div>
 
       <div class="hr"></div>
@@ -341,8 +206,40 @@
     (function(){
       "use strict";
 
+      const FETCH_TIMEOUT_MS = 8000;
+      const MODULE = "PAY";
+      const CACHE_TTL_MS = 5 * 60 * 1000;
+
+      const SUPABASE_URL =
+        window.DIGIY_SUPABASE_URL ||
+        "https://wesqmwjjtsefyjnluosj.supabase.co";
+
+      const SUPABASE_ANON_KEY =
+        window.DIGIY_SUPABASE_ANON_KEY ||
+        window.DIGIY_SUPABASE_ANON ||
+        "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
+
+      const sb = window.supabase?.createClient
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false,
+              storage: {
+                getItem: () => null,
+                setItem: () => {},
+                removeItem: () => {}
+              }
+            }
+          })
+        : null;
+
       const $ = (id) => document.getElementById(id);
       const q = new URLSearchParams(location.search);
+
+      let resolvedName = "";
+      let resolvedPhone = "";
+      let resolvedSlug = "";
 
       function safeUrl(raw){
         const value = String(raw || "").trim();
@@ -357,48 +254,28 @@
       }
 
       function normPhone(v){
-        return String(v || "").trim().replace(/[^\\d]/g, "");
+        const raw = String(v || "").trim().replace(/[^\\d]/g, "");
+        if(!raw) return "";
+        if(raw.startsWith("221") && raw.length >= 12) return raw;
+        if(raw.length === 9) return "221" + raw;
+        return raw;
       }
 
       function normSlug(v){
-        return String(v || "")
-          .trim()
-          .toLowerCase()
-          .replace(/\\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "")
-          .replace(/-+/g, "-")
-          .replace(/^-|-$/g, "");
+        return String(v || "").trim().toLowerCase().replace(/\\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
       }
 
       function normCode(v){
-        return String(v || "")
-          .trim()
-          .toUpperCase()
-          .replace(/\\s+/g, "")
-          .replace(/[^A-Z0-9_-]/g, "");
+        return String(v || "").trim().toUpperCase().replace(/\\s+/g, "").replace(/[^A-Z0-9_-]/g, "");
       }
 
       function normModuleRaw(v){
         const raw = String(v || "").trim().toUpperCase();
         const alias = {
-          CAISSE: "POS",
-          CAISSE_BOUTIQUE: "POS",
-          POS: "POS",
-          POS_PRO: "POS",
-          MON_COMMERCE: "POS",
-          DRIVER: "DRIVER",
-          LOC: "LOC",
-          JOB: "JOBS",
-          JOBS: "JOBS",
-          DIGIY_JOBS: "JOBS",
-          RESA: "RESA",
-          RESA_TABLE: "RESA",
-          RESTO_RESA: "RESA",
-          PAY: "PAY",
-          MARKET: "MARKET",
-          BUILD: "BUILD",
-          MULTI_SERVICE: "BUILD",
-          EXPLORE: "EXPLORE",
+          CAISSE: "POS", CAISSE_BOUTIQUE: "POS", POS: "POS", POS_PRO: "POS", MON_COMMERCE: "POS",
+          DRIVER: "DRIVER", LOC: "LOC", JOB: "JOBS", JOBS: "JOBS", DIGIY_JOBS: "JOBS",
+          RESA: "RESA", RESA_TABLE: "RESA", RESTO_RESA: "RESA",
+          PAY: "PAY", MARKET: "MARKET", BUILD: "BUILD", MULTI_SERVICE: "BUILD", EXPLORE: "EXPLORE"
         };
         return alias[raw] || raw || "";
       }
@@ -414,24 +291,14 @@
           RESA: "JE RÉSERVE",
           MARKET: "JE VENDS",
           BUILD: "JE PROPOSE MES SERVICES",
-          EXPLORE: "JE FAIS DÉCOUVRIR MON LIEU",
+          EXPLORE: "JE FAIS DÉCOUVRIR MON LIEU"
         };
         return labels[mod] || mod || "—";
       }
 
       function slugPrefixForModule(module){
         const m = normModuleRaw(module);
-        const map = {
-          POS: "pos",
-          PAY: "pay",
-          DRIVER: "driver",
-          LOC: "loc",
-          JOBS: "jobs",
-          RESA: "resa",
-          MARKET: "market",
-          BUILD: "build",
-          EXPLORE: "explore",
-        };
+        const map = { POS:"pos", PAY:"pay", DRIVER:"driver", LOC:"loc", JOBS:"jobs", RESA:"resa", MARKET:"market", BUILD:"build", EXPLORE:"explore" };
         return map[m] || "digiy";
       }
 
@@ -456,26 +323,52 @@
         return slugPrefixForModule(module) + "-" + cleanPhone;
       }
 
+      function withTimeout(promise, ms, label){
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error(label || "timeout")), ms))
+        ]);
+      }
+
+      function cacheKey(code){
+        return "digiy_pay_public_resolve_" + normCode(code);
+      }
+
+      function readCache(code){
+        try{
+          const raw = localStorage.getItem(cacheKey(code));
+          if(!raw) return null;
+          const parsed = JSON.parse(raw);
+          if(!parsed || !parsed.ts || !parsed.data) return null;
+          if((Date.now() - parsed.ts) > CACHE_TTL_MS) return null;
+          return parsed.data;
+        }catch(_){
+          return null;
+        }
+      }
+
+      function saveCache(code, data){
+        try{
+          localStorage.setItem(cacheKey(code), JSON.stringify({ ts: Date.now(), data }));
+        }catch(_){}
+      }
+
       function getState(){
         return {
-          rawModule: q.get("base_module") || q.get("module") || "",
           module: normModuleRaw(q.get("base_module") || q.get("module") || ""),
           publicLabel: String(q.get("public_label") || "").trim(),
           plan: String(q.get("plan") || "").trim(),
           code: normCode(q.get("code") || ""),
           amount: String($("payAmount")?.value || q.get("amount") || "").replace(/[^\\d]/g, ""),
-          phone: normPhone($("payPhone")?.value || q.get("phone") || ""),
-          slug: normSlug($("paySlug")?.value || q.get("slug") || ""),
+          phone: normPhone($("payPhone")?.value || resolvedPhone || q.get("phone") || ""),
+          slug: normSlug($("paySlug")?.value || resolvedSlug || q.get("slug") || ""),
           returnUrl: safeUrl(q.get("return")) || ""
         };
       }
 
       function renderRecap(){
         const st = getState();
-
-        const product =
-          st.publicLabel ||
-          (st.module === "PAY" ? "Carte publique DIGIY" : displayModule(st.module));
+        const product = st.publicLabel || resolvedName || (st.module === "PAY" ? "Carte publique DIGIY" : displayModule(st.module));
 
         $("recapProduct").textContent = product || "—";
         $("recapModule").textContent = displayModule(st.module);
@@ -486,57 +379,126 @@
         $("recapRef").textContent = buildRef(st.module, st.code, st.phone);
         $("recapReturn").textContent = st.returnUrl ? "OK" : "—";
 
-        const payAmount = $("payAmount");
-        const payPhone = $("payPhone");
-        const paySlug = $("paySlug");
+        if($("payAmount") && st.amount && !$("payAmount").value) $("payAmount").value = st.amount;
+        if($("payPhone") && st.phone && !$("payPhone").value) $("payPhone").value = st.phone;
+        if($("paySlug") && st.slug && !$("paySlug").value) $("paySlug").value = st.slug;
 
-        if(payAmount && st.amount && !payAmount.value){
-          payAmount.value = st.amount;
-        }
-        if(payPhone && st.phone && !payPhone.value){
-          payPhone.value = st.phone;
-        }
-        if(paySlug && st.slug && !paySlug.value){
-          paySlug.value = st.slug;
+        $("slugAuto").textContent = [
+          st.module ? "Module : " + displayModule(st.module) : "",
+          st.code ? "Code : " + st.code : "",
+          st.plan && st.plan !== "payment" ? "Plan : " + st.plan : "",
+          (!st.slug && buildSuggestedSlug(st.module, st.phone)) ? "Identifiant suggéré : " + buildSuggestedSlug(st.module, st.phone) : ""
+        ].filter(Boolean).join(" • ");
+
+        $("dynamicPills").innerHTML = [
+          product ? '<span class="pill gold">' + product + '</span>' : "",
+          st.phone ? '<span class="pill ok">Wave : ' + displayPhone(st.phone) + '</span>' : "",
+          st.code ? '<span class="pill">Code : ' + st.code + '</span>' : ""
+        ].join(" ");
+
+        $("btnBack").href = st.returnUrl || ("./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : ""));
+      }
+
+      function setInfo(message, kind){
+        const box = $("payMsg");
+        if(!box) return;
+        box.className = "msg " + (kind || "");
+        box.textContent = message || "";
+      }
+
+      async function resolveByCode(){
+        const code = normCode(q.get("code") || "");
+        if(!code || !sb) return;
+
+        const cached = readCache(code);
+        if(cached){
+          resolvedName = String(cached.business_name || "").trim();
+          resolvedPhone = normPhone(cached.wave_phone || "");
+          resolvedSlug = normSlug(cached.slug || "");
+          renderRecap();
+          return;
         }
 
-        const suggested = buildSuggestedSlug(st.module, st.phone);
-        const slugAuto = $("slugAuto");
-        if(slugAuto){
-          let line = [];
-          if(st.module) line.push("Module : " + displayModule(st.module));
-          if(st.code) line.push("Code : " + st.code);
-          if(st.plan && st.plan !== "payment") line.push("Plan : " + st.plan);
-          if(!st.slug && suggested) line.push("Identifiant suggéré : " + suggested);
-          slugAuto.textContent = line.join(" • ");
+        setInfo("Recherche du numéro Wave liée au code DIGIY…", "muted");
+
+        const { data, error } = await withTimeout(
+          sb.from("digiy_pay_pro")
+            .select("business_name,business_code,wave_phone,is_active")
+            .eq("business_code", code)
+            .limit(1)
+            .maybeSingle(),
+          FETCH_TIMEOUT_MS,
+          "pay_lookup_timeout"
+        );
+
+        if(error || !data){
+          setInfo("Impossible de retrouver automatiquement le numéro Wave avec ce code.", "bad");
+          renderRecap();
+          return;
         }
 
-        const pills = $("dynamicPills");
-        if(pills){
-          let html = "";
-          if(product) html += '<span class="pill gold">' + product + '</span>';
-          if(st.phone) html += '<span class="pill ok">Wave : ' + displayPhone(st.phone) + '</span>';
-          if(st.code) html += '<span class="pill">Code : ' + st.code + '</span>';
-          pills.innerHTML = html;
+        resolvedName = String(data.business_name || "").trim();
+        resolvedPhone = normPhone(data.wave_phone || "");
+
+        if(!resolvedPhone){
+          setInfo("Code trouvé, mais numéro Wave absent pour le moment.", "bad");
+          renderRecap();
+          return;
         }
 
-        const btnBack = $("btnBack");
-        if(btnBack){
-          btnBack.href = st.returnUrl || "./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : "");
-        }
+        try{
+          const [sub1, sub2] = await Promise.allSettled([
+            withTimeout(
+              sb.from("digiy_subscriptions_public")
+                .select("phone,slug,module")
+                .eq("phone", resolvedPhone)
+                .eq("module", MODULE)
+                .limit(1)
+                .maybeSingle(),
+              FETCH_TIMEOUT_MS,
+              "slug_lookup_timeout"
+            ),
+            withTimeout(
+              sb.from("digiy_subscriptions_public")
+                .select("phone,slug,module")
+                .eq("phone", "+" + resolvedPhone)
+                .eq("module", MODULE)
+                .limit(1)
+                .maybeSingle(),
+              FETCH_TIMEOUT_MS,
+              "slug_lookup_timeout"
+            )
+          ]);
 
-        const flowInfo = $("flowInfo");
-        if(flowInfo){
-          flowInfo.innerHTML =
-            'Parcours : <span class="mono">carte publique DIGIY → preuve → attente de traitement</span>';
-        }
+          const one = sub1.status === "fulfilled" ? sub1.value : null;
+          const two = sub2.status === "fulfilled" ? sub2.value : null;
+
+          if(!one?.error && one?.data?.slug){
+            resolvedSlug = normSlug(one.data.slug);
+          } else if(!two?.error && two?.data?.slug){
+            resolvedSlug = normSlug(two.data.slug);
+          }
+        }catch(_){}
+
+        saveCache(code, {
+          business_name: resolvedName,
+          wave_phone: resolvedPhone,
+          slug: resolvedSlug
+        });
+
+        setInfo("Numéro Wave retrouvé automatiquement à partir du code.", "ok");
+        renderRecap();
       }
 
       renderRecap();
-
       $("payAmount")?.addEventListener("input", renderRecap);
       $("payPhone")?.addEventListener("input", renderRecap);
       $("paySlug")?.addEventListener("input", renderRecap);
+
+      resolveByCode().catch((e) => {
+        console.error("payer resolveByCode error", e);
+        setInfo("Recherche automatique impossible pour le moment.", "bad");
+      });
     })();
   </script>
 
