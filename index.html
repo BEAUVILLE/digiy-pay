@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>MON ARGENT by DIGIY ♾️</title>
+  <title>Payer ce professionnel — DIGIY</title>
   <meta name="theme-color" content="#04110d" />
   <meta
     name="description"
-    content="MON ARGENT by DIGIY — paiement direct au professionnel, lecture simple, 0% commission."
+    content="Carte publique DIGIY : paiement direct au professionnel via Wave, avec lecture simple et confiance claire."
   />
 
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1" />
@@ -26,18 +26,14 @@
   <style>
     :root{
       --bg:#04110d;
-      --bg2:#071a13;
       --card:#0b1f18;
       --line:rgba(255,255,255,.08);
-      --line-strong:rgba(34,197,94,.28);
       --text:#f3fff7;
-      --muted:rgba(243,255,247,.72);
+      --muted:rgba(243,255,247,.74);
       --green:#22c55e;
       --green2:#16a34a;
       --gold:#facc15;
-      --gold-soft:rgba(250,204,21,.10);
       --danger:#f87171;
-      --danger-soft:rgba(248,113,113,.10);
       --shadow:0 18px 50px rgba(0,0,0,.32);
       --radius:24px;
       --max:760px;
@@ -56,39 +52,11 @@
       padding:14px;
     }
 
-    .site-back-float{
-      position:fixed;
-      top:calc(env(safe-area-inset-top, 0px) + 12px);
-      left:calc(env(safe-area-inset-left, 0px) + 12px);
-      z-index:9999;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:44px;
-      padding:10px 14px;
-      border-radius:999px;
-      text-decoration:none;
-      font-weight:900;
-      font-size:14px;
-      color:#e5e7eb;
-      background:rgba(4,17,13,.82);
-      border:1px solid rgba(255,255,255,.12);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-      box-shadow:0 14px 30px rgba(0,0,0,.28);
-      transition:transform .18s ease,background .18s ease,border-color .18s ease;
-    }
-    .site-back-float:hover{
-      transform:translateY(-1px);
-      background:rgba(8,24,18,.96);
-      border-color:rgba(250,204,21,.30);
-    }
-
     .wrap{
       width:min(var(--max), 100%);
       margin:0 auto;
-      padding-top:62px;
+      padding-top:18px;
+      padding-bottom:26px;
     }
 
     .card{
@@ -100,7 +68,7 @@
     }
 
     .top{
-      padding:20px 18px 10px;
+      padding:22px 18px 10px;
       text-align:center;
     }
 
@@ -167,102 +135,49 @@
       color:#fde68a;
     }
 
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      justify-content:center;
-      padding:10px 18px 0;
-    }
-
-    .nav-mini{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:10px;
+    .hero{
       padding:14px 18px 0;
-    }
-
-    .nav-card{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      padding:12px 12px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      text-decoration:none;
-      color:var(--text);
-      min-height:78px;
-      transition:transform .16s ease,border-color .16s ease,background .16s ease;
-    }
-    .nav-card:hover{
-      transform:translateY(-1px);
-      border-color:rgba(250,204,21,.24);
-      background:rgba(255,255,255,.04);
-    }
-    .nav-card strong{
-      font-size:13px;
-      font-weight:900;
-      color:var(--gold);
-      line-height:1.2;
-    }
-    .nav-card span{
-      font-size:11px;
-      line-height:1.45;
-      color:var(--muted);
-      font-weight:800;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:46px;
-      padding:12px 15px;
-      border-radius:999px;
-      text-decoration:none;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      font-weight:900;
-      cursor:pointer;
-      transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
-    .btn.primary{
-      border:none;
-      background:linear-gradient(135deg,var(--green),var(--green2));
-      color:#032215;
-    }
-    .btn.gold{
-      border:1px solid rgba(250,204,21,.34);
-      background:rgba(250,204,21,.12);
-      color:#fde68a;
-    }
-    .btn.ghost{
-      background:rgba(255,255,255,.02);
+      text-align:center;
     }
 
     .name{
-      margin-top:16px;
-      font-size:24px;
+      font-size:28px;
       font-weight:900;
       color:var(--gold);
-      text-align:center;
-      padding:0 18px;
+      line-height:1.15;
       word-break:break-word;
     }
 
     .hint{
-      margin-top:8px;
+      margin-top:10px;
       color:var(--muted);
       font-weight:800;
-      font-size:13px;
-      line-height:1.55;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .trust{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:20px;
+      border:1px solid rgba(34,197,94,.20);
+      background:rgba(34,197,94,.08);
       text-align:center;
-      padding:0 18px;
+    }
+
+    .trust strong{
+      display:block;
+      font-size:16px;
+      color:#dcfce7;
+      margin-bottom:6px;
+    }
+
+    .trust span{
+      display:block;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+      font-weight:800;
     }
 
     .panel{
@@ -314,9 +229,42 @@
       font-weight:800;
     }
 
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:48px;
+      padding:12px 16px;
+      border-radius:999px;
+      text-decoration:none;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;
+      font-family:inherit;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn.primary{
+      border:none;
+      background:linear-gradient(135deg,var(--green),var(--green2));
+      color:#032215;
+    }
+    .btn.gold{
+      border:1px solid rgba(250,204,21,.34);
+      background:rgba(250,204,21,.12);
+      color:#fde68a;
+    }
+    .btn.ghost{
+      background:rgba(255,255,255,.02);
+    }
+
     .msg,
     .err{
-      margin-top:12px;
+      margin:12px 18px 0;
       padding:12px 14px;
       border-radius:16px;
       font-size:13px;
@@ -337,36 +285,29 @@
       color:#fecaca;
     }
 
-    .locked{
+    .unavailable{
       margin:16px 18px 0;
       padding:16px;
       border-radius:20px;
-      border:1px solid rgba(250,204,21,.28);
-      background:rgba(250,204,21,.08);
+      border:1px solid rgba(248,113,113,.26);
+      background:rgba(248,113,113,.10);
       display:none;
+      text-align:center;
     }
 
-    .locked-title{
-      font-size:12px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:#fde68a;
-      font-weight:900;
+    .unavailable strong{
+      display:block;
+      color:#fecaca;
+      font-size:16px;
       margin-bottom:8px;
     }
 
-    .locked-text{
-      color:#fef3c7;
+    .unavailable span{
+      display:block;
+      color:#fee2e2;
       font-weight:800;
-      line-height:1.55;
+      line-height:1.6;
       font-size:14px;
-    }
-
-    .locked .btnrow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:12px;
     }
 
     .paybox{
@@ -410,7 +351,7 @@
     }
 
     .nm{
-      font-size:22px;
+      font-size:24px;
       font-weight:900;
       color:var(--gold);
       word-break:break-word;
@@ -423,7 +364,7 @@
       border:1px solid rgba(255,255,255,.08);
       padding:8px 10px;
       border-radius:14px;
-      font-size:18px;
+      font-size:19px;
       font-weight:900;
       color:#ecfdf5;
       word-break:break-word;
@@ -436,6 +377,31 @@
       margin-top:12px;
     }
 
+    .steps{
+      margin-top:12px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(250,204,21,.22);
+      background:rgba(250,204,21,.08);
+      color:#fef3c7;
+      font-weight:800;
+      font-size:14px;
+      line-height:1.65;
+    }
+
+    .note{
+      margin:16px 18px 0;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+      font-weight:800;
+      text-align:center;
+    }
+
     .foot{
       padding:16px 18px 20px;
       font-size:12px;
@@ -445,114 +411,70 @@
       line-height:1.7;
     }
 
-    @media (max-width:700px){
-      .nav-mini{
-        grid-template-columns:repeat(2,minmax(0,1fr));
-      }
-    }
-
     @media (max-width:640px){
       body{padding:10px}
-      .wrap{padding-top:58px}
       .search-row{grid-template-columns:1fr}
       h1{font-size:24px}
-      .name{font-size:22px}
-      .site-back-float{
-        font-size:13px;
-        min-height:42px;
-        padding:10px 12px;
-      }
-      .actions .btn{flex:1}
+      .name{font-size:24px}
       .btnrow .btn{flex:1}
     }
   </style>
 </head>
 <body>
-
-  <a class="site-back-float" href="https://digiylyfe.com/" target="_blank" rel="noopener">
-    ← Retour au site
-  </a>
-
   <main class="wrap">
     <section class="card">
       <div class="top">
         <div class="brand-mark">₣</div>
-        <h1>MON ARGENT by DIGIY ♾️</h1>
+        <h1>Payer ce professionnel</h1>
         <div class="sub">
-          Paiement direct au professionnel • 0% commission • lecture simple côté client
+          Carte publique DIGIY • paiement direct via Wave • DIGIY ne garde pas l’argent
         </div>
 
         <div class="chips">
           <div class="chip ok">✅ Paiement direct</div>
-          <div class="chip gold">💳 PAY actif requis</div>
-          <div class="chip">♾️ DIGIYLYFE</div>
+          <div class="chip gold">🔎 QR DIGIY</div>
+          <div class="chip">0% commission DIGIY</div>
         </div>
       </div>
 
-      <div class="actions">
-        <button id="btnInstallApp" class="btn ghost" type="button">📲 Installer l’app</button>
-        <a id="btnPinTop" class="btn gold" href="./pin.html">🔐 Entrée PIN</a>
-        <a id="btnCockpitTop" class="btn ghost" href="./cockpit.html">📊 Cockpit pro</a>
-        <a id="btnSubscribeTop" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
+      <div class="hero">
+        <div id="proName" class="name">MON ARGENT by DIGIY</div>
+        <div id="proHint" class="hint">
+          Scanne le QR du professionnel ou entre son code pour afficher sa carte de paiement.
+        </div>
       </div>
 
-      <div class="nav-mini">
-        <a class="nav-card" href="https://digiylyfe.com/" target="_blank" rel="noopener">
-          <strong>Site DIGIY</strong>
-          <span>Retour vers la maison mère</span>
-        </a>
-        <a id="navPin" class="nav-card" href="./pin.html">
-          <strong>PIN PAY</strong>
-          <span>Entrée pro protégée</span>
-        </a>
-        <a id="navCockpit" class="nav-card" href="./cockpit.html">
-          <strong>Cockpit</strong>
-          <span>Vue financière pro</span>
-        </a>
-        <a id="navActivate" class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
-          <strong>Activation</strong>
-          <span>Abonnement et renouvellement</span>
-        </a>
-      </div>
-
-      <div id="proName" class="name">MON ARGENT by DIGIY</div>
-      <div id="proHint" class="hint">
-        Scanne un QR ou entre un code pro actif pour afficher la carte de paiement.
+      <div class="trust">
+        <strong>Vous payez directement le professionnel.</strong>
+        <span>DIGIY montre le bon contact, mais ne garde pas l’argent et n’encaisse pas à la place du pro.</span>
       </div>
 
       <div class="panel">
-        <h2>Charger un pro</h2>
+        <h2>Code du professionnel</h2>
 
         <div class="search-row">
           <div>
             <input
               id="codeInput"
               type="text"
-              placeholder="Entre un code pro actif (ex : JBBEAUVILLE)"
+              placeholder="Ex : JBBEAUVILLE"
               autocomplete="off"
             />
             <div class="helper">
-              QR attendu : <b>?pro=CODE</b>
+              Le QR DIGIY ouvre cette page avec un lien du type <b>?pro=CODE</b>.
             </div>
           </div>
 
-          <button id="btnLoad" class="btn ghost" type="button">🔎 Charger</button>
+          <button id="btnLoad" class="btn ghost" type="button">🔎 Ouvrir</button>
         </div>
-
-        <div id="autoMsg" class="msg" aria-live="polite"></div>
-        <div id="autoErr" class="err" aria-live="polite"></div>
       </div>
 
-      <div id="lockedBox" class="locked">
-        <div class="locked-title">Abonnement requis</div>
-        <div id="lockedText" class="locked-text">
-          Ce code existe, mais l’affichage public PAY n’est pas actif.
-        </div>
-        <div class="btnrow">
-          <a id="btnSubscribeLocked" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
-          <a id="btnPinLocked" class="btn ghost" href="./pin.html">🔐 Ouvrir le PIN</a>
-          <a id="btnCockpitLocked" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
-        </div>
+      <div id="autoMsg" class="msg" aria-live="polite"></div>
+      <div id="autoErr" class="err" aria-live="polite"></div>
+
+      <div id="unavailableBox" class="unavailable">
+        <strong>Carte indisponible pour le moment</strong>
+        <span id="unavailableText">Cette carte de paiement n’est pas disponible ou n’est pas encore activée.</span>
       </div>
 
       <div id="paybox" class="paybox">
@@ -560,48 +482,46 @@
 
         <div class="big">
           <div class="box">
-            <div class="small">Nom</div>
+            <div class="small">Nom du professionnel</div>
             <div id="payName" class="nm">—</div>
           </div>
 
           <div class="box">
-            <div class="small">Numéro</div>
+            <div class="small">Numéro Wave</div>
             <code id="payPhone">—</code>
           </div>
         </div>
 
         <div class="btnrow">
-          <button id="btnCopy" class="btn" type="button">📋 Copier</button>
+          <button id="btnCopy" class="btn gold" type="button">📋 Copier le numéro</button>
           <a id="btnCall" class="btn ghost" href="#">📞 Appeler</a>
-          <a id="btnPayNow" class="btn primary" href="#">💳 Payer maintenant</a>
+          <a id="btnPayNow" class="btn primary" href="#">✅ J’ai payé</a>
         </div>
 
-        <div class="btnrow">
-          <a id="btnPinInline" class="btn ghost" href="./pin.html">🔐 PIN pro</a>
-          <a id="btnCockpitInline" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
+        <div class="steps" id="howto">
+          1️⃣ Ouvre Wave.<br>
+          2️⃣ Envoie au numéro affiché.<br>
+          3️⃣ Reviens ici puis clique sur <b>“J’ai payé”</b> pour confirmer.
         </div>
+      </div>
 
-        <div id="howto" class="msg" style="display:none;"></div>
+      <div class="note">
+        Le QR DIGIY ne remplace pas Wave : il montre clairement <b>qui reçoit</b>, <b>où payer</b> et laisse au professionnel une lecture plus propre dans son univers DIGIY PAY.
       </div>
 
       <div class="foot">
-        DIGIY n’est pas une banque et ne garde pas l’argent.<br />
-        Cette page affiche seulement le moyen de paiement direct du professionnel.<br />
-        Le cockpit PAY et l’administration restent côté pro.
+        DIGIY n’est pas une banque.<br />
+        Cette page montre seulement le moyen de paiement direct du professionnel.
       </div>
     </section>
   </main>
 
   <script>
-    const PIN_URL = "./pin.html";
-    const COCKPIT_URL = "./cockpit.html";
     const PAYER_URL = "./payer.html";
-    const SUBSCRIBE_BASE = "https://commencer-a-payer.digiylyfe.com/";
     const MODULE = "PAY";
     const CACHE_TTL_MS = 5 * 60 * 1000;
     const FETCH_TIMEOUT_MS = 8000;
     const SLOW_HINT_MS = 4000;
-    const PUBLIC_CTX_KEY = "DIGIY_PAY_PUBLIC_CTX";
 
     const SUPABASE_URL =
       window.DIGIY_SUPABASE_URL ||
@@ -611,62 +531,6 @@
       window.DIGIY_SUPABASE_ANON_KEY ||
       window.DIGIY_SUPABASE_ANON ||
       "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
-
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-        storage: {
-          getItem: () => null,
-          setItem: () => {},
-          removeItem: () => {}
-        }
-      }
-    });
-
-    const els = {
-      codeInput: document.getElementById("codeInput"),
-      btnLoad: document.getElementById("btnLoad"),
-      btnInstallApp: document.getElementById("btnInstallApp"),
-
-      btnPinTop: document.getElementById("btnPinTop"),
-      btnCockpitTop: document.getElementById("btnCockpitTop"),
-      btnSubscribeTop: document.getElementById("btnSubscribeTop"),
-
-      navPin: document.getElementById("navPin"),
-      navCockpit: document.getElementById("navCockpit"),
-      navActivate: document.getElementById("navActivate"),
-
-      proName: document.getElementById("proName"),
-      proHint: document.getElementById("proHint"),
-
-      autoMsg: document.getElementById("autoMsg"),
-      autoErr: document.getElementById("autoErr"),
-
-      lockedBox: document.getElementById("lockedBox"),
-      lockedText: document.getElementById("lockedText"),
-      btnSubscribeLocked: document.getElementById("btnSubscribeLocked"),
-      btnPinLocked: document.getElementById("btnPinLocked"),
-      btnCockpitLocked: document.getElementById("btnCockpitLocked"),
-
-      paybox: document.getElementById("paybox"),
-      payName: document.getElementById("payName"),
-      payPhone: document.getElementById("payPhone"),
-      btnCopy: document.getElementById("btnCopy"),
-      btnCall: document.getElementById("btnCall"),
-      btnPayNow: document.getElementById("btnPayNow"),
-      btnPinInline: document.getElementById("btnPinInline"),
-      btnCockpitInline: document.getElementById("btnCockpitInline"),
-      howto: document.getElementById("howto")
-    };
-
-    let deferredInstallPrompt = null;
-
-    function show(el, on = true){
-      if (!el) return;
-      el.style.display = on ? "" : "none";
-    }
 
     function digitsOnly(v){
       return String(v || "").replace(/\D/g, "");
@@ -706,6 +570,11 @@
         .replace(/"/g, "&quot;");
     }
 
+    function show(el, on = true){
+      if (!el) return;
+      el.style.display = on ? "" : "none";
+    }
+
     function withTimeout(promise, ms, label = "timeout"){
       return Promise.race([
         promise,
@@ -715,42 +584,19 @@
       ]);
     }
 
-    function queryWithTimeout(query, label){
-      return withTimeout(query, FETCH_TIMEOUT_MS, label || "timeout");
-    }
-
-    function storePrivateRouteContext(row, code){
-      try{
-        const payload = {
-          module: MODULE,
-          code: normalizeCode(code),
-          slug: pickSlug(row),
-          phone: pickPhone(row),
-          business_name: pickBusinessName(row, code),
-          ts: Date.now()
-        };
-
-        sessionStorage.setItem(PUBLIC_CTX_KEY, JSON.stringify(payload));
-      }catch(_){}
-    }
-
-    function clearPrivateRouteContext(){
-      try{
-        sessionStorage.removeItem(PUBLIC_CTX_KEY);
-      }catch(_){}
-    }
-
-    async function copyTextSafe(text){
+    function copyTextSafe(text){
       const value = String(text || "");
-      if (!value) return false;
+      if (!value) return Promise.resolve(false);
 
       if (navigator.clipboard?.writeText){
-        try{
-          await navigator.clipboard.writeText(value);
-          return true;
-        }catch(_){}
+        return navigator.clipboard.writeText(value)
+          .then(() => true)
+          .catch(() => fallbackCopy(value));
       }
+      return fallbackCopy(value);
+    }
 
+    function fallbackCopy(value){
       try{
         const input = document.createElement("input");
         input.type = "text";
@@ -765,10 +611,44 @@
         input.setSelectionRange(0, input.value.length);
         const ok = document.execCommand("copy");
         input.remove();
-        return !!ok;
+        return Promise.resolve(!!ok);
       }catch(_){
-        return false;
+        return Promise.resolve(false);
       }
+    }
+
+    const els = {
+      codeInput: document.getElementById("codeInput"),
+      btnLoad: document.getElementById("btnLoad"),
+      proName: document.getElementById("proName"),
+      proHint: document.getElementById("proHint"),
+      autoMsg: document.getElementById("autoMsg"),
+      autoErr: document.getElementById("autoErr"),
+      unavailableBox: document.getElementById("unavailableBox"),
+      unavailableText: document.getElementById("unavailableText"),
+      paybox: document.getElementById("paybox"),
+      payName: document.getElementById("payName"),
+      payPhone: document.getElementById("payPhone"),
+      btnCopy: document.getElementById("btnCopy"),
+      btnCall: document.getElementById("btnCall"),
+      btnPayNow: document.getElementById("btnPayNow"),
+      howto: document.getElementById("howto")
+    };
+
+    let sb = null;
+    if (window.supabase?.createClient){
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+          storage: {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {}
+          }
+        }
+      });
     }
 
     function cacheKey(code){
@@ -802,35 +682,22 @@
       els.autoErr.textContent = "";
       show(els.autoMsg, false);
       show(els.autoErr, false);
-      show(els.lockedBox, false);
+      show(els.unavailableBox, false);
       show(els.paybox, false);
-      show(els.howto, false);
     }
 
     function setNeutral(){
       clearUi();
-      clearPrivateRouteContext();
+      document.title = "Payer ce professionnel — DIGIY";
       els.proName.textContent = "MON ARGENT by DIGIY";
-      els.proHint.textContent = "Scanne un QR ou entre un code pro actif pour afficher la carte de paiement.";
+      els.proHint.textContent = "Scanne le QR du professionnel ou entre son code pour afficher sa carte de paiement.";
       els.payName.textContent = "—";
       els.payPhone.textContent = "—";
       els.btnCall.href = "#";
       els.btnPayNow.href = "#";
-      els.btnCopy.textContent = "📋 Copier";
-
-      els.btnPinTop.href = PIN_URL;
-      els.btnCockpitTop.href = COCKPIT_URL;
-      els.btnPinLocked.href = PIN_URL;
-      els.btnCockpitLocked.href = COCKPIT_URL;
-      els.btnPinInline.href = PIN_URL;
-      els.btnCockpitInline.href = COCKPIT_URL;
-
-      els.navPin.href = PIN_URL;
-      els.navCockpit.href = COCKPIT_URL;
-      els.navActivate.href = SUBSCRIBE_BASE + "?module=" + MODULE;
-
-      els.btnSubscribeTop.href = SUBSCRIBE_BASE + "?module=" + MODULE;
-      els.btnSubscribeLocked.href = SUBSCRIBE_BASE + "?module=" + MODULE;
+      els.btnCopy.textContent = "📋 Copier le numéro";
+      els.howto.innerHTML =
+        '1️⃣ Ouvre Wave.<br>2️⃣ Envoie au numéro affiché.<br>3️⃣ Reviens ici puis clique sur <b>“J’ai payé”</b> pour confirmer.';
     }
 
     function showMsg(text){
@@ -887,39 +754,9 @@
       );
     }
 
-    function buildSubscribeUrl(row, code){
-      const params = new URLSearchParams();
-      params.set("module", MODULE);
-
-      const phone = pickPhone(row);
-      const cleanedCode = normalizeCode(code);
-
-      if (phone) params.set("phone", phone);
-      if (cleanedCode) params.set("code", cleanedCode);
-
-      return SUBSCRIBE_BASE + "?" + params.toString();
-    }
-
-    function buildPinUrl(row, code){
-      const params = new URLSearchParams();
-      const slug = pickSlug(row);
-      const cleanedCode = normalizeCode(code);
-
-      if (slug) params.set("slug", slug);
-      if (cleanedCode) params.set("code", cleanedCode);
-
-      return params.toString() ? (PIN_URL + "?" + params.toString()) : PIN_URL;
-    }
-
-    function buildCockpitUrl(row, code){
-      const params = new URLSearchParams();
-      const slug = pickSlug(row);
-      const cleanedCode = normalizeCode(code);
-
-      if (slug) params.set("slug", slug);
-      if (cleanedCode) params.set("code", cleanedCode);
-
-      return params.toString() ? (COCKPIT_URL + "?" + params.toString()) : COCKPIT_URL;
+    function rowHasActiveSubscription(row){
+      if (!row || typeof row !== "object") return false;
+      return row?.is_active !== false;
     }
 
     function buildPayerUrl(row, code){
@@ -929,10 +766,11 @@
       const cleanedCode = normalizeCode(code);
       const businessName = pickBusinessName(row, code);
 
-      params.set("module", "PAY");
-      params.set("base_module", "PAY");
+      params.set("module", MODULE);
+      params.set("base_module", MODULE);
       params.set("public_label", businessName);
       params.set("plan", "payment");
+
       if (cleanedCode) params.set("code", cleanedCode);
       if (phone) params.set("phone", phone);
       if (slug) params.set("slug", slug);
@@ -940,81 +778,41 @@
       return PAYER_URL + "?" + params.toString();
     }
 
-    function rowHasActiveSubscription(row){
-      if (!row || typeof row !== "object") return false;
-      return row?.is_active !== false;
-    }
-
-    function showLocked(row, code){
-      storePrivateRouteContext(row, code);
-
-      const businessName = pickBusinessName(row, code);
-      const subscribeUrl = buildSubscribeUrl(row, code);
-      const pinUrl = buildPinUrl(row, code);
-      const cockpitUrl = buildCockpitUrl(row, code);
-
-      els.proName.textContent = businessName;
-      els.proHint.textContent = "Affichage public PAY non actif.";
-
-      els.lockedText.innerHTML =
-        "<b>" + escapeHtml(businessName) + "</b> existe, mais l’affichage public PAY n’est pas encore actif.<br>" +
-        "Active le module pour remettre la carte de paiement sur les rails.";
-
-      els.btnSubscribeLocked.href = subscribeUrl;
-      els.btnSubscribeTop.href = subscribeUrl;
-
-      els.btnPinLocked.href = pinUrl;
-      els.btnCockpitLocked.href = cockpitUrl;
-      els.btnPinTop.href = pinUrl;
-      els.btnCockpitTop.href = cockpitUrl;
-      els.btnPinInline.href = pinUrl;
-      els.btnCockpitInline.href = cockpitUrl;
-
-      els.navPin.href = pinUrl;
-      els.navCockpit.href = cockpitUrl;
-      els.navActivate.href = subscribeUrl;
-
-      show(els.lockedBox, true);
+    function showUnavailable(title, text){
+      els.proName.textContent = title || "Carte indisponible";
+      els.proHint.textContent = "Cette page n’a pas encore de carte publique active.";
+      els.unavailableText.innerHTML = text || "Cette carte de paiement n’est pas disponible pour le moment.";
+      show(els.unavailableBox, true);
     }
 
     function showPayCard(row, code){
-      storePrivateRouteContext(row, code);
-
       const businessName = pickBusinessName(row, code);
       const cleanPhone = pickPhone(row);
+      const publicCode = normalizeCode(code || row?.business_code || "");
 
       if (!businessName || cleanPhone.length < 12){
         show(els.paybox, false);
         return;
       }
 
-      const phone = "+" + cleanPhone;
-      const pinUrl = buildPinUrl(row, code);
-      const cockpitUrl = buildCockpitUrl(row, code);
+      const displayPhone = "+" + cleanPhone;
       const payerUrl = buildPayerUrl(row, code);
 
+      document.title = "Payer " + businessName + " — DIGIY";
       els.proName.textContent = businessName;
-      els.proHint.textContent = "Paiement direct au professionnel • PAY actif";
+      els.proHint.textContent = "Paiement direct au professionnel via Wave.";
 
       els.payName.textContent = businessName;
-      els.payPhone.textContent = phone;
+      els.payPhone.textContent = displayPhone;
       els.btnCall.href = "tel:" + cleanPhone;
       els.btnPayNow.href = payerUrl;
 
-      els.btnPinTop.href = pinUrl;
-      els.btnCockpitTop.href = cockpitUrl;
-      els.btnPinInline.href = pinUrl;
-      els.btnCockpitInline.href = cockpitUrl;
-
-      els.navPin.href = pinUrl;
-      els.navCockpit.href = cockpitUrl;
-
       els.btnCopy.onclick = async () => {
         const original = els.btnCopy.textContent;
-        const copied = await copyTextSafe(phone);
+        const copied = await copyTextSafe(displayPhone);
 
         if (copied){
-          els.btnCopy.textContent = "✅ Copié";
+          els.btnCopy.textContent = "✅ Numéro copié";
           setTimeout(() => {
             els.btnCopy.textContent = original;
           }, 1400);
@@ -1022,112 +820,112 @@
         }
 
         els.btnCopy.textContent = "📋 Numéro affiché";
-        showMsg("Numéro à copier : " + phone);
+        showMsg("Numéro à copier : " + displayPhone);
         setTimeout(() => {
           els.btnCopy.textContent = original;
         }, 1800);
       };
 
-      els.howto.innerHTML =
-        "💳 Étapes simples :<br><br>" +
-        "1️⃣ Ouvre Wave<br>" +
-        "2️⃣ Envoie au numéro : <b>" + phone + "</b><br>" +
-        "3️⃣ Clique sur <b>“Payer maintenant”</b> pour confirmer et envoyer la preuve<br><br>" +
-        (code ? "<b>Code pro :</b> " + escapeHtml(code) + "<br><br>" : "") +
-        "DIGIY ne garde pas l’argent.";
+      let codeLine = "";
+      if (publicCode){
+        codeLine = '4️⃣ Référence DIGIY : <b>' + escapeHtml(publicCode) + '</b><br>';
+      }
 
-      show(els.howto, true);
+      els.howto.innerHTML =
+        '1️⃣ Ouvre Wave.<br>' +
+        '2️⃣ Envoie au numéro : <b>' + displayPhone + '</b><br>' +
+        '3️⃣ Vérifie le nom : <b>' + escapeHtml(businessName) + '</b><br>' +
+        codeLine +
+        '✅ Ensuite clique sur <b>“J’ai payé”</b> pour confirmer.';
+
       show(els.paybox, true);
     }
 
     async function fetchDirectByCode(code){
       const cleaned = normalizeCode(code);
       if (!cleaned) return null;
+      if (!sb) throw new Error("supabase_unavailable");
 
       const cached = readCache(cleaned);
       if (cached) return cached;
 
-      const tries = [cleaned];
+      const { data, error } = await withTimeout(
+        sb
+          .from("digiy_pay_pro")
+          .select("business_name,business_code,wave_phone,is_active")
+          .eq("business_code", cleaned)
+          .limit(1)
+          .maybeSingle(),
+        FETCH_TIMEOUT_MS,
+        "pay_public_lookup_timeout"
+      );
 
-      for (const candidate of tries){
-        const { data, error } = await queryWithTimeout(
-          sb
-            .from("digiy_pay_pro")
-            .select("business_name,business_code,wave_phone,is_active")
-            .eq("business_code", candidate)
-            .limit(1)
-            .maybeSingle(),
-          "pay_public_lookup_timeout"
-        );
+      if (error || !data) return null;
 
-        if (!error && data){
-          const row = {
-            ...data,
-            business_code: normalizeCode(data.business_code || candidate)
-          };
+      const row = {
+        ...data,
+        business_code: normalizeCode(data.business_code || cleaned)
+      };
 
-          const phoneDigits = pickPhone(row);
-          if (phoneDigits){
-            try{
-              const [sub, subPlus] = await Promise.allSettled([
-                queryWithTimeout(
-                  sb
-                    .from("digiy_subscriptions_public")
-                    .select("phone,slug,module")
-                    .eq("phone", phoneDigits)
-                    .eq("module", "PAY")
-                    .limit(1)
-                    .maybeSingle(),
-                  "pay_subscription_lookup_timeout"
-                ),
-                queryWithTimeout(
-                  sb
-                    .from("digiy_subscriptions_public")
-                    .select("phone,slug,module")
-                    .eq("phone", "+" + phoneDigits)
-                    .eq("module", "PAY")
-                    .limit(1)
-                    .maybeSingle(),
-                  "pay_subscription_lookup_timeout"
-                )
-              ]);
+      const phoneDigits = pickPhone(row);
+      if (phoneDigits){
+        try{
+          const [sub, subPlus] = await Promise.allSettled([
+            withTimeout(
+              sb
+                .from("digiy_subscriptions_public")
+                .select("phone,slug,module")
+                .eq("phone", phoneDigits)
+                .eq("module", MODULE)
+                .limit(1)
+                .maybeSingle(),
+              FETCH_TIMEOUT_MS,
+              "pay_subscription_lookup_timeout"
+            ),
+            withTimeout(
+              sb
+                .from("digiy_subscriptions_public")
+                .select("phone,slug,module")
+                .eq("phone", "+" + phoneDigits)
+                .eq("module", MODULE)
+                .limit(1)
+                .maybeSingle(),
+              FETCH_TIMEOUT_MS,
+              "pay_subscription_lookup_timeout"
+            )
+          ]);
 
-              const first = sub.status === "fulfilled" ? sub.value : null;
-              const second = subPlus.status === "fulfilled" ? subPlus.value : null;
+          const first = sub.status === "fulfilled" ? sub.value : null;
+          const second = subPlus.status === "fulfilled" ? subPlus.value : null;
 
-              if (!first?.error && first?.data?.slug){
-                row.slug = normalizeSlug(first.data.slug);
-              } else if (!second?.error && second?.data?.slug){
-                row.slug = normalizeSlug(second.data.slug);
-              }
-            }catch(_){}
+          if (!first?.error && first?.data?.slug){
+            row.slug = normalizeSlug(first.data.slug);
+          } else if (!second?.error && second?.data?.slug){
+            row.slug = normalizeSlug(second.data.slug);
           }
-
-          saveCache(cleaned, row);
-          return row;
-        }
+        }catch(_){}
       }
 
-      return null;
+      saveCache(cleaned, row);
+      return row;
     }
 
     async function loadByCode(rawCode){
       const cleaned = normalizeCode(rawCode);
       clearUi();
-      clearPrivateRouteContext();
       els.codeInput.value = cleaned;
       updateUrlCode(cleaned);
 
       if (!cleaned){
         setNeutral();
-        showMsg("Aucun professionnel chargé pour le moment.");
+        showMsg("Entre un code professionnel pour ouvrir la carte de paiement.");
         return;
       }
 
       let slowTimer = null;
 
       try{
-        showMsg("Chargement du professionnel…");
+        showMsg("Chargement de la carte…");
         slowTimer = setTimeout(() => {
           showMsg("Chargement lent… réseau terrain en cours.");
         }, SLOW_HINT_MS);
@@ -1141,31 +939,32 @@
         showMsg("");
 
         if (!row){
-          els.proName.textContent = "Code introuvable";
-          els.proHint.textContent = "Vérifie le code ou scanne un QR valide.";
-          showErr("Aucun professionnel trouvé pour ce code.");
+          showUnavailable(
+            "Carte introuvable",
+            "Aucune carte de paiement n’a été trouvée pour ce code. Vérifie le QR ou redemande le bon code au professionnel."
+          );
+          showErr("Aucune carte trouvée pour ce code.");
           return;
         }
 
         if (!rowHasActiveSubscription(row)){
-          showLocked(row, cleaned);
-          showErr("Ce code existe, mais PAY n’est pas actif sur l’affichage public.");
+          showUnavailable(
+            pickBusinessName(row, cleaned),
+            "Cette carte existe, mais elle n’est pas encore active côté public."
+          );
+          showErr("Cette carte n’est pas active pour le moment.");
           return;
         }
 
         const phone = pickPhone(row);
-
         if (phone.length < 12){
-          els.proName.textContent = pickBusinessName(row, cleaned);
-          els.proHint.textContent = "Compte incomplet.";
-          showErr("Ce professionnel n’a pas encore de numéro de paiement valide.");
+          showUnavailable(
+            pickBusinessName(row, cleaned),
+            "Le numéro de paiement de ce professionnel n’est pas encore prêt."
+          );
+          showErr("Numéro de paiement indisponible pour le moment.");
           return;
         }
-
-        const subscribeUrl = buildSubscribeUrl(row, cleaned);
-        els.btnSubscribeTop.href = subscribeUrl;
-        els.btnSubscribeLocked.href = subscribeUrl;
-        els.navActivate.href = subscribeUrl;
 
         showPayCard(row, cleaned);
       }catch(e){
@@ -1175,14 +974,30 @@
         }
 
         console.error("DIGIY PAY public load error:", e);
-        els.proName.textContent = "Service indisponible";
-        els.proHint.textContent = "Impossible de charger ce professionnel pour le moment.";
+
+        if (String(e?.message || "").includes("supabase_unavailable")){
+          showUnavailable(
+            "Service indisponible",
+            "La carte publique ne peut pas être chargée pour le moment."
+          );
+          showErr("Chargement impossible pour le moment.");
+          return;
+        }
 
         if (String(e?.message || "").includes("timeout")){
-          showErr("Chargement trop long. Réseau lent ou indisponible. Réessaie dans un instant.");
-        } else {
-          showErr("Erreur de chargement. Réessaie plus tard.");
+          showUnavailable(
+            "Chargement trop long",
+            "Le réseau est lent ou indisponible. Réessaie dans un instant."
+          );
+          showErr("Chargement trop long. Réessaie dans un instant.");
+          return;
         }
+
+        showUnavailable(
+          "Service indisponible",
+          "Impossible de charger cette carte pour le moment."
+        );
+        showErr("Erreur de chargement. Réessaie plus tard.");
       }
     }
 
@@ -1193,24 +1008,6 @@
         e.preventDefault();
         loadByCode(els.codeInput.value);
       }
-    });
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredInstallPrompt = e;
-    });
-
-    els.btnInstallApp.addEventListener("click", async () => {
-      if (deferredInstallPrompt){
-        deferredInstallPrompt.prompt();
-        try{
-          await deferredInstallPrompt.userChoice;
-        }catch(_){}
-        deferredInstallPrompt = null;
-        return;
-      }
-
-      alert("Pour installer l’app, utilise l’option « Ajouter à l’écran d’accueil » de ton navigateur.");
     });
 
     const params = new URLSearchParams(location.search);
