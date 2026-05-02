@@ -577,6 +577,101 @@
       color:#032215;
     }
 
+    .return-house{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:20px;
+      border:1px solid rgba(250,204,21,.22);
+      background:rgba(250,204,21,.08);
+      text-align:center;
+    }
+
+    .return-house strong{
+      display:block;
+      color:#fef3c7;
+      font-size:16px;
+      margin-bottom:8px;
+      font-weight:1000;
+    }
+
+    .return-house span{
+      display:block;
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .return-actions{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+    }
+
+    .digiy-bottom-nav{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:9997;
+      padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));
+      background:linear-gradient(180deg, rgba(4,17,13,.02), rgba(4,17,13,.96) 28%);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .digiy-bottom-nav-inner{
+      width:min(var(--max), 100%);
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px;
+      background:rgba(10,24,18,.96);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:6px;
+      box-shadow:0 14px 36px rgba(0,0,0,.22);
+    }
+
+    .digiy-bottom-nav a,
+    .digiy-bottom-nav button{
+      min-height:54px;
+      border-radius:14px;
+      border:1px solid transparent;
+      background:transparent;
+      color:rgba(243,255,247,.72);
+      display:grid;
+      place-items:center;
+      align-content:center;
+      gap:2px;
+      font-size:11px;
+      font-weight:1000;
+      text-align:center;
+      text-decoration:none;
+      cursor:pointer;
+      font-family:inherit;
+      padding:0 4px;
+    }
+
+    .digiy-bottom-nav .ico{font-size:18px;line-height:1}
+
+    .digiy-bottom-nav a.active,
+    .digiy-bottom-nav button.active{
+      background:linear-gradient(135deg,var(--green),var(--green2));
+      color:#032215;
+      box-shadow:0 10px 22px rgba(0,0,0,.16);
+    }
+
+    .sticky-paybar{
+      bottom:calc(76px + env(safe-area-inset-bottom, 0px));
+    }
+
+    #digiy-audio-btn{
+      bottom:calc(156px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
     @media (max-width:640px){
       body{padding:10px}
       .search-row{grid-template-columns:1fr}
@@ -613,6 +708,9 @@
           <div class="hero-action-row">
             <button id="btnFocusCode" class="hero-action-primary" type="button">🔎 Entrer un code</button>
             <button id="btnScrollPay" class="hero-action-secondary" type="button">💳 Voir la carte</button>
+            <a class="hero-action-secondary" href="https://digiylyfe.com/">🌍 Site</a>
+            <a class="hero-action-secondary" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
+            <a class="hero-action-secondary" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">📦 Tarifs</a>
           </div>
         </div>
 
@@ -695,6 +793,20 @@
         </div>
       </div>
 
+
+      <div class="return-house" id="retours-digiy">
+        <strong>Revenir dans la maison DIGIY</strong>
+        <span>
+          Cette page sert au paiement direct d’un professionnel. Pour revenir à la vitrine, au HUB ou aux tarifs officiels,
+          utilise les portes ci-dessous.
+        </span>
+        <div class="return-actions">
+          <a class="btn ghost" href="https://digiylyfe.com/">🌍 Site DIGIYLYFE</a>
+          <a class="btn primary" href="https://digiy-hub.digiylyfe.com/">🧭 HUB DIGIY</a>
+          <a class="btn gold" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">📦 Tarifs</a>
+        </div>
+      </div>
+
       <div class="note">
         Le QR DIGIY ne remplace pas Wave : il montre clairement <b>qui reçoit</b>, <b>où payer</b> et laisse au professionnel une lecture plus propre dans son univers DIGIY PAY.
       </div>
@@ -713,11 +825,23 @@
         <strong id="stickyPayText">Entre un code professionnel pour ouvrir la carte.</strong>
       </div>
       <div class="sticky-paybar-actions">
+        <a class="sticky-open" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
         <button id="btnStickyOpen" class="sticky-open" type="button">🔎 Ouvrir</button>
         <a id="btnStickyPaid" class="sticky-paid" href="#">✅ J’ai payé</a>
       </div>
     </div>
   </div>
+
+
+  <nav class="digiy-bottom-nav" aria-label="Navigation rapide PAY public">
+    <div class="digiy-bottom-nav-inner">
+      <a href="https://digiylyfe.com/"><span class="ico">🌍</span><span>Site</span></a>
+      <a href="https://digiy-hub.digiylyfe.com/"><span class="ico">🧭</span><span>HUB</span></a>
+      <a href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer"><span class="ico">📦</span><span>Tarifs</span></a>
+      <button id="btnBottomOpen" type="button"><span class="ico">🔎</span><span>Code</span></button>
+      <a class="active" id="btnBottomPaid" href="#"><span class="ico">✅</span><span>Payé</span></a>
+    </div>
+  </nav>
 
   <script>
     const PAYER_URL = "./payer.html";
@@ -894,6 +1018,8 @@
       show(els.unavailableBox, false);
       show(els.paybox, false);
       els.btnStickyPaid.href = "#";
+      const bottomPaid = document.getElementById("btnBottomPaid");
+      if (bottomPaid) bottomPaid.href = "#";
       els.stickyPayText.textContent = "Entre un code professionnel pour ouvrir la carte.";
     }
 
@@ -1019,6 +1145,8 @@
       els.btnCall.href = "tel:" + cleanPhone;
       els.btnPayNow.href = payerUrl;
       els.btnStickyPaid.href = payerUrl;
+      const bottomPaid = document.getElementById("btnBottomPaid");
+      if (bottomPaid) bottomPaid.href = payerUrl;
       els.stickyPayText.textContent = "Vérifie le nom et le numéro, puis paie directement.";
 
       els.btnCopy.onclick = async () => {
@@ -1242,6 +1370,19 @@
       els.codeInput.focus();
       els.searchPanel.scrollIntoView({ behavior:"smooth", block:"center" });
     });
+
+    const btnBottomOpen = document.getElementById("btnBottomOpen");
+    if (btnBottomOpen){
+      btnBottomOpen.addEventListener("click", () => {
+        const currentCode = normalizeCode(els.codeInput.value);
+        if (currentCode){
+          loadByCode(currentCode);
+          return;
+        }
+        els.codeInput.focus();
+        els.searchPanel.scrollIntoView({ behavior:"smooth", block:"center" });
+      });
+    }
 
     const params = new URLSearchParams(location.search);
     const bootCode = normalizeCode(params.get("pro") || "");
