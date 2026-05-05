@@ -5,6 +5,8 @@ window.DIGIY_PAY_PROOF_READY = true;
 
   const WAIT_URL = "./wait.html";
   const PUBLIC_CTX_KEY = "DIGIY_PAY_PUBLIC_CTX";
+  const PUBLIC_CARD_KEY = "digiy_pay_public_card";
+  const PUBLIC_CARD_BY_CODE_PREFIX = "digiy_pay_public_card_";
   const LAST_PROOF_KEY = "DIGIY_PAY_LAST_PROOF";
   const LAST_PROOF_BY_REF_PREFIX = "DIGIY_PAY_PROOF_REF_";
   const DEFAULT_MODULE = "PAY";
@@ -106,22 +108,86 @@ window.DIGIY_PAY_PROOF_READY = true;
     if (!value) return "";
     try {
       const u = new URL(value, location.href);
-      if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+      const host = u.hostname.toLowerCase();
+      const sameOrigin = u.origin === window.location.origin;
+      const digiyHost = host === "digiylyfe.com" || host.endsWith(".digiylyfe.com");
+      if ((u.protocol === "http:" || u.protocol === "https:") && (sameOrigin || digiyHost)) return u.toString();
       return "";
     } catch {
       return "";
     }
   }
 
-  function readPublicCtx() {
+  function cleanPublicUrl() {
     try {
-      const raw = sessionStorage.getItem(PUBLIC_CTX_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : null;
+      const url = new URL(location.href);
+      let changed = false;
+
+      [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "wallet_phone",
+        "pay_phone",
+        "access_note",
+        "keybox_code",
+        "keybox_location"
+      ].forEach((key) => {
+        if (url.searchParams.has(key)) {
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+      }
+    } catch {}
+  }
+
+  function safeJsonParse(raw) {
+    try {
+      return JSON.parse(raw);
     } catch {
       return null;
     }
+  }
+
+  function readPublicCtx() {
+    const code = normCode(q.get("code") || q.get("pro") || "");
+
+    const keys = [
+      code ? PUBLIC_CARD_BY_CODE_PREFIX + code : "",
+      PUBLIC_CARD_KEY,
+      PUBLIC_CTX_KEY
+    ].filter(Boolean);
+
+    for (const key of keys) {
+      try {
+        const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
+        const parsed = safeJsonParse(raw);
+        if (!parsed || typeof parsed !== "object") continue;
+
+        if (parsed.ts && Date.now() - Number(parsed.ts) > CACHE_TTL_MS) continue;
+        if (code && parsed.code && normCode(parsed.code) !== code) continue;
+
+        return {
+          module: parsed.module || DEFAULT_MODULE,
+          code: normCode(parsed.code || code),
+          business_name: parsed.business_name || parsed.public_label || "",
+          phone: normPhone(parsed.wave_phone || parsed.phone || parsed.public_wave_phone || ""),
+          slug: normSlug(parsed.slug || parsed.pay_slug || parsed.subscription_slug || "")
+        };
+      } catch {}
+    }
+
+    return null;
   }
 
   function setMsg(text, kind = "muted") {
@@ -151,12 +217,17 @@ window.DIGIY_PAY_PROOF_READY = true;
     const ctx = readPublicCtx() || {};
 
     const module = normModule(q.get("base_module") || q.get("module") || ctx.module || DEFAULT_MODULE);
-    const code = normCode(q.get("code") || ctx.code || "");
+    const code = normCode(q.get("code") || q.get("pro") || ctx.code || "");
     const publicLabel = String(q.get("public_label") || ctx.business_name || "").trim();
 
+    /*
+      Sécurité : phone / slug ne sont plus acceptés depuis l'URL.
+      Le numéro Wave vient du formulaire hydraté par payer.html ou de la session locale.
+      La référence technique reste cachée côté formulaire/session.
+    */
     const amount = String(els.payAmount?.value || q.get("amount") || "").replace(/[^\d]/g, "");
-    const phone = normPhone(els.payPhone?.value || q.get("phone") || ctx.phone || "");
-    const slug = normSlug(els.paySlug?.value || q.get("slug") || ctx.slug || "");
+    const phone = normPhone(els.payPhone?.value || ctx.phone || "");
+    const slug = normSlug(els.paySlug?.value || ctx.slug || "");
     const returnUrl = safeUrl(q.get("return"));
 
     return {
@@ -182,13 +253,13 @@ window.DIGIY_PAY_PROOF_READY = true;
     }
 
     if (els.btnBack) {
-      els.btnBack.href = st.returnUrl || ("./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : ""));
+      els.btnBack.href = "./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : "");
     }
   }
 
   function validate(st) {
     if (!st.code) return "Code DIGIY manquant.";
-    if (!st.phone || st.phone.length < 12) return "Numéro Wave manquant ou invalide.";
+    if (!st.phone || st.phone.length < 12) return "Numéro Wave manquant ou invalide. Reviens à la carte puis ouvre à nouveau la preuve.";
     if (!st.amount_xof || st.amount_xof <= 0) return "Montant payé manquant ou invalide.";
     if (!els.proofFile?.files?.[0]) return "Ajoute la capture Wave avant d’envoyer la preuve.";
     return "";
@@ -349,6 +420,7 @@ window.DIGIY_PAY_PROOF_READY = true;
     }
   }
 
+  cleanPublicUrl();
   hydrateFromCtx();
 
   if (els.btnSendProof) {
