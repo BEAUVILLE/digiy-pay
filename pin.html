@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#04110d">
   <meta
     name="description"
-    content="MON ARGENT by DIGIY — entrée sécurisée par téléphone et code pour ouvrir l’espace financier."
+    content="MON ARGENT by DIGIY — entrée sécurisée par téléphone et code pour ouvrir le cockpit financier sans exposer les données dans l’adresse."
   >
 
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
@@ -415,7 +415,7 @@
         <div class="brand-mark">🔐</div>
         <h1>MON ARGENT PRO</h1>
         <div class="sub">
-          Entrée sécurisée par téléphone et PIN pour ouvrir ton cockpit financier DIGIY PAY
+          Entrée sécurisée par téléphone et PIN. La session ouvre ton cockpit financier sans exposer tes données dans l’adresse.
         </div>
 
         <div class="chips">
@@ -433,8 +433,8 @@
 
       <div class="nav-mini">
         <a class="nav-card" href="./index.html">
-          <strong>Wallet public</strong>
-          <span>Vue publique du moyen de paiement</span>
+          <strong>Carte publique</strong>
+          <span>Carte publique du moyen de paiement</span>
         </a>
         <a id="navCockpit" class="nav-card" href="./cockpit.html">
           <strong>Cockpit</strong>
@@ -442,7 +442,15 @@
         </a>
         <a id="navAdmin" class="nav-card" href="./admin.html">
           <strong>Admin</strong>
-          <span>Outils internes plus profonds</span>
+          <span>Outils financiers protégés</span>
+        </a>
+        <a class="nav-card" href="https://digiy-hub.digiylyfe.com/">
+          <strong>HUB</strong>
+          <span>Revenir à la maison DIGIY</span>
+        </a>
+        <a class="nav-card" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">
+          <strong>Tarifs</strong>
+          <span>Voir les offres officielles</span>
         </a>
         <a class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
           <strong>Activation</strong>
@@ -450,7 +458,7 @@
         </a>
       </div>
 
-      <div id="screenName" class="name">Accès wallet</div>
+      <div id="screenName" class="name">Accès Mon argent</div>
       <div id="screenHint" class="hint">
         Entre ton téléphone et ton PIN pour ouvrir ton cockpit MON ARGENT PRO.
       </div>
@@ -470,8 +478,8 @@
         </div>
 
         <div class="btnrow">
-          <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
-          <a id="btnPublic" class="btn ghost" href="./index.html">💳 Wallet public</a>
+          <button id="btnSupport" class="btn ghost" type="button">🛟 Support</button>
+          <a id="btnPublic" class="btn ghost" href="./index.html">💳 Carte publique</a>
           <a id="btnCockpitGhost" class="btn ghost" href="./cockpit.html">📊 Cockpit</a>
           <a id="btnAdminGhost" class="btn ghost" href="./admin.html">⚙️ Admin</a>
         </div>
@@ -485,7 +493,7 @@
 
       <div class="foot">
         Usage ouvert côté public, accès fermé côté pro.<br>
-        Après validation PIN, redirection vers <span class="mono">cockpit.html</span> avec le slug PAY.
+        Après validation PIN, redirection vers <span class="mono">cockpit.html</span> avec une session locale protégée.
       </div>
     </section>
   </main>
@@ -514,6 +522,7 @@
   const LS_PAY_PHONE = "digiy_pay_phone";
   const LS_PAY_SLUG = "digiy_pay_slug";
   const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
+  const MAX_SESSION_MS = 8 * 60 * 60 * 1000;
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
@@ -551,6 +560,8 @@
   let slugQ = normSlug(qs.get("slug") || "");
   let codeQ = normalizeCode(qs.get("code") || "");
 
+  cleanVisibleUrl();
+
   function digitsOnly(v) {
     return String(v || "").replace(/\D/g, "");
   }
@@ -580,6 +591,39 @@
       .toUpperCase()
       .replace(/\s+/g, "")
       .replace(/[^A-Z0-9_-]/g, "");
+  }
+
+  function cleanVisibleUrl(){
+    try{
+      const url = new URL(window.location.href);
+      let changed = false;
+
+      [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "Mon argent_phone",
+        "pay_phone",
+        "access_note",
+        "keybox_code",
+        "keybox_location"
+      ].forEach(function(key){
+        if(url.searchParams.has(key)){
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      });
+
+      if(changed){
+        history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+      }
+    }catch(_){}
   }
 
   function show(el, on = true) {
@@ -629,22 +673,31 @@
   function saveQueryState(phone, slug, code) {
     try {
       const url = new URL(window.location.href);
-      const p = digitsOnly(phone || "");
-      const s = normSlug(slug || "");
       const c = normalizeCode(code || "");
 
-      if (p) url.searchParams.set("phone", p);
-      else url.searchParams.delete("phone");
-
-      if (s) url.searchParams.set("slug", s);
-      else url.searchParams.delete("slug");
+      [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "Mon argent_phone",
+        "pay_phone"
+      ].forEach(function(key){
+        url.searchParams.delete(key);
+      });
 
       if (c) url.searchParams.set("code", c);
       else url.searchParams.delete("code");
 
-      history.replaceState({}, "", url.toString());
+      history.replaceState({}, "", url.pathname + url.search + url.hash);
     } catch (_) {}
   }
+
 
   function saveSession({ phone, slug }) {
     const cleanPhone = normPhone(phone || "");
@@ -667,23 +720,28 @@
         localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
       }
 
-      localStorage.setItem(
-        SESSION_KEY,
-        JSON.stringify({
-          phone: cleanPhone,
-          slug: cleanSlug,
-          module: MODULE_CODE,
-          ts: Date.now()
-        })
-      );
+      const payload = JSON.stringify({
+        phone: cleanPhone,
+        slug: cleanSlug,
+        module: MODULE_CODE,
+        access_ok: true,
+        ts: Date.now()
+      });
+
+      localStorage.setItem(SESSION_KEY, payload);
+      sessionStorage.setItem(SESSION_KEY, payload);
     } catch (_) {}
   }
 
   function readSavedSession() {
     try {
-      const raw = localStorage.getItem(SESSION_KEY);
+      const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
       const data = raw ? JSON.parse(raw) : null;
       const map = readModuleSlugs();
+
+      if(data?.ts && (Date.now() - Number(data.ts)) > MAX_SESSION_MS){
+        return null;
+      }
 
       const phone =
         normPhone(data?.phone || "") ||
@@ -703,48 +761,34 @@
     }
   }
 
-  function buildCockpitUrl(phone, slug, code = "") {
-    const u = new URL(COCKPIT_URL, window.location.href);
-    const p = digitsOnly(phone || "");
-    const s = normSlug(slug || "");
-    const c = normalizeCode(code || "");
 
-    if (p) u.searchParams.set("phone", p);
-    if (s) u.searchParams.set("slug", s);
-    if (c) u.searchParams.set("code", c);
-
-    return u.toString();
+  function buildCockpitUrl() {
+    return COCKPIT_URL;
   }
 
-  function buildAdminUrl(phone, slug, code = "") {
-    const u = new URL(ADMIN_URL, window.location.href);
-    const p = digitsOnly(phone || "");
-    const s = normSlug(slug || "");
-    const c = normalizeCode(code || "");
-
-    if (p) u.searchParams.set("phone", p);
-    if (s) u.searchParams.set("slug", s);
-    if (c) u.searchParams.set("code", c);
-
-    return u.toString();
+  function buildAdminUrl() {
+    return ADMIN_URL;
   }
 
-  function syncQuickLinks(phone, slug, code = "") {
-    const cockpitHref = buildCockpitUrl(phone, slug, code);
-    const adminHref = buildAdminUrl(phone, slug, code);
+
+  function syncQuickLinks() {
+    const cockpitHref = buildCockpitUrl();
+    const adminHref = buildAdminUrl();
     btnCockpitGhost.href = cockpitHref;
     btnAdminGhost.href = adminHref;
     navCockpit.href = cockpitHref;
     navAdmin.href = adminHref;
   }
 
+
   function goCockpit(phone, slug) {
     const finalPhone = normPhone(phone || "");
     const finalSlug = normSlug(slug || "");
     saveSession({ phone: finalPhone, slug: finalSlug });
-    saveQueryState(finalPhone, finalSlug, codeQ);
-    location.href = buildCockpitUrl(finalPhone, finalSlug, codeQ);
+    saveQueryState("", "", codeQ);
+    location.href = buildCockpitUrl();
   }
+
 
   async function resolvePhoneFromSlug(slug) {
     const s = normSlug(slug);
@@ -924,7 +968,7 @@
       const parsed = extractLoginResult(res.data, phone, slug);
 
       if (!parsed.ok) {
-        throw new Error("PIN refusé ou accès wallet non trouvé.");
+        throw new Error("PIN refusé ou accès Mon argent non trouvé.");
       }
 
       if (!parsed.slug) {
@@ -935,14 +979,14 @@
       const finalSlug = parsed.slug || slug;
 
       if (!finalSlug) {
-        throw new Error("Slug PAY introuvable pour ce compte.");
+        throw new Error("Référence PAY introuvable pour ce compte.");
       }
 
       phoneQ = finalPhone;
       slugQ = finalSlug;
       saveSession({ phone: finalPhone, slug: finalSlug });
-      saveQueryState(finalPhone, finalSlug, codeQ);
-      syncQuickLinks(finalPhone, finalSlug, codeQ);
+      saveQueryState("", "", codeQ);
+      syncQuickLinks();
 
       setOk("Accès validé. Redirection vers le cockpit…");
       setTimeout(() => {
@@ -956,15 +1000,12 @@
   }
 
   function supportMessage() {
-    const p = normPhone(phoneInput.value || phoneQ || "");
-    const s = normSlug(slugQ || "");
     let msg = "DIGIY — MON ARGENT PRO\n\n";
-    if (p) msg += "Téléphone: " + p + "\n";
-    if (s) msg += "Slug: " + s + "\n";
-    if (codeQ) msg += "Code: " + codeQ + "\n";
-    msg += "J'ai besoin d'aide pour accéder à MON ARGENT PRO.";
+    msg += "J'ai besoin d'aide pour accéder à MON ARGENT PRO.\n";
+    msg += "Je suis sur la page PIN et je préfère ne pas envoyer mes données sensibles dans le lien.";
     return msg;
   }
+
 
   function openSupport() {
     const num = SUPPORT_WA.replace(/\+/g, "");
@@ -979,11 +1020,11 @@
 
     if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
 
-    saveQueryState(phoneQ, slugQ, codeQ);
-    syncQuickLinks(phoneQ, slugQ, codeQ);
+    saveQueryState("", "", codeQ);
+    syncQuickLinks();
 
     if (slugQ) {
-      screenName.textContent = "Accès wallet détecté";
+      screenName.textContent = "Accès Mon argent détecté";
       screenHint.textContent = "Un slug PAY a été détecté. Il sera utilisé pour ouvrir le cockpit.";
       slugHint.textContent = "Slug PAY détecté : " + slugQ;
     } else {
@@ -1015,7 +1056,7 @@
       const saved = readSavedSession();
 
       if (!saved?.phone && !saved?.slug) {
-        setError("Aucune session wallet trouvée.");
+        setError("Aucune session Mon argent trouvée.");
         return;
       }
 
@@ -1028,7 +1069,7 @@
       }
 
       if (!slug && phone) {
-        setInfo("Résolution du slug wallet à partir de la session…");
+        setInfo("Résolution de la référence PAY à partir de la session…");
         slug = await resolveSlugFromPhone(phone);
       }
 
@@ -1038,7 +1079,7 @@
       }
 
       if (!slug) {
-        setError("Session incomplète. Slug PAY introuvable.");
+        setError("Session incomplète. Référence PAY introuvable.");
         return;
       }
 
@@ -1047,8 +1088,8 @@
       if (phoneQ) phoneInput.value = digitsOnly(phoneQ);
 
       saveSession({ phone, slug });
-      saveQueryState(phone, slug, codeQ);
-      syncQuickLinks(phone, slug, codeQ);
+      saveQueryState("", "", codeQ);
+      syncQuickLinks();
 
       setOk("Session trouvée. Redirection vers le cockpit…");
       setTimeout(() => {
