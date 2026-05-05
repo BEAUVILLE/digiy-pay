@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>DIGIY — Confirmer mon paiement</title>
+  <title>Mon argent — confirmer mon paiement</title>
   <meta name="theme-color" content="#16a34a"/>
   <meta name="robots" content="noindex"/>
 
@@ -152,11 +152,14 @@
     <div class="card">
       <h1>✅ J’ai payé — j’envoie maintenant la preuve</h1>
       <p class="muted">
-        Tu as déjà payé via Wave. Cette page sert à confirmer le paiement et à envoyer la capture pour que le professionnel puisse retrouver le mouvement dans son univers DIGIY PAY.
+        Tu as déjà payé via Wave. Cette page sert à confirmer le paiement et à envoyer la capture pour que le professionnel puisse retrouver le mouvement dans Mon argent.
       </p>
 
       <div class="top-actions">
         <a id="btnBack" class="btn ghost" href="./index.html">⬅️ Retour à la carte</a>
+        <a class="btn ghost" href="https://digiylyfe.com/">🌍 Site</a>
+        <a class="btn ghost" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
+        <a class="btn gold" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">📦 Tarifs</a>
       </div>
 
       <div class="hr"></div>
@@ -190,12 +193,12 @@
           </div>
 
           <div>
-            <div class="label">Numéro Wave</div>
+            <div class="label">Numéro Wave vérifié</div>
             <div class="value mono" id="recapPhone">—</div>
           </div>
           <div>
-            <div class="label">Identifiant</div>
-            <div class="value mono" id="recapSlug">—</div>
+            <div class="label">Référence protégée</div>
+            <div class="value mono" id="recapSlug">Session locale</div>
           </div>
 
           <div>
@@ -203,7 +206,7 @@
             <div class="value mono" id="recapRef">—</div>
           </div>
           <div>
-            <div class="label">Retour</div>
+            <div class="label">Retour carte</div>
             <div class="value mono" id="recapReturn">—</div>
           </div>
         </div>
@@ -229,9 +232,11 @@
 
         <div class="hr"></div>
 
-        <div class="label">Identifiant DIGIY (optionnel)</div>
-        <input class="in" id="paySlug" placeholder="Ex : pay-221771342889" />
-        <div class="muted" id="slugAuto" style="margin-top:8px;font-size:12px;"></div>
+        <div class="label">Référence DIGIY protégée</div>
+        <input class="in" id="paySlug" type="hidden" />
+        <div class="muted" id="slugAuto" style="margin-top:8px;font-size:12px;">
+          La référence technique reste en session locale. Le client vérifie surtout le nom, le numéro et le montant.
+        </div>
       </div>
 
       <div class="hr"></div>
@@ -299,12 +304,91 @@
       let resolvedPhone = "";
       let resolvedSlug = "";
 
+      function cleanPublicUrl(){
+        try{
+          const url = new URL(window.location.href);
+          let changed = false;
+
+          [
+            "phone",
+            "tel",
+            "owner_phone",
+            "owner_id",
+            "slug",
+            "pay_slug",
+            "subscription_slug",
+            "business_phone",
+            "wave_phone",
+            "wallet_phone",
+            "pay_phone",
+            "access_note",
+            "keybox_code",
+            "keybox_location"
+          ].forEach(function(key){
+            if(url.searchParams.has(key)){
+              url.searchParams.delete(key);
+              changed = true;
+            }
+          });
+
+          if(changed){
+            history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+          }
+        }catch(_){}
+      }
+
+      function safeJsonParse(raw){
+        try{ return JSON.parse(raw); }catch(_){ return null; }
+      }
+
+      function readPublicCardSession(code){
+        const clean = normCode(code);
+        const keys = [
+          clean ? "digiy_pay_public_card_" + clean : "",
+          "digiy_pay_public_card"
+        ].filter(Boolean);
+
+        for(const key of keys){
+          try{
+            const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
+            const parsed = safeJsonParse(raw);
+            if(!parsed || typeof parsed !== "object") continue;
+            if(parsed.ts && (Date.now() - Number(parsed.ts)) > CACHE_TTL_MS) continue;
+            if(clean && parsed.code && normCode(parsed.code) !== clean) continue;
+            return parsed;
+          }catch(_){}
+        }
+
+        return null;
+      }
+
+      function savePublicCardSession(code, row){
+        const clean = normCode(code);
+        const payload = {
+          ts: Date.now(),
+          code: clean,
+          business_name: String(row?.business_name || row?.display_name || row?.public_label || "").trim(),
+          wave_phone: normPhone(row?.wave_phone || row?.public_wave_phone || row?.pay_phone || row?.phone || ""),
+          slug: normSlug(row?.slug || row?.pay_slug || row?.subscription_slug || "")
+        };
+
+        try{
+          sessionStorage.setItem("digiy_pay_public_card", JSON.stringify(payload));
+          if(clean) sessionStorage.setItem("digiy_pay_public_card_" + clean, JSON.stringify(payload));
+        }catch(_){}
+
+        return payload;
+      }
+
       function safeUrl(raw){
         const value = String(raw || "").trim();
         if(!value) return "";
         try{
           const u = new URL(value, location.href);
-          if(u.protocol === "http:" || u.protocol === "https:") return u.toString();
+          const host = u.hostname.toLowerCase();
+          const sameOrigin = u.origin === window.location.origin;
+          const digiyHost = host === "digiylyfe.com" || host.endsWith(".digiylyfe.com");
+          if((u.protocol === "http:" || u.protocol === "https:") && (sameOrigin || digiyHost)) return u.toString();
           return "";
         }catch{
           return "";
@@ -444,13 +528,13 @@
 
       function getState(){
         return {
-          module: normModuleRaw(q.get("base_module") || q.get("module") || ""),
-          publicLabel: String(q.get("public_label") || "").trim(),
+          module: normModuleRaw(q.get("base_module") || q.get("module") || MODULE),
+          publicLabel: String(q.get("public_label") || resolvedName || "").trim(),
           plan: String(q.get("plan") || "").trim(),
-          code: normCode(q.get("code") || ""),
+          code: normCode(q.get("code") || q.get("pro") || ""),
           amount: String($("payAmount")?.value || q.get("amount") || "").replace(/[^\d]/g, ""),
-          phone: normPhone($("payPhone")?.value || resolvedPhone || q.get("phone") || ""),
-          slug: normSlug($("paySlug")?.value || resolvedSlug || q.get("slug") || ""),
+          phone: normPhone($("payPhone")?.value || resolvedPhone || ""),
+          slug: normSlug($("paySlug")?.value || resolvedSlug || ""),
           returnUrl: safeUrl(q.get("return")) || ""
         };
       }
@@ -464,9 +548,9 @@
         $("recapCode").textContent = st.code || "—";
         $("recapAmount").textContent = fmtFcfa(st.amount);
         $("recapPhone").textContent = displayPhone(st.phone);
-        $("recapSlug").textContent = st.slug || "—";
+        $("recapSlug").textContent = st.slug ? "OK" : "—";
         $("recapRef").textContent = buildRef(st.module, st.code, st.phone);
-        $("recapReturn").textContent = st.returnUrl ? "OK" : "—";
+        $("recapReturn").textContent = "Carte publique";
 
         if($("payAmount") && st.amount && !$("payAmount").value) $("payAmount").value = st.amount;
         if($("payPhone") && st.phone && !$("payPhone").value) $("payPhone").value = st.phone;
@@ -476,16 +560,16 @@
           st.module ? "Module : " + displayModule(st.module) : "",
           st.code ? "Code : " + st.code : "",
           st.plan && st.plan !== "payment" ? "Plan : " + st.plan : "",
-          (!st.slug && buildSuggestedSlug(st.module, st.phone)) ? "Identifiant suggéré : " + buildSuggestedSlug(st.module, st.phone) : ""
+          st.slug ? "Référence protégée : OK" : ""
         ].filter(Boolean).join(" • ");
 
         $("dynamicPills").innerHTML = [
           product ? '<span class="pill gold">' + product + '</span>' : "",
-          st.phone ? '<span class="pill ok">Wave : ' + displayPhone(st.phone) + '</span>' : "",
+          st.phone ? '<span class="pill ok">Numéro Wave vérifié</span>' : "",
           st.code ? '<span class="pill">Code : ' + st.code + '</span>' : ""
         ].join(" ");
 
-        $("btnBack").href = st.returnUrl || ("./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : ""));
+        $("btnBack").href = "./index.html" + (st.code ? ("?pro=" + encodeURIComponent(st.code)) : "");
       }
 
       function refreshUiState(){
@@ -500,9 +584,59 @@
         }
       }
 
+      function unwrapRpcCard(data, fallbackCode){
+        if(!data) return null;
+
+        const root = Array.isArray(data) ? data[0] : data;
+        if(!root) return null;
+        if(root.ok === false) return null;
+
+        const card =
+          root.card ||
+          root.item ||
+          root.pro ||
+          root.profile ||
+          root.data ||
+          root;
+
+        if(!card || typeof card !== "object") return null;
+
+        return {
+          business_name: String(
+            card.business_name ||
+            card.display_name ||
+            card.public_label ||
+            card.merchant_name ||
+            card.shop_name ||
+            fallbackCode ||
+            ""
+          ).trim(),
+          business_code: normCode(card.business_code || card.code || fallbackCode || ""),
+          wave_phone: normPhone(
+            card.wave_phone ||
+            card.public_wave_phone ||
+            card.pay_phone ||
+            card.wallet_phone ||
+            card.phone ||
+            ""
+          ),
+          slug: normSlug(card.slug || card.pay_slug || card.subscription_slug || "")
+        };
+      }
+
       async function resolveByCode(){
-        const code = normCode(q.get("code") || "");
-        if(!code || !sb) return;
+        const code = normCode(q.get("code") || q.get("pro") || "");
+        if(!code) return;
+
+        const sessionCard = readPublicCardSession(code);
+        if(sessionCard){
+          resolvedName = String(sessionCard.business_name || "").trim();
+          resolvedPhone = normPhone(sessionCard.wave_phone || "");
+          resolvedSlug = normSlug(sessionCard.slug || "");
+          refreshUiState();
+          if(resolvedPhone) setInfo("Carte reprise depuis la session locale.", "ok");
+          return;
+        }
 
         const cached = readCache(code);
         if(cached){
@@ -513,75 +647,62 @@
           return;
         }
 
+        if(!sb) return;
+
         setInfo("Recherche du numéro Wave liée au code DIGIY…", "muted");
 
-        const { data, error } = await withTimeout(
-          sb.from("digiy_pay_pro")
-            .select("business_name,business_code,wave_phone,is_active")
-            .eq("business_code", code)
-            .limit(1)
-            .maybeSingle(),
-          FETCH_TIMEOUT_MS,
-          "pay_lookup_timeout"
-        );
+        const attempts = [
+          { name: "digiy_pay_public_card_by_code", args: { p_code: code } },
+          { name: "digiy_pay_public_card", args: { p_code: code } },
+          { name: "digiy_pay_get_public_card", args: { p_code: code } },
+          { name: "digiy_pay_public_pro_by_code", args: { p_code: code } }
+        ];
 
-        if(error || !data){
-          setInfo("Impossible de retrouver automatiquement le numéro Wave avec ce code.", "bad");
-          refreshUiState();
-          return;
+        for(const attempt of attempts){
+          try{
+            const { data, error } = await withTimeout(
+              sb.rpc(attempt.name, attempt.args),
+              FETCH_TIMEOUT_MS,
+              "pay_lookup_timeout"
+            );
+
+            if(error) continue;
+
+            const row = unwrapRpcCard(data, code);
+            if(!row || !row.wave_phone) continue;
+
+            resolvedName = String(row.business_name || "").trim();
+            resolvedPhone = normPhone(row.wave_phone || "");
+            resolvedSlug = normSlug(row.slug || "");
+
+            saveCache(code, {
+              business_name: resolvedName,
+              wave_phone: resolvedPhone,
+              slug: resolvedSlug
+            });
+            savePublicCardSession(code, {
+              business_name: resolvedName,
+              wave_phone: resolvedPhone,
+              slug: resolvedSlug
+            });
+
+            setInfo("Numéro Wave retrouvé automatiquement à partir du code.", "ok");
+            refreshUiState();
+            return;
+          }catch(_){}
         }
 
-        resolvedName = String(data.business_name || "").trim();
-        resolvedPhone = normPhone(data.wave_phone || "");
-
-        if(!resolvedPhone){
-          setInfo("Code trouvé, mais numéro Wave absent pour le moment.", "bad");
-          refreshUiState();
-          return;
-        }
-
-        try{
-          const [sub1, sub2] = await Promise.allSettled([
-            withTimeout(
-              sb.from("digiy_subscriptions_public")
-                .select("phone,slug,module")
-                .eq("phone", resolvedPhone)
-                .eq("module", MODULE)
-                .limit(1)
-                .maybeSingle(),
-              FETCH_TIMEOUT_MS,
-              "slug_lookup_timeout"
-            ),
-            withTimeout(
-              sb.from("digiy_subscriptions_public")
-                .select("phone,slug,module")
-                .eq("phone", "+" + resolvedPhone)
-                .eq("module", MODULE)
-                .limit(1)
-                .maybeSingle(),
-              FETCH_TIMEOUT_MS,
-              "slug_lookup_timeout"
-            )
-          ]);
-
-          const one = sub1.status === "fulfilled" ? sub1.value : null;
-          const two = sub2.status === "fulfilled" ? sub2.value : null;
-
-          if(!one?.error && one?.data?.slug){
-            resolvedSlug = normSlug(one.data.slug);
-          } else if(!two?.error && two?.data?.slug){
-            resolvedSlug = normSlug(two.data.slug);
-          }
-        }catch(_){}
-
-        saveCache(code, {
-          business_name: resolvedName,
-          wave_phone: resolvedPhone,
-          slug: resolvedSlug
-        });
-
-        setInfo("Numéro Wave retrouvé automatiquement à partir du code.", "ok");
+        setInfo("Impossible de retrouver automatiquement le numéro Wave avec ce code.", "bad");
         refreshUiState();
+      }
+
+      cleanPublicUrl();
+
+      const bootSessionCard = readPublicCardSession(q.get("code") || q.get("pro") || "");
+      if(bootSessionCard){
+        resolvedName = String(bootSessionCard.business_name || "").trim();
+        resolvedPhone = normPhone(bootSessionCard.wave_phone || "");
+        resolvedSlug = normSlug(bootSessionCard.slug || "");
       }
 
       refreshUiState();
