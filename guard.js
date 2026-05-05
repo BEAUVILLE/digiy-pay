@@ -1,4 +1,4 @@
-/* guard.js — DIGIY UNIVERSAL SUBSCRIPTION GUARD (SAFE + CACHE) */
+/* guard.js — DIGIY PAY GUARD (SAFE URL + SESSION 8H) */
 (function(){
   "use strict";
 
@@ -21,6 +21,10 @@
     window.DIGIY_PAY_URL ||
     "https://commencer-a-payer.digiylyfe.com/";
 
+  const DEFAULT_MODULE = String(window.DIGIY_MODULE || "PAY").trim().toUpperCase();
+  const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
+  const MAX_SESSION_MS = 8 * 60 * 60 * 1000;
+
   // =============================
   // BASE GitHub Pages
   // =============================
@@ -28,8 +32,150 @@
   const parts = path.split("/").filter(Boolean);
   const BASE = (parts.length >= 1) ? ("/" + parts[0]) : "";
 
+  cleanVisibleUrl();
+
   function normalizePhone(value){
     return String(value || "").replace(/\D/g, "");
+  }
+
+  function normalizeSlug(value){
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function cleanVisibleUrl(){
+    try{
+      const url = new URL(location.href);
+      let changed = false;
+
+      [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "wallet_phone",
+        "pay_phone",
+        "access_note",
+        "keybox_code",
+        "keybox_location",
+        "from",
+        "redirect"
+      ].forEach(function(key){
+        if(url.searchParams.has(key)){
+          url.searchParams.delete(key);
+          changed = true;
+        }
+      });
+
+      if(changed){
+        history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+      }
+    }catch(_){}
+  }
+
+  function safeLocalPath(pathname){
+    try{
+      const u = new URL(pathname || location.pathname, location.href);
+
+      [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "wallet_phone",
+        "pay_phone",
+        "from",
+        "redirect"
+      ].forEach(function(key){
+        u.searchParams.delete(key);
+      });
+
+      if(u.origin === location.origin){
+        return u.pathname + u.search + u.hash;
+      }
+
+      return "./pin.html";
+    }catch(_){
+      return "./pin.html";
+    }
+  }
+
+  function buildCleanPayUrl(module, err){
+    const url = new URL(PAY_URL, location.href);
+    url.searchParams.set("module", String(module || DEFAULT_MODULE || "PAY").trim().toUpperCase());
+    if(err) url.searchParams.set("err", String(err));
+    return url.toString();
+  }
+
+  function readSession(){
+    try{
+      const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
+      const data = raw ? JSON.parse(raw) : null;
+
+      if(!data || typeof data !== "object") return null;
+
+      if(data.ts && (Date.now() - Number(data.ts)) > MAX_SESSION_MS){
+        return null;
+      }
+
+      const phone = normalizePhone(data.phone || "");
+      const slug = normalizeSlug(data.slug || "");
+      const module = String(data.module || DEFAULT_MODULE || "PAY").trim().toUpperCase();
+
+      if(!phone && !slug) return null;
+
+      return {
+        phone,
+        slug,
+        module,
+        access_ok: data.access_ok === true,
+        ts: data.ts || 0
+      };
+    }catch(_){
+      return null;
+    }
+  }
+
+  function saveSession(phone, slug, module){
+    const p = normalizePhone(phone || "");
+    const s = normalizeSlug(slug || "");
+    const m = String(module || DEFAULT_MODULE || "PAY").trim().toUpperCase();
+
+    try{
+      const payload = JSON.stringify({
+        phone: p,
+        slug: s,
+        module: m,
+        access_ok: true,
+        ts: Date.now()
+      });
+
+      sessionStorage.setItem(SESSION_KEY, payload);
+      localStorage.setItem(SESSION_KEY, payload);
+
+      if(p){
+        localStorage.setItem("digiy_pay_phone", "+" + p.replace(/^\+/, ""));
+      }
+
+      if(s){
+        localStorage.setItem("digiy_pay_slug", s);
+      }
+    }catch(_){}
   }
 
   function nowMs(){
@@ -88,8 +234,21 @@
 
   const supabase = window.__sb || window.supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY
+    SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storage: {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {}
+        }
+      }
+    }
   );
+
   window.__sb = supabase;
 
   // =============================
@@ -106,6 +265,9 @@
   }
 
   function pickPhoneFromKnownStores(){
+    const session = readSession();
+    if(session?.phone) return session.phone;
+
     const directKeys = [
       "digiy_phone",
       "digiy_driver_phone",
@@ -208,10 +370,10 @@
       data?.ok === true;
 
     if (ok) {
-      console.log("✅ Abonnement actif:", { phone, module });
+      console.log("✅ Abonnement actif:", { module });
       cacheSet(phone, module, 60);
     } else {
-      console.log("❌ Pas d'abonnement actif:", { phone, module });
+      console.log("❌ Pas d'abonnement actif:", { module });
     }
 
     return !!ok;
@@ -224,9 +386,11 @@
     BASE,
     PAY_URL,
     getPhone,
+    readSession,
 
     async guardOrPay(module, loginPath){
-      module = String(module || "").trim();
+      module = String(module || "").trim().toUpperCase();
+
       if(!module){
         console.error("❌ guardOrPay: module manquant");
         return false;
@@ -242,24 +406,22 @@
         console.log("❌ Pas de phone -> redirection login");
 
         const target = loginPath
-          ? (loginPath.startsWith("http") ? loginPath : (BASE + loginPath))
-          : (BASE + "/login.html");
+          ? (loginPath.startsWith("http") ? loginPath : safeLocalPath(loginPath))
+          : "./pin.html";
 
         setTimeout(() => {
-          location.replace(
-            target +
-            (target.includes("?") ? "&" : "?") +
-            "redirect=" + encodeURIComponent(location.href)
-          );
-        }, 1000);
+          location.replace(target);
+        }, 600);
 
         return false;
       }
 
-      console.log("✅ Phone:", phone);
       say("Vérification abonnement...");
 
-      window.DIGIY_ACCESS = { phone, module, ok: false };
+      window.DIGIY_ACCESS = {
+        module,
+        ok: false
+      };
 
       try{
         const ok = await isActive(phone, module);
@@ -269,13 +431,8 @@
           say("❌ Abonnement requis");
 
           setTimeout(() => {
-            location.replace(
-              PAY_URL +
-              "?phone=" + encodeURIComponent(phone) +
-              "&module=" + encodeURIComponent(module) +
-              "&from=" + encodeURIComponent(location.href)
-            );
-          }, 1500);
+            location.replace(buildCleanPayUrl(module));
+          }, 900);
 
           return false;
         }
@@ -285,6 +442,7 @@
         console.log("✅ Accès OK pour:", module);
 
         document.documentElement.classList.add("access-ok");
+        saveSession(phone, readSession()?.slug || "", module);
         window.DIGIY_ACCESS.ok = true;
 
         setTimeout(() => {
@@ -299,11 +457,8 @@
         say("❌ Erreur vérification");
 
         setTimeout(() => {
-          location.replace(
-            PAY_URL +
-            "?err=verify&from=" + encodeURIComponent(location.href)
-          );
-        }, 1500);
+          location.replace(buildCleanPayUrl(module, "verify"));
+        }, 900);
 
         return false;
       }
