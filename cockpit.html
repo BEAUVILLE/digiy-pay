@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#04110d">
   <meta
     name="description"
-    content="MON ARGENT by DIGIY — espace financier sécurisé, QR de paiement, carte PNG, lien public et pilotage PAY."
+    content="MON ARGENT by DIGIY — cockpit financier sécurisé, QR de paiement, carte PNG, lien public et pilotage PAY sans exposer la session dans l’adresse."
   >
 
   <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
@@ -559,7 +559,7 @@
       <div class="nav-mini">
         <a id="navPublic" class="nav-card" href="./index.html">
           <strong>Page publique</strong>
-          <span>Vue client du paiement direct</span>
+          <span>Carte client du paiement direct</span>
         </a>
         <a id="navPin" class="nav-card" href="./pin.html">
           <strong>Code PAY</strong>
@@ -568,6 +568,14 @@
         <a id="navAdmin" class="nav-card" href="./admin.html">
           <strong>Réglages PAY</strong>
           <span>Réglages rapides et gestion légère</span>
+        </a>
+        <a class="nav-card" href="https://digiy-hub.digiylyfe.com/">
+          <strong>HUB</strong>
+          <span>Revenir à la maison DIGIY</span>
+        </a>
+        <a class="nav-card" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">
+          <strong>Tarifs</strong>
+          <span>Voir les offres officielles</span>
         </a>
         <a id="navActivate" class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
           <strong>Activation</strong>
@@ -601,9 +609,13 @@
             </div>
 
             <div>
-              <label for="walletSlug">Identifiant session</label>
-              <input id="walletSlug" type="text" readonly>
-              <div class="hint">Lu depuis la session active.</div>
+              <label for="walletSlug">Référence protégée</label>
+              <input id="walletSlug" type="hidden" readonly>
+              <div class="stat" style="margin-top:0;">
+                <div class="statLabel">État référence</div>
+                <div class="statValue">Protégée</div>
+              </div>
+              <div class="hint">Rangée dans la session locale, non affichée dans l’adresse.</div>
             </div>
           </div>
 
@@ -631,11 +643,11 @@
 
           <div class="stats">
             <div class="stat">
-              <div class="statLabel">Téléphone session</div>
+              <div class="statLabel">Session</div>
               <div class="statValue mono" id="sessionPhone">—</div>
             </div>
             <div class="stat">
-              <div class="statLabel">Slug session</div>
+              <div class="statLabel">Référence PAY</div>
               <div class="statValue mono" id="sessionSlug">—</div>
             </div>
             <div class="stat">
@@ -658,7 +670,7 @@
 
           <div class="btnrow">
             <a id="btnOpenPublic" class="btn" href="./index.html" target="_blank" rel="noopener">🌍 Ouvrir la page publique</a>
-            <button id="btnSupport" class="btn ghost" type="button">🛟 Support WhatsApp</button>
+            <button id="btnSupport" class="btn ghost" type="button">🛟 Support</button>
           </div>
 
           <div class="mini" style="margin-top:14px;">
@@ -792,6 +804,7 @@
       const LS_PAY_PHONE = "digiy_pay_phone";
       const LS_PAY_SLUG = "digiy_pay_slug";
       const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
+      const MAX_SESSION_MS = 8 * 60 * 60 * 1000;
 
       const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
@@ -873,6 +886,8 @@
       let currentCodeFromQuery = normalizeCode(qs.get("code") || "");
       let loadedProfile = null;
 
+      cleanVisibleUrl();
+
       let renderToken = 0;
       let lastRenderFingerprint = "";
       let lastCardDataUrl = "";
@@ -914,6 +929,39 @@
           .toUpperCase()
           .replace(/\s+/g, "")
           .replace(/[^A-Z0-9_-]/g, "");
+      }
+
+      function cleanVisibleUrl() {
+        try {
+          const url = new URL(window.location.href);
+          let changed = false;
+
+          [
+            "phone",
+            "tel",
+            "owner_phone",
+            "owner_id",
+            "slug",
+            "pay_slug",
+            "subscription_slug",
+            "business_phone",
+            "wave_phone",
+            "wallet_phone",
+            "pay_phone",
+            "access_note",
+            "keybox_code",
+            "keybox_location"
+          ].forEach(function(key){
+            if (url.searchParams.has(key)) {
+              url.searchParams.delete(key);
+              changed = true;
+            }
+          });
+
+          if (changed) {
+            history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+          }
+        } catch (_) {}
       }
 
       function show(el, on = true) {
@@ -963,41 +1011,53 @@
       function saveQueryState(phone, slug, code) {
         try {
           const url = new URL(window.location.href);
-          const p = phoneDigits(phone || "");
-          const s = normSlug(slug || "");
           const c = normalizeCode(code || "");
 
-          if (p) url.searchParams.set("phone", p);
-          else url.searchParams.delete("phone");
-
-          if (s) url.searchParams.set("slug", s);
-          else url.searchParams.delete("slug");
+          [
+            "phone",
+            "tel",
+            "owner_phone",
+            "owner_id",
+            "slug",
+            "pay_slug",
+            "subscription_slug",
+            "business_phone",
+            "wave_phone",
+            "wallet_phone",
+            "pay_phone"
+          ].forEach(function(key){
+            url.searchParams.delete(key);
+          });
 
           if (c) url.searchParams.set("code", c);
           else url.searchParams.delete("code");
 
-          history.replaceState({}, "", url.toString());
+          history.replaceState({}, "", url.pathname + url.search + url.hash);
         } catch (_) {}
       }
 
+
       function readSession() {
-        let phone = normPhone(qs.get("phone") || "");
-        let slug = normSlug(qs.get("slug") || "");
+        let phone = "";
+        let slug = "";
+
+        try {
+          const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
+          const s = raw ? JSON.parse(raw) : null;
+
+          if (s?.ts && (Date.now() - Number(s.ts)) > MAX_SESSION_MS) {
+            return { phone:"", slug:"" };
+          }
+
+          if (s?.phone) phone = normPhone(s.phone);
+          if (s?.slug) slug = normSlug(s.slug);
+        } catch (_) {}
 
         if (!phone) {
           try { phone = normPhone(localStorage.getItem(LS_PAY_PHONE) || ""); } catch (_) {}
         }
         if (!slug) {
           try { slug = normSlug(localStorage.getItem(LS_PAY_SLUG) || ""); } catch (_) {}
-        }
-
-        if (!phone || !slug) {
-          try {
-            const raw = localStorage.getItem(SESSION_KEY);
-            const s = raw ? JSON.parse(raw) : null;
-            if (!phone && s?.phone) phone = normPhone(s.phone);
-            if (!slug && s?.slug) slug = normSlug(s.slug);
-          } catch (_) {}
         }
 
         if (!slug) {
@@ -1015,9 +1075,11 @@
         return { phone, slug };
       }
 
+
       function clearSession() {
         try {
           localStorage.removeItem(SESSION_KEY);
+          sessionStorage.removeItem(SESSION_KEY);
           localStorage.removeItem(LS_PAY_PHONE);
           localStorage.removeItem(LS_PAY_SLUG);
 
@@ -1046,12 +1108,16 @@
             localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
           }
 
-          localStorage.setItem(SESSION_KEY, JSON.stringify({
+          const payload = JSON.stringify({
             phone: p,
             slug: s,
             module: MODULE_CODE,
+            access_ok: true,
             ts: Date.now()
-          }));
+          });
+
+          localStorage.setItem(SESSION_KEY, payload);
+          sessionStorage.setItem(SESSION_KEY, payload);
         } catch (_) {}
       }
 
@@ -1062,47 +1128,27 @@
         return u.toString();
       }
 
-      function buildPinUrl(phone = "", slug = "", code = "") {
-        const u = new URL(PIN_URL, window.location.href);
-        const p = phoneDigits(phone || "");
-        const s = normSlug(slug || "");
-        const c = normalizeCode(code || "");
-        if (p) u.searchParams.set("phone", p);
-        if (s) u.searchParams.set("slug", s);
-        if (c) u.searchParams.set("code", c);
-        return u.toString();
+      function buildPinUrl() {
+        return PIN_URL;
       }
 
-      function buildAdminUrl(phone = "", slug = "", code = "") {
-        const u = new URL(ADMIN_URL, window.location.href);
-        const p = phoneDigits(phone || "");
-        const s = normSlug(slug || "");
-        const c = normalizeCode(code || "");
-        if (p) u.searchParams.set("phone", p);
-        if (s) u.searchParams.set("slug", s);
-        if (c) u.searchParams.set("code", c);
-        return u.toString();
+      function buildAdminUrl() {
+        return ADMIN_URL;
       }
 
-      function buildActivateUrl(phone = "", code = "") {
+      function buildActivateUrl() {
         const u = new URL(ACTIVATE_BASE);
         u.searchParams.set("module", "PAY");
-        const p = phoneDigits(phone || "");
-        const c = normalizeCode(code || "");
-        if (p) u.searchParams.set("phone", p);
-        if (c) u.searchParams.set("code", c);
         return u.toString();
       }
+
 
       function syncNavLinks() {
         const code = getEffectiveCode() || currentCodeFromQuery || "";
-        const phone = currentPhone || walletPhone.value || "";
-        const slug = currentSlug || walletSlug.value || "";
-
         const publicHref = code ? buildPublicUrl(code) : PUBLIC_BASE_URL;
-        const pinHref = buildPinUrl(phone, slug, code);
-        const adminHref = buildAdminUrl(phone, slug, code);
-        const activateHref = buildActivateUrl(phone, code);
+        const pinHref = buildPinUrl();
+        const adminHref = buildAdminUrl();
+        const activateHref = buildActivateUrl();
 
         btnPublicTop.href = publicHref;
         navPublic.href = publicHref;
@@ -1117,6 +1163,7 @@
         btnActivateTop.href = activateHref;
         navActivate.href = activateHref;
       }
+
 
       function getEffectiveCode() {
         return normalizeCode(walletCode.value || "");
@@ -1193,8 +1240,8 @@
         const wave = getEffectiveWave();
         const url = getEffectivePublicUrl();
 
-        sessionPhone.textContent = currentPhone ? phoneDigits(currentPhone) : "—";
-        sessionSlug.textContent = currentSlug || "—";
+        sessionPhone.textContent = currentPhone ? "Ouverte" : "—";
+        sessionSlug.textContent = currentSlug ? "OK" : "—";
         merchantWave.textContent = wave || "—";
         publicLink.textContent = code ? url : "—";
         publicCode.textContent = code || "—";
@@ -1204,11 +1251,12 @@
         qrActiveWave.textContent = wave || "—";
         qrActiveUrl.textContent = code ? url : "—";
 
-        saveQueryState(currentPhone || walletPhone.value || "", currentSlug || walletSlug.value || "", code);
+        saveQueryState("", "", code);
         syncNavLinks();
         void renderQrOnly();
         void renderCard();
       }
+
 
       function fillForm(profile) {
         walletName.value = profile?.business_name || "";
@@ -1241,7 +1289,7 @@
         currentSlug = normSlug(session.slug || "");
 
         if (!currentPhone && currentSlug) {
-          setInfo("Résolution du téléphone à partir du slug…");
+          setInfo("Résolution de la session PAY…");
           currentPhone = await resolvePhoneFromSlug(currentSlug);
         }
 
@@ -1253,8 +1301,8 @@
         saveSession(currentPhone, currentSlug);
 
         walletSlug.value = currentSlug || "";
-        sessionPhone.textContent = phoneDigits(currentPhone);
-        sessionSlug.textContent = currentSlug || "—";
+        sessionPhone.textContent = currentPhone ? "Ouverte" : "—";
+        sessionSlug.textContent = currentSlug ? "OK" : "—";
         syncNavLinks();
 
         setInfo("Chargement du profil PAY…");
@@ -1418,16 +1466,13 @@
       }
 
       function openSupport() {
-        const phoneDigitsValue = phoneDigits(walletPhone.value || currentPhone || "");
-        const code = getEffectiveCode();
         let msg = "DIGIY — MON ARGENT PRO\n\n";
-        if (phoneDigitsValue) msg += "Numéro de paiement: " + phoneDigitsValue + "\n";
-        if (code) msg += "Code: " + code + "\n";
-        if (currentSlug) msg += "Slug: " + currentSlug + "\n";
-        msg += "J'ai besoin d'aide pour MON ARGENT PRO.";
+        msg += "J'ai besoin d'aide pour MON ARGENT PRO.\n";
+        msg += "Je préfère ne pas envoyer mon numéro ou ma référence dans le lien.";
         const num = SUPPORT_WA.replace(/\+/g, "");
         location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
       }
+
 
       function roundedRect(ctx, x, y, w, h, r) {
         ctx.beginPath();
