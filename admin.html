@@ -1,1306 +1,419 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>MON ARGENT — Réglages PAY</title>
-  <meta name="theme-color" content="#04110d">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DIGIY PAY — Espace professionnel réservé</title>
+  <meta name="theme-color" content="#f4ead2" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="digiy-build" content="pay-public-admin-gate-20260510-v1-audio" />
   <meta
     name="description"
-    content="MON ARGENT by DIGIY — administration PAY protégée, réglages rapides et accès au cockpit financier."
-  >
-
-  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1">
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1">
-  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1">
-  <link rel="manifest" href="./site.webmanifest?v=1">
-
-  <script>
-    window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-    window.DIGIY_SUPABASE_ANON_KEY = "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
-    window.DIGIY_SUPABASE_ANON = window.DIGIY_SUPABASE_ANON_KEY;
-    window.DIGIY_MODULE = "PAY";
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    content="DIGIY PAY — cette page publique protège l'accès aux réglages professionnels et renvoie vers PAY PRO."
+  />
 
   <style>
     :root{
-      --bg:#04110d;
-      --bg2:#071a13;
-      --card:#0b1f18;
-      --line:rgba(255,255,255,.08);
-      --text:#f3fff7;
-      --muted:rgba(243,255,247,.72);
-      --green:#22c55e;
-      --green2:#16a34a;
+      --bg:#f4ead2;
+      --bg2:#ead9b7;
+      --card:#fff7e6;
+      --line:rgba(83,58,26,.24);
+      --text:#1f2a1f;
+      --muted:#3d3324;
       --gold:#facc15;
-      --danger:#f87171;
-      --shadow:0 18px 50px rgba(0,0,0,.32);
-      --radius:24px;
-      --max:860px;
+      --green:#16a34a;
+      --shadow:0 14px 34px rgba(77,52,22,.16);
+      --max:720px;
+      --ff:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
     }
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
+
     body{
       min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:18px;
+      font-family:var(--ff);
       color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(34,197,94,.10), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(250,204,21,.06), transparent 28%),
-        linear-gradient(180deg, var(--bg), #061710 55%, #04110d);
-      padding:14px;
-    }
-
-    .site-back-float{
-      position:fixed;
-      top:calc(env(safe-area-inset-top, 0px) + 12px);
-      left:calc(env(safe-area-inset-left, 0px) + 12px);
-      z-index:9999;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:44px;
-      padding:10px 14px;
-      border-radius:999px;
-      text-decoration:none;
-      font-weight:950;
-      font-size:14px;
-      color:#e5e7eb;
-      background:rgba(4,17,13,.82);
-      border:1px solid rgba(255,255,255,.12);
-      backdrop-filter:blur(12px);
-      -webkit-backdrop-filter:blur(12px);
-      box-shadow:0 14px 30px rgba(0,0,0,.28);
-      transition:transform .18s ease,background .18s ease,border-color .18s ease;
-    }
-    .site-back-float:hover{
-      transform:translateY(-1px);
-      background:rgba(8,24,18,.96);
-      border-color:rgba(250,204,21,.30);
-    }
-
-    .wrap{
-      width:min(var(--max), 100%);
-      margin:0 auto;
-      padding-top:62px;
+        radial-gradient(circle at 10% 0%,rgba(250,204,21,.22),transparent 34%),
+        radial-gradient(circle at 100% 100%,rgba(22,101,52,.10),transparent 30%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+      font-size:17px;
+      font-weight:850;
+      -webkit-font-smoothing:antialiased;
     }
 
     .card{
-      background:linear-gradient(180deg, rgba(11,31,24,.98), rgba(9,24,19,.98));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
+      width:min(var(--max),100%);
+      border:2px solid var(--line);
+      border-radius:32px;
+      background:linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96));
       box-shadow:var(--shadow);
       overflow:hidden;
     }
 
     .top{
-      padding:20px 18px 10px;
+      padding:26px 22px 10px;
       text-align:center;
     }
 
-    .brand-mark{
-      width:58px;
-      height:58px;
-      margin:0 auto 10px;
-      border-radius:18px;
+    .mark{
+      width:76px;
+      height:76px;
+      margin:0 auto 14px;
+      border-radius:26px;
       display:grid;
       place-items:center;
-      background:linear-gradient(135deg,var(--green),var(--green2));
-      color:#032215;
-      font-size:28px;
-      font-weight:1000;
-      box-shadow:var(--shadow);
+      background:linear-gradient(135deg,var(--green),#bbf7d0);
+      color:#052215;
+      font-size:38px;
+      font-weight:900;
+      box-shadow:0 12px 28px rgba(77,52,22,.16);
+    }
+
+    .kicker{
+      margin:0 0 10px;
+      color:#6b4e09;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
     }
 
     h1{
       margin:0;
-      font-size:28px;
-      line-height:1.08;
-      font-weight:1000;
-      color:var(--gold);
+      color:#241a0d;
+      font-size:clamp(34px,7vw,52px);
+      line-height:1.02;
+      letter-spacing:-.04em;
+      font-weight:900;
     }
 
     .sub{
-      margin-top:8px;
+      max-width:58ch;
+      margin:14px auto 0;
       color:var(--muted);
-      font-weight:850;
-      line-height:1.55;
-      font-size:14px;
-    }
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:8px;
-      margin-top:14px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      font-size:12px;
+      font-size:17px;
+      line-height:1.56;
       font-weight:900;
-      color:var(--text);
     }
 
-    .chip.ok{
-      border-color:rgba(34,197,94,.28);
-      background:rgba(34,197,94,.10);
-      color:#bbf7d0;
+    .notice{
+      margin:18px 22px 0;
+      padding:16px;
+      border-radius:22px;
+      border:2px solid rgba(121,83,12,.24);
+      background:rgba(254,243,199,.86);
+      color:#4a3508;
+      font-size:16px;
+      line-height:1.55;
+      font-weight:900;
+      text-align:center;
     }
 
-    .chip.gold{
-      border-color:rgba(250,204,21,.28);
-      background:rgba(250,204,21,.10);
-      color:#fde68a;
+    .steps{
+      margin:16px 22px 0;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .step{
+      border:1px solid rgba(83,58,26,.20);
+      border-radius:20px;
+      background:rgba(255,255,255,.66);
+      padding:14px;
+      display:grid;
+      gap:6px;
+    }
+
+    .step strong{
+      color:#241a0d;
+      font-size:16px;
+      line-height:1.2;
+      font-weight:900;
+    }
+
+    .step span{
+      color:#3d3324;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:900;
     }
 
     .actions{
+      padding:20px 22px 6px;
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
       justify-content:center;
-      padding:10px 18px 0;
-    }
-
-    .nav-mini{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:10px;
-      padding:14px 18px 0;
-    }
-
-    .nav-card{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      padding:12px 12px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      text-decoration:none;
-      color:var(--text);
-      min-height:78px;
-      transition:transform .16s ease,border-color .16s ease,background .16s ease;
-    }
-    .nav-card:hover{
-      transform:translateY(-1px);
-      border-color:rgba(250,204,21,.24);
-      background:rgba(255,255,255,.04);
-    }
-    .nav-card strong{
-      font-size:13px;
-      font-weight:1000;
-      color:var(--gold);
-      line-height:1.2;
-    }
-    .nav-card span{
-      font-size:11px;
-      line-height:1.45;
-      color:var(--muted);
-      font-weight:850;
     }
 
     .btn{
+      min-height:54px;
+      border-radius:999px;
+      border:1px solid rgba(83,58,26,.22);
+      background:rgba(255,255,255,.70);
+      color:#1f2a1f;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:8px;
-      min-height:46px;
-      padding:12px 15px;
-      border-radius:999px;
+      padding:13px 17px;
       text-decoration:none;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      font-weight:950;
+      font-size:15px;
+      font-weight:900;
       cursor:pointer;
-      transition:transform .16s ease,border-color .16s ease,background .16s ease,opacity .16s ease;
+      font-family:inherit;
+      box-shadow:0 8px 18px rgba(77,52,22,.08);
     }
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
+
     .btn.primary{
-      border:none;
-      background:linear-gradient(135deg,var(--green),var(--green2));
-      color:#032215;
-    }
-    .btn.gold{
-      border:1px solid rgba(250,204,21,.34);
-      background:rgba(250,204,21,.12);
-      color:#fde68a;
-    }
-    .btn.ghost{
-      background:rgba(255,255,255,.02);
-    }
-    .btn.bad{
-      background:rgba(248,113,113,.10);
-      border:1px solid rgba(248,113,113,.35);
-      color:#fecaca;
-    }
-    .btn[disabled]{
-      opacity:.62;
-      cursor:not-allowed;
+      background:linear-gradient(135deg,#facc15,#fff3c4);
+      border-color:rgba(121,83,12,.28);
     }
 
-    .name{
-      margin-top:16px;
-      font-size:24px;
-      font-weight:1000;
-      color:var(--gold);
-      text-align:center;
-      padding:0 18px;
-      word-break:break-word;
+    .btn.green{
+      background:linear-gradient(135deg,#16a34a,#bbf7d0);
+      border-color:rgba(22,101,52,.28);
     }
 
-    .hint{
-      margin-top:8px;
-      color:var(--muted);
-      font-weight:850;
-      font-size:13px;
-      line-height:1.55;
-      text-align:center;
-      padding:0 18px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:14px;
-      padding:16px 18px 0;
-    }
-    @media(max-width:920px){
-      .grid{grid-template-columns:1fr}
-    }
-
-    .panel{
+    .audio-panel{
+      margin:16px 22px 0;
       padding:16px;
-      border-radius:20px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.025);
-    }
-
-    .panel h2{
-      margin:0 0 10px;
-      font-size:13px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:#bbf7d0;
-      font-weight:1000;
-    }
-
-    .formGrid{
+      border-radius:22px;
+      border:2px solid rgba(22,101,52,.24);
+      background:
+        radial-gradient(circle at right top,rgba(34,197,94,.10),transparent 34%),
+        rgba(255,255,255,.62);
       display:grid;
-      grid-template-columns:1fr 1fr;
       gap:10px;
-      margin-top:12px;
-    }
-    @media(max-width:640px){
-      .formGrid{grid-template-columns:1fr}
+      text-align:center;
     }
 
-    label{
-      display:block;
-      font-size:12px;
-      color:#bbf7d0;
-      font-weight:950;
-      margin-bottom:6px;
-      letter-spacing:.03em;
-      text-transform:uppercase;
-    }
-
-    input{
-      width:100%;
-      min-height:48px;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      font:inherit;
+    .audio-panel strong{
+      color:#14532d;
+      font-size:17px;
       font-weight:900;
-      outline:none;
     }
-    input::placeholder{color:rgba(243,255,247,.45)}
-    input[readonly]{opacity:.92;cursor:not-allowed}
 
-    .field-hint{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:12px;
+    .audio-panel span{
+      color:#3d3324;
+      font-size:15px;
       line-height:1.5;
-      font-weight:800;
-    }
-
-    .switch{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin-top:14px;
-      padding:12px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-    }
-    .switch input{
-      width:20px;
-      height:20px;
-      accent-color:#22c55e;
-      min-height:auto;
-      padding:0;
-    }
-
-    .btnrow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    .stats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    .stat{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      border-radius:16px;
-      padding:12px;
-    }
-    .statLabel{
-      font-size:12px;
-      color:var(--muted);
       font-weight:900;
-      margin-bottom:6px;
-    }
-    .statValue{
-      font-size:16px;
-      font-weight:950;
-      word-break:break-word;
-    }
-
-    .msg,.err,.okbox{
-      margin:16px 18px 0;
-      padding:12px 14px;
-      border-radius:16px;
-      font-size:13px;
-      line-height:1.55;
-      font-weight:900;
-      display:none;
-    }
-    .msg{
-      border:1px solid rgba(250,204,21,.28);
-      background:rgba(250,204,21,.10);
-      color:#fde68a;
-    }
-    .err{
-      border:1px solid rgba(248,113,113,.26);
-      background:rgba(248,113,113,.10);
-      color:#fecaca;
-    }
-    .okbox{
-      border:1px solid rgba(34,197,94,.32);
-      background:rgba(34,197,94,.09);
-      color:#dcfce7;
     }
 
     .foot{
-      padding:16px 18px 20px;
-      font-size:12px;
-      color:var(--muted);
+      padding:18px 22px 24px;
+      color:#3d3324;
+      font-size:13px;
+      line-height:1.65;
       font-weight:850;
       text-align:center;
-      line-height:1.7;
     }
 
-    .mono{
-      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    }
-
-    @media (max-width:700px){
-      .nav-mini{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-
-    @media (max-width:640px){
+    @media(max-width:720px){
       body{padding:10px}
-      .wrap{padding-top:58px}
-      h1{font-size:24px}
-      .name{font-size:22px}
-      .site-back-float{
-        font-size:13px;
-        min-height:42px;
-        padding:10px 12px;
-      }
-      .actions .btn,
-      .btnrow .btn{
-        flex:1;
-      }
+      .steps{grid-template-columns:1fr}
+      .actions .btn{width:100%}
     }
   </style>
 </head>
+
 <body>
+  <main class="card" aria-label="DIGIY PAY admin réservé">
+    <section class="top">
+      <div class="mark">🔐</div>
+      <p class="kicker">DIGIY PAY · espace réservé</p>
+      <h1>Cette porte est professionnelle.</h1>
+      <p class="sub">
+        Les réglages PAY ne se font plus ici côté public. Pour gérer la carte, les preuves,
+        le cockpit et les mouvements, il faut passer par PAY PRO.
+      </p>
+    </section>
 
-  <a class="site-back-float" href="https://digiylyfe.com/" target="_blank" rel="noopener">
-    ← Retour au site
-  </a>
+    <div class="notice">
+      Sécurité DIGIY : cette page publique ne doit pas afficher de téléphone, de slug,
+      de session ou de réglage professionnel.
+    </div>
 
-  <main class="wrap">
-    <section class="card">
-      <div class="top">
-        <div class="brand-mark">⚙️</div>
-        <h1>MON ARGENT PRO — RÉGLAGES PAY</h1>
-        <div class="sub">
-          Réglages rapides de la carte de paiement direct, sans exposer les données de session
-        </div>
+    <section class="audio-panel" aria-label="Aide audio">
+      <strong>🎧 Besoin d’explication ?</strong>
+      <span>
+        Écoute DIGIY : cette page protège les réglages pro et t’indique le bon chemin.
+      </span>
+      <button class="btn primary" id="audioBtn" type="button">🎧 Écouter DIGIY</button>
+    </section>
 
-        <div class="chips">
-          <div class="chip ok">✅ Coffre réglages</div>
-          <div class="chip gold">💳 PAY actif requis</div>
-          <div class="chip">♾️ DIGIYLYFE</div>
-        </div>
+    <section class="steps" aria-label="Orientation">
+      <div class="step">
+        <strong>1 · Client</strong>
+        <span>Le client reste sur la carte publique PAY.</span>
       </div>
-
-      <div class="actions">
-        <a id="btnPublicTop" class="btn ghost" href="./index.html">💳 Page publique</a>
-        <a id="btnPinTop" class="btn ghost" href="./pin.html">🔐 PIN</a>
-        <a id="btnCockpitTop" class="btn gold" href="./cockpit.html">📊 Cockpit</a>
-        <a id="btnActivateTop" class="btn primary" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">💳 Activer PAY</a>
-        <button id="btnLogout" class="btn bad" type="button">Déconnexion</button>
+      <div class="step">
+        <strong>2 · Professionnel</strong>
+        <span>Le pro gère ses preuves et son cockpit dans PAY PRO.</span>
       </div>
-
-      <div class="nav-mini">
-        <a id="navPublic" class="nav-card" href="./index.html">
-          <strong>Page publique</strong>
-          <span>Carte client du paiement direct</span>
-        </a>
-        <a id="navPin" class="nav-card" href="./pin.html">
-          <strong>PIN PAY</strong>
-          <span>Entrée sécurisée du module</span>
-        </a>
-        <a id="navCockpit" class="nav-card" href="./cockpit.html">
-          <strong>Cockpit</strong>
-          <span>QR, carte, aperçu et outils terrain</span>
-        </a>
-        <a class="nav-card" href="https://digiy-hub.digiylyfe.com/">
-          <strong>HUB</strong>
-          <span>Revenir à la maison DIGIY</span>
-        </a>
-        <a class="nav-card" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">
-          <strong>Tarifs</strong>
-          <span>Voir les offres officielles</span>
-        </a>
-        <a id="navActivate" class="nav-card" href="https://commencer-a-payer.digiylyfe.com/?module=PAY">
-          <strong>Activation</strong>
-          <span>Abonnement et renouvellement</span>
-        </a>
-      </div>
-
-      <div class="name">Réglages rapides PAY</div>
-      <div class="hint">
-        Ici, on règle l’essentiel. Le QR, la carte et les outils visuels restent dans le cockpit.
-      </div>
-
-      <div class="grid">
-        <div class="panel">
-          <h2>Fiche pro</h2>
-
-          <div class="formGrid">
-            <div>
-              <label for="businessName">Nom affiché</label>
-              <input id="businessName" type="text" placeholder="Ex: JB BEAUVILLE">
-              <div class="field-hint">Nom visible sur la page publique MON ARGENT.</div>
-            </div>
-
-            <div>
-              <label for="businessCode">Code pro</label>
-              <input id="businessCode" type="text" placeholder="Ex: JBBEAUVILLE">
-              <div class="field-hint">Utilisé dans le lien public <span class="mono">?pro=CODE</span>.</div>
-            </div>
-
-            <div>
-              <label for="paymentPhone">Numéro de paiement</label>
-              <input id="paymentPhone" type="tel" placeholder="Ex: 221771342889">
-              <div class="field-hint">Numéro direct utilisé par le professionnel.</div>
-            </div>
-
-            <div>
-              <label for="sessionRéférence">Référence protégée</label>
-              <input id="sessionRéférence" type="hidden" readonly>
-              <div class="stat" style="margin-top:0;">
-                <div class="statLabel">État référence</div>
-                <div class="statValue">Protégée</div>
-              </div>
-              <div class="field-hint">Rangée dans la session PAY, non affichée dans l’adresse.</div>
-            </div>
-          </div>
-
-          <div class="switch">
-            <input id="isActive" type="checkbox">
-            <div>
-              <div style="font-weight:950">Affichage public PAY actif</div>
-              <div class="field-hint">Si décoché, la page publique ne doit plus être considérée comme active.</div>
-            </div>
-          </div>
-
-          <div class="btnrow">
-            <button id="btnSave" class="btn primary" type="button">💾 Sauvegarder</button>
-            <button id="btnReload" class="btn ghost" type="button">🔄 Recharger</button>
-            <button id="btnCopyLink" class="btn gold" type="button">📋 Copier lien public</button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h2>Vue rapide</h2>
-
-          <div class="stats">
-            <div class="stat">
-              <div class="statLabel">Session</div>
-              <div id="statPhone" class="statValue mono">—</div>
-            </div>
-            <div class="stat">
-              <div class="statLabel">Référence PAY</div>
-              <div id="statRéférence" class="statValue mono">—</div>
-            </div>
-            <div class="stat">
-              <div class="statLabel">Code pro</div>
-              <div id="statCode" class="statValue mono">—</div>
-            </div>
-            <div class="stat">
-              <div class="statLabel">État</div>
-              <div id="statStatus" class="statValue">—</div>
-            </div>
-            <div class="stat">
-              <div class="statLabel">Numéro de paiement</div>
-              <div id="statPayPhone" class="statValue mono">—</div>
-            </div>
-            <div class="stat">
-              <div class="statLabel">Lien public</div>
-              <div id="statLink" class="statValue mono">—</div>
-            </div>
-          </div>
-
-          <div class="btnrow">
-            <a id="btnOpenPublic" class="btn ghost" href="./index.html" target="_blank" rel="noopener">🌍 Ouvrir la page publique</a>
-            <a id="btnOpenCockpit" class="btn primary" href="./cockpit.html">📊 Ouvrir le cockpit</a>
-          </div>
-
-          <div class="btnrow">
-            <button id="btnSupport" class="btn ghost" type="button">🛟 Support</button>
-          </div>
-
-          <div class="field-hint" style="margin-top:14px;">
-            DIGIY ne garde pas l’argent. Cette interface sert à piloter la façade PAY et ses réglages rapides.
-          </div>
-        </div>
-      </div>
-
-      <div id="infoBox" class="msg"></div>
-      <div id="errorBox" class="err"></div>
-      <div id="okBox" class="okbox"></div>
-
-      <div class="foot">
-        MON ARGENT PRO — Réglages PAY protégés.<br>
-        Le cockpit reste l’outil principal pour le QR, la carte de paiement et les visuels terrain.
+      <div class="step">
+        <strong>3 · Sécurité</strong>
+        <span>Aucune donnée sensible n’est exposée ici.</span>
       </div>
     </section>
+
+    <nav class="actions" aria-label="Navigation">
+      <a class="btn green" href="https://pro-pay.digiylyfe.com/">🔐 Ouvrir PAY PRO</a>
+      <a class="btn" href="./index.html">💳 Retour carte PAY</a>
+      <a class="btn" href="https://digiylyfe.com/">🌍 Site DIGIYLYFE</a>
+      <a class="btn" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
+      <a class="btn primary" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">📦 Tarifs</a>
+    </nav>
+
+    <div class="foot">
+      DIGIY PAY public sert à payer directement et à envoyer une preuve.
+      PAY PRO sert à gérer, vérifier et organiser l’activité.
+    </div>
   </main>
 
   <script>
-    (function () {
+    (() => {
       "use strict";
 
-      const SUPABASE_URL =
-        window.DIGIY_SUPABASE_URL ||
-        "https://wesqmwjjtsefyjnluosj.supabase.co";
+      const SENSITIVE_KEYS = [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "wallet_phone",
+        "pay_phone",
+        "access_note",
+        "keybox_code",
+        "keybox_location",
+        "return",
+        "redirect",
+        "redirect_url",
+        "url",
+        "from",
+        "v"
+      ];
 
-      const SUPABASE_ANON_KEY =
-        window.DIGIY_SUPABASE_ANON_KEY ||
-        window.DIGIY_SUPABASE_ANON ||
-        "sb_publishable_tGHItRgeWDmGjnd0CK1DVQ_BIep4Ug3";
-
-      const MODULE_CODE = "PAY";
-      const PUBLIC_BASE_URL = "https://pay.digiylyfe.com/";
-      const PIN_URL = "./pin.html";
-      const COCKPIT_URL = "./cockpit.html";
-      const ACTIVATE_BASE = "https://commencer-a-payer.digiylyfe.com/";
-      const SUPPORT_WA = "+221771342889";
-
-      const LS_PHONE = "digiy_phone";
-      const LS_SLUG = "digiy_référence";
-      const LS_MODULE_SLUGS = "digiy_module_références";
-      const LS_PAY_PHONE = "digiy_pay_phone";
-      const LS_PAY_SLUG = "digiy_pay_référence";
-      const SESSION_KEY = "DIGIY_PAY_PRO_SESSION";
-      const MAX_SESSION_MS = 8 * 60 * 60 * 1000;
-
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          storage: {
-            getItem: () => null,
-            setItem: () => {},
-            removeItem: () => {}
-          }
-        }
-      });
-
-      const $ = (id) => document.getElementById(id);
-
-      const businessName = $("businessName");
-      const businessCode = $("businessCode");
-      const paymentPhone = $("paymentPhone");
-      const sessionRéférenceInput = $("sessionRéférence");
-      const isActive = $("isActive");
-
-      const statPhone = $("statPhone");
-      const statRéférence = $("statRéférence");
-      const statCode = $("statCode");
-      const statStatus = $("statStatus");
-      const statPayPhone = $("statPayPhone");
-      const statLink = $("statLink");
-
-      const btnPublicTop = $("btnPublicTop");
-      const btnPinTop = $("btnPinTop");
-      const btnCockpitTop = $("btnCockpitTop");
-      const btnActivateTop = $("btnActivateTop");
-
-      const navPublic = $("navPublic");
-      const navPin = $("navPin");
-      const navCockpit = $("navCockpit");
-      const navActivate = $("navActivate");
-
-      const btnSave = $("btnSave");
-      const btnReload = $("btnReload");
-      const btnCopyLink = $("btnCopyLink");
-      const btnLogout = $("btnLogout");
-      const btnSupport = $("btnSupport");
-      const btnOpenPublic = $("btnOpenPublic");
-      const btnOpenCockpit = $("btnOpenCockpit");
-
-      const infoBox = $("infoBox");
-      const errorBox = $("errorBox");
-      const okBox = $("okBox");
-
-      const qs = new URLSearchParams(location.search);
-
-      let currentPhone = "";
-      let currentRéférence = "";
-      let currentCodeFromQuery = normalizeCode(qs.get("code") || "");
-      let loadedProfile = null;
-
-      cleanVisibleUrl();
-
-      function digitsOnly(v) {
-        return String(v || "").replace(/\D/g, "");
-      }
-
-      function normPhone(v) {
-        const raw = digitsOnly(v);
-        if (!raw) return "";
-        if (raw.startsWith("221") && raw.length >= 12) return "+" + raw;
-        if (raw.length === 9) return "+221" + raw;
-        if (String(v || "").trim().startsWith("+")) return "+" + raw;
-        return "+" + raw;
-      }
-
-      function phoneDigits(v) {
-        return digitsOnly(v);
-      }
-
-      function normRéférence(v) {
-        return String(v || "")
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "")
-          .replace(/-+/g, "-")
-          .replace(/^-|-$/g, "");
-      }
-
-      function normalizeCode(v) {
-        return String(v || "")
-          .trim()
-          .toUpperCase()
-          .replace(/\s+/g, "")
-          .replace(/[^A-Z0-9_-]/g, "");
-      }
-
-      function cleanVisibleUrl() {
-        try {
-          const url = new URL(window.location.href);
+      function cleanVisibleUrl(){
+        try{
+          const url = new URL(location.href);
           let changed = false;
 
-          [
-            "phone",
-            "tel",
-            "owner_phone",
-            "owner_id",
-            "référence",
-            "pay_référence",
-            "subscription_référence",
-            "business_phone",
-            "wave_phone",
-            "wallet_phone",
-            "pay_phone",
-            "access_note",
-            "keybox_code",
-            "keybox_location"
-          ].forEach(function(key){
-            if (url.searchParams.has(key)) {
+          SENSITIVE_KEYS.forEach((key) => {
+            if(url.searchParams.has(key)){
               url.searchParams.delete(key);
               changed = true;
             }
           });
 
-          if (changed) {
+          if(changed){
             history.replaceState({}, document.title, url.pathname + url.search + url.hash);
           }
-        } catch (_) {}
+        }catch(_){}
       }
 
-      function show(el, on = true) {
-        if (!el) return;
-        el.style.display = on ? "" : "none";
-      }
+      function cleanLinks(){
+        try{
+          document.querySelectorAll("a[href]").forEach((link) => {
+            const href = link.getAttribute("href") || "";
+            if(!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
 
-      function setBusy(btn, on) {
-        if (!btn) return;
-        btn.disabled = !!on;
-      }
+            const url = new URL(href, location.href);
+            if(url.origin !== location.origin) return;
 
-      function resetBoxes() {
-        show(infoBox, false);
-        show(errorBox, false);
-        show(okBox, false);
-        infoBox.textContent = "";
-        errorBox.textContent = "";
-        okBox.textContent = "";
-      }
-
-      function setInfo(msg) {
-        infoBox.textContent = msg;
-        show(infoBox, true);
-      }
-
-      function setError(msg) {
-        errorBox.textContent = msg;
-        show(errorBox, true);
-      }
-
-      function setOk(msg) {
-        okBox.textContent = msg;
-        show(okBox, true);
-      }
-
-      function readModuleRéférences() {
-        try {
-          const raw = localStorage.getItem(LS_MODULE_SLUGS);
-          const parsed = raw ? JSON.parse(raw) : {};
-          return parsed && typeof parsed === "object" ? parsed : {};
-        } catch (_) {
-          return {};
-        }
-      }
-
-      function saveQueryState(phone, référence, code) {
-        try {
-          const url = new URL(window.location.href);
-          const c = normalizeCode(code || "");
-
-          [
-            "phone",
-            "tel",
-            "owner_phone",
-            "owner_id",
-            "référence",
-            "pay_référence",
-            "subscription_référence",
-            "business_phone",
-            "wave_phone",
-            "wallet_phone",
-            "pay_phone"
-          ].forEach(function(key){
-            url.searchParams.delete(key);
+            SENSITIVE_KEYS.forEach((key) => url.searchParams.delete(key));
+            const file = url.pathname.split("/").pop() || "index.html";
+            link.setAttribute("href","./" + file + (url.search || "") + (url.hash || ""));
           });
-
-          if (c) url.searchParams.set("code", c);
-          else url.searchParams.delete("code");
-
-          history.replaceState({}, "", url.pathname + url.search + url.hash);
-        } catch (_) {}
+        }catch(_){}
       }
 
-
-      function readSession() {
-        let phone = "";
-        let référence = "";
-
-        try {
-          const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
-          const s = raw ? JSON.parse(raw) : null;
-
-          if (s?.ts && (Date.now() - Number(s.ts)) > MAX_SESSION_MS) {
-            return { phone:"", référence:"" };
-          }
-
-          if (s?.phone) phone = normPhone(s.phone);
-          if (s?.référence) référence = normRéférence(s.référence);
-        } catch (_) {}
-
-        if (!phone) {
-          try { phone = normPhone(localStorage.getItem(LS_PAY_PHONE) || ""); } catch (_) {}
-        }
-        if (!référence) {
-          try { référence = normRéférence(localStorage.getItem(LS_PAY_SLUG) || ""); } catch (_) {}
-        }
-
-        if (!référence) {
-          const map = readModuleRéférences();
-          if (map.PAY) référence = normRéférence(map.PAY);
-        }
-
-        if (!phone) {
-          try { phone = normPhone(localStorage.getItem(LS_PHONE) || ""); } catch (_) {}
-        }
-        if (!référence) {
-          try { référence = normRéférence(localStorage.getItem(LS_SLUG) || ""); } catch (_) {}
-        }
-
-        return { phone, référence };
+      function canSpeak(){
+        return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
       }
 
-
-      function clearSession() {
-        try {
-          localStorage.removeItem(SESSION_KEY);
-          sessionStorage.removeItem(SESSION_KEY);
-          localStorage.removeItem(LS_PAY_PHONE);
-          localStorage.removeItem(LS_PAY_SLUG);
-
-          const map = readModuleRéférences();
-          delete map.PAY;
-          localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
-        } catch (_) {}
-      }
-
-      function saveSession(phone, référence) {
-        const p = normPhone(phone || "");
-        const s = normRéférence(référence || "");
-        try {
-          if (p) {
-            localStorage.setItem(LS_PHONE, p);
-            localStorage.setItem(LS_PAY_PHONE, p);
-          }
-          if (s) {
-            localStorage.setItem(LS_SLUG, s);
-            localStorage.setItem(LS_PAY_SLUG, s);
-          }
-
-          const map = readModuleRéférences();
-          if (s) {
-            map.PAY = s;
-            localStorage.setItem(LS_MODULE_SLUGS, JSON.stringify(map));
-          }
-
-          const payload = JSON.stringify({
-            phone: p,
-            référence: s,
-            module: MODULE_CODE,
-            access_ok: true,
-            ts: Date.now()
-          });
-
-          localStorage.setItem(SESSION_KEY, payload);
-          sessionStorage.setItem(SESSION_KEY, payload);
-        } catch (_) {}
-      }
-
-      function buildPublicUrl(code) {
-        const clean = normalizeCode(code);
-        const u = new URL(PUBLIC_BASE_URL);
-        if (clean) u.searchParams.set("pro", clean);
-        return u.toString();
-      }
-
-      function buildPinUrl() {
-        return PIN_URL;
-      }
-
-      function buildCockpitUrl() {
-        return COCKPIT_URL;
-      }
-
-      function buildActivateUrl() {
-        const u = new URL(ACTIVATE_BASE);
-        u.searchParams.set("module", "PAY");
-        return u.toString();
-      }
-
-
-      function getEffectiveCode() {
-        return normalizeCode(businessCode.value || "");
-      }
-
-      function getEffectivePhone() {
-        return phoneDigits(paymentPhone.value || "");
-      }
-
-      function syncNavLinks() {
-        const code = getEffectiveCode() || currentCodeFromQuery || "";
-        const publicHref = code ? buildPublicUrl(code) : PUBLIC_BASE_URL;
-        const pinHref = buildPinUrl();
-        const cockpitHref = buildCockpitUrl();
-        const activateHref = buildActivateUrl();
-
-        btnPublicTop.href = publicHref;
-        navPublic.href = publicHref;
-        btnOpenPublic.href = publicHref;
-
-        btnPinTop.href = pinHref;
-        navPin.href = pinHref;
-
-        btnCockpitTop.href = cockpitHref;
-        navCockpit.href = cockpitHref;
-        btnOpenCockpit.href = cockpitHref;
-
-        btnActivateTop.href = activateHref;
-        navActivate.href = activateHref;
-      }
-
-
-      async function resolvePhoneFromRéférence(référence) {
-        const s = normRéférence(référence);
-        if (!s) return "";
-
-        const { data, error } = await sb
-          .from("digiy_subscriptions_public")
-          .select("phone,référence,module")
-          .eq("référence", s)
-          .limit(1)
-          .maybeSingle();
-
-        if (error || !data?.phone) return "";
-        return normPhone(data.phone);
-      }
-
-      async function ensurePayProfile(phoneDigitsValue) {
-        if (!phoneDigitsValue) return;
-        try {
-          await sb.rpc("rpc_wallet_ensure", { p_phone: phoneDigitsValue });
-        } catch (_) {}
-      }
-
-      async function fetchByPhone(phoneDigitsValue) {
-        if (!phoneDigitsValue) return null;
-
-        let { data, error } = await sb
-          .from("digiy_pay_pro")
-          .select("business_name,business_code,wave_phone,is_active")
-          .eq("wave_phone", phoneDigitsValue)
-          .maybeSingle();
-
-        if (!error && data) return data;
-
-        ({ data, error } = await sb
-          .from("digiy_pay_pro")
-          .select("business_name,business_code,wave_phone,is_active")
-          .eq("wave_phone", "+" + phoneDigitsValue)
-          .maybeSingle());
-
-        if (!error && data) return data;
-
-        return null;
-      }
-
-      async function fetchByCode(code) {
-        const clean = normalizeCode(code);
-        if (!clean) return null;
-
-        const { data, error } = await sb
-          .from("digiy_pay_pro")
-          .select("business_name,business_code,wave_phone,is_active")
-          .eq("business_code", clean)
-          .maybeSingle();
-
-        if (error) return null;
-        return data || null;
-      }
-
-      function updateStats() {
-        const code = getEffectiveCode();
-        const phone = getEffectivePhone();
-        const link = code ? buildPublicUrl(code) : "—";
-
-        statPhone.textContent = currentPhone ? "Ouverte" : "—";
-        statRéférence.textContent = currentRéférence ? "OK" : "—";
-        statCode.textContent = code || "—";
-        statStatus.textContent = isActive.checked ? "Actif" : "Inactif";
-        statPayPhone.textContent = phone || "—";
-        statLink.textContent = link;
-
-        saveQueryState("", "", code);
-        syncNavLinks();
-      }
-
-
-      function fillForm(profile) {
-        businessName.value = profile?.business_name || "";
-        businessCode.value = normalizeCode(profile?.business_code || currentCodeFromQuery || "");
-        paymentPhone.value = phoneDigits(profile?.wave_phone || currentPhone || "");
-        sessionRéférenceInput.value = currentRéférence || "";
-        isActive.checked = profile?.is_active !== false;
-        loadedProfile = profile || null;
-        currentCodeFromQuery = normalizeCode(businessCode.value || currentCodeFromQuery || "");
-        updateStats();
-      }
-
-      function autoCodeFromName() {
-        if (businessCode.value.trim()) return;
-        const raw = String(businessName.value || "")
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toUpperCase()
-          .replace(/[^A-Z0-9]+/g, "");
-        businessCode.value = raw.slice(0, 24);
-        currentCodeFromQuery = normalizeCode(businessCode.value);
-        updateStats();
-      }
-
-      async function loadProfile() {
-        resetBoxes();
-
-        const session = readSession();
-        currentPhone = normPhone(session.phone || "");
-        currentRéférence = normRéférence(session.référence || "");
-
-        if (!currentPhone && currentRéférence) {
-          setInfo("Résolution de la session PAY…");
-          currentPhone = await resolvePhoneFromRéférence(currentRéférence);
-        }
-
-        if (!currentPhone) {
-          location.replace(PIN_URL);
-          return;
-        }
-
-        saveSession(currentPhone, currentRéférence);
-
-        sessionRéférenceInput.value = currentRéférence || "";
-        statPhone.textContent = currentPhone ? "Ouverte" : "—";
-        statRéférence.textContent = currentRéférence ? "OK" : "—";
-        syncNavLinks();
-
-        setInfo("Chargement du profil PAY…");
-
-        const currentPhoneDigits = phoneDigits(currentPhone);
-        await ensurePayProfile(currentPhoneDigits);
-
-        let profile = await fetchByPhone(currentPhoneDigits);
-
-        if (!profile && currentCodeFromQuery) {
-          profile = await fetchByCode(currentCodeFromQuery);
-        }
-
-        fillForm(profile);
-        resetBoxes();
-
-        if (profile) {
-          setOk("Profil PAY chargé.");
-        } else {
-          paymentPhone.value = currentPhoneDigits;
-          updateStats();
-          setInfo("Aucune fiche trouvée. Tu peux poser les réglages maintenant.");
+      function getFrenchVoice(){
+        try{
+          const voices = speechSynthesis.getVoices() || [];
+          return voices.find(v => /fr[-_]?fr/i.test(v.lang || "")) ||
+                 voices.find(v => /^fr/i.test(v.lang || "")) ||
+                 voices[0] ||
+                 null;
+        }catch(_){
+          return null;
         }
       }
 
-      async function saveProfile() {
-        resetBoxes();
+      function stopAudio(){
+        try{ if(canSpeak()) speechSynthesis.cancel(); }catch(_){}
+        const btn = document.getElementById("audioBtn");
+        if(btn) btn.textContent = "🎧 Écouter DIGIY";
+      }
 
-        const phoneDigitsValue = phoneDigits(paymentPhone.value || currentPhone || "");
-        const code = normalizeCode(businessCode.value || "");
-        const name = String(businessName.value || "").trim();
-        const active = !!isActive.checked;
+      function speakAudio(){
+        if(!canSpeak()) return;
 
-        if (!phoneDigitsValue) {
-          setError("Numéro de paiement obligatoire.");
-          paymentPhone.focus();
-          return;
-        }
+        stopAudio();
 
-        if (!name) {
-          setError("Nom affiché obligatoire.");
-          businessName.focus();
-          return;
-        }
+        const text =
+          "Cette page est une porte de sécurité DIGIY PAY. Elle ne sert pas aux clients pour payer, et elle ne sert plus au professionnel pour régler sa carte dans le domaine public. Le client doit rester sur la carte PAY publique. Le professionnel doit ouvrir PAY PRO pour gérer son cockpit, ses preuves, ses mouvements et ses réglages. Ici, aucune donnée sensible ne doit être affichée : pas de téléphone, pas de slug, pas de session. DIGIY protège la route : public d’un côté, professionnel de l’autre.";
 
-        if (!code) {
-          setError("Code pro obligatoire.");
-          businessCode.focus();
-          return;
-        }
+        const run = () => {
+          const u = new SpeechSynthesisUtterance(text);
+          const voice = getFrenchVoice();
+          if(voice) u.voice = voice;
+          u.lang = voice?.lang || "fr-FR";
+          u.rate = 0.86;
+          u.pitch = 1.04;
+          u.volume = 1;
 
-        setBusy(btnSave, true);
-        setInfo("Sauvegarde en cours…");
+          const btn = document.getElementById("audioBtn");
+          if(btn) btn.textContent = "⏹ Stop";
 
-        const payload = {
-          business_name: name,
-          business_code: code,
-          wave_phone: phoneDigitsValue,
-          is_active: active
+          u.onend = () => { if(btn) btn.textContent = "🎧 Écouter DIGIY"; };
+          u.onerror = () => { if(btn) btn.textContent = "🎧 Écouter DIGIY"; };
+
+          speechSynthesis.speak(u);
         };
 
-        try {
-          let updated = false;
-
-          if (loadedProfile?.business_code) {
-            const { error } = await sb
-              .from("digiy_pay_pro")
-              .update(payload)
-              .eq("business_code", normalizeCode(loadedProfile.business_code));
-
-            if (!error) updated = true;
-            else throw error;
-          } else {
-            if (currentPhone) {
-              const byPhoneDigits = await sb
-                .from("digiy_pay_pro")
-                .update(payload)
-                .eq("wave_phone", phoneDigits(currentPhone))
-                .select("business_code")
-                .limit(1);
-
-              if (!byPhoneDigits.error && Array.isArray(byPhoneDigits.data) && byPhoneDigits.data.length > 0) {
-                updated = true;
-              }
-
-              if (!updated) {
-                const byPhonePlus = await sb
-                  .from("digiy_pay_pro")
-                  .update(payload)
-                  .eq("wave_phone", normPhone(currentPhone))
-                  .select("business_code")
-                  .limit(1);
-
-                if (!byPhonePlus.error && Array.isArray(byPhonePlus.data) && byPhonePlus.data.length > 0) {
-                  updated = true;
-                }
-              }
-            }
-
-            if (!updated && code) {
-              const byCode = await sb
-                .from("digiy_pay_pro")
-                .update(payload)
-                .eq("business_code", code)
-                .select("business_code")
-                .limit(1);
-
-              if (!byCode.error && Array.isArray(byCode.data) && byCode.data.length > 0) {
-                updated = true;
-              }
-            }
-
-            if (!updated) {
-              const { error } = await sb
-                .from("digiy_pay_pro")
-                .insert(payload);
-
-              if (error) throw error;
-            }
-          }
-
-          loadedProfile = {
-            business_name: name,
-            business_code: code,
-            wave_phone: phoneDigitsValue,
-            is_active: active
-          };
-
-          currentPhone = normPhone(phoneDigitsValue);
-          currentCodeFromQuery = code;
-          saveSession(currentPhone, currentRéférence);
-
-          fillForm(loadedProfile);
-          resetBoxes();
-          setOk("Réglages PAY sauvegardés.");
-        } catch (e) {
-          setError(
-            "Sauvegarde refusée ou bloquée par la base. Détail: " +
-            String(e?.message || e)
-          );
-        } finally {
-          setBusy(btnSave, false);
+        const voices = speechSynthesis.getVoices();
+        if(voices && voices.length) run();
+        else{
+          speechSynthesis.onvoiceschanged = run;
+          setTimeout(run, 650);
         }
       }
 
-      function copyPublicLink() {
-        const code = getEffectiveCode();
-        if (!code) {
-          setError("Code pro manquant.");
-          businessCode.focus();
-          return;
-        }
+      cleanVisibleUrl();
 
-        const url = buildPublicUrl(code);
-
-        if (navigator.clipboard?.writeText) {
-          navigator.clipboard.writeText(url).then(
-            () => setOk("Lien public copié."),
-            () => window.prompt("Copie ce lien :", url)
-          );
-        } else {
-          window.prompt("Copie ce lien :", url);
-        }
+      if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", cleanLinks);
+      }else{
+        cleanLinks();
       }
 
-      function openSupport() {
-        let msg = "DIGIY — MON ARGENT PRO / RÉGLAGES PAY\n\n";
-        msg += "J'ai besoin d'aide sur l'admin PAY.\n";
-        msg += "Je préfère ne pas envoyer mon numéro ou ma référence dans le lien.";
-        const num = SUPPORT_WA.replace(/\+/g, "");
-        location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
-      }
-
-
-      btnReload.addEventListener("click", loadProfile);
-      btnSave.addEventListener("click", saveProfile);
-      btnCopyLink.addEventListener("click", copyPublicLink);
-      btnSupport.addEventListener("click", openSupport);
-
-      btnLogout.addEventListener("click", () => {
-        clearSession();
-        location.href = PIN_URL;
+      document.getElementById("audioBtn")?.addEventListener("click", () => {
+        if(canSpeak() && speechSynthesis.speaking) stopAudio();
+        else speakAudio();
       });
 
-      businessName.addEventListener("blur", autoCodeFromName);
-
-      businessCode.addEventListener("input", () => {
-        businessCode.value = normalizeCode(businessCode.value);
-        currentCodeFromQuery = normalizeCode(businessCode.value);
-        updateStats();
+      window.addEventListener("pagehide", stopAudio);
+      document.addEventListener("visibilitychange", () => {
+        if(document.hidden) stopAudio();
       });
-
-      paymentPhone.addEventListener("input", () => {
-        paymentPhone.value = phoneDigits(paymentPhone.value);
-        updateStats();
-      });
-
-      isActive.addEventListener("change", updateStats);
-
-      void loadProfile();
     })();
   </script>
 </body>
 </html>
+
