@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Mon argent — confirmer mon paiement</title>
-  <meta name="theme-color" content="#16a34a"/>
+  <title>DIGIY PAY — Confirmer mon paiement</title>
+  <meta name="theme-color" content="#f4ead2"/>
   <meta name="robots" content="noindex"/>
+  <meta name="digiy-build" content="pay-public-payer-20260510-v1-guide"/>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -144,6 +145,197 @@
       text-align:center;
       font-weight:800;
     }
+
+    /* =========================================================
+       DIGIY PAY PUBLIC — PREUVE SIMPLE ET LISIBLE
+       Client : vérifier, montant, capture, envoyer.
+       ========================================================= */
+    :root{
+      --bg:#f4ead2;
+      --card:#fff7e6;
+      --line:rgba(83,58,26,.22);
+      --text:#1f2a1f;
+      --muted:rgba(31,42,31,.78);
+      --ok:#16a34a;
+      --gold:#facc15;
+      --bad:#dc2626;
+      --shadow:0 12px 28px rgba(77,52,22,.16);
+    }
+
+    body{
+      color:#1f2a1f !important;
+      background:
+        radial-gradient(circle at top left,rgba(250,204,21,.20),transparent 34%),
+        radial-gradient(circle at bottom right,rgba(22,101,52,.09),transparent 28%),
+        linear-gradient(180deg,#f6edd8,#ead9b7 56%,#dfc99c) !important;
+      font-size:17px;
+      font-weight:850;
+    }
+
+    .card,
+    .box,
+    .status,
+    .steps{
+      background:linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96)) !important;
+      border:2px solid rgba(83,58,26,.22) !important;
+      box-shadow:0 10px 24px rgba(77,52,22,.12) !important;
+      color:#1f2a1f !important;
+    }
+
+    h1,
+    .value,
+    .guide-card strong{
+      color:#241a0d !important;
+      font-weight:900 !important;
+      text-shadow:none !important;
+    }
+
+    p,
+    .muted,
+    .status,
+    .steps,
+    .foot,
+    .guide-card span,
+    .msg{
+      color:#3d3324 !important;
+      font-size:15px !important;
+      line-height:1.58 !important;
+      font-weight:900 !important;
+    }
+
+    .label{
+      color:#5f4308 !important;
+      font-weight:900 !important;
+    }
+
+    .in{
+      background:rgba(255,255,255,.82) !important;
+      color:#1f2a1f !important;
+      border:2px solid rgba(83,58,26,.24) !important;
+      font-size:18px !important;
+      font-weight:900 !important;
+      min-height:56px;
+    }
+
+    .in::placeholder{
+      color:rgba(31,42,31,.50) !important;
+    }
+
+    .btn,
+    .btn.ghost,
+    .btn.gold{
+      background:rgba(255,255,255,.70) !important;
+      color:#1f2a1f !important;
+      border:1px solid rgba(83,58,26,.22) !important;
+      font-weight:900 !important;
+      font-size:15px !important;
+    }
+
+    .btn.gold,
+    #btnSendProof{
+      background:linear-gradient(135deg,#facc15,#fff3c4) !important;
+      color:#1f2a1f !important;
+      border:1px solid rgba(121,83,12,.28) !important;
+    }
+
+    .pill,
+    .pill.gold,
+    .pill.ok{
+      background:rgba(255,255,255,.70) !important;
+      color:#1f2a1f !important;
+      border:1px solid rgba(83,58,26,.22) !important;
+    }
+
+    .guide-pay-proof{
+      margin:14px 0 0;
+      padding:15px;
+      border-radius:20px;
+      border:2px solid rgba(121,83,12,.22);
+      background:linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96));
+      box-shadow:0 10px 24px rgba(77,52,22,.12);
+    }
+
+    .guide-title{
+      color:#6b4e09;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+      text-align:center;
+    }
+
+    .guide-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .guide-card{
+      border:1px solid rgba(83,58,26,.20);
+      border-radius:18px;
+      background:rgba(255,255,255,.66);
+      padding:13px;
+      display:grid;
+      gap:5px;
+    }
+
+    .guide-card strong{
+      font-size:16px;
+      line-height:1.2;
+    }
+
+    .guide-card span{
+      font-size:14px !important;
+      line-height:1.45 !important;
+    }
+
+    .amount-quick,
+    .proof-type-row{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .amount-quick button,
+    .proof-type{
+      min-height:44px;
+      border-radius:999px;
+      border:1px solid rgba(83,58,26,.22);
+      background:rgba(255,255,255,.72);
+      color:#1f2a1f;
+      padding:9px 13px;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      font-family:inherit;
+    }
+
+    .amount-quick button:hover,
+    .amount-quick button.active,
+    .proof-type:hover,
+    .proof-type.active{
+      background:rgba(250,204,21,.30);
+      border-color:rgba(121,83,12,.34);
+    }
+
+    .proof-ref{
+      margin-top:10px;
+    }
+
+    .msg.ok{color:#14532d !important}
+    .msg.bad{color:#9f1239 !important}
+
+    @media(max-width:640px){
+      body{font-size:18px}
+      .wrap{padding:10px}
+      h1{font-size:27px !important}
+      .guide-grid{grid-template-columns:1fr}
+      .top-actions .btn{width:100%; min-height:50px}
+      #btnSendProof{min-height:58px; font-size:17px !important}
+    }
+
   </style>
 </head>
 
@@ -152,7 +344,7 @@
     <div class="card">
       <h1>✅ J’ai payé — j’envoie maintenant la preuve</h1>
       <p class="muted">
-        Tu as déjà payé via Wave. Cette page sert à confirmer le paiement et à envoyer la capture pour que le professionnel puisse retrouver le mouvement dans Mon argent.
+        Tu as déjà payé via Wave. Cette page sert seulement à laisser une preuve claire pour que le professionnel retrouve le mouvement dans Mon Argent.
       </p>
 
       <div class="top-actions">
@@ -167,6 +359,30 @@
       <div class="status" id="flowInfo">
         Parcours : <span class="mono">carte publique DIGIY → preuve → attente de traitement</span>
       </div>
+
+
+      <div class="guide-pay-proof" id="guidePayProof">
+        <div class="guide-title">🧭 Laisser une preuve propre</div>
+        <div class="guide-grid">
+          <div class="guide-card">
+            <strong>1 · Vérifie</strong>
+            <span>Nom du pro, numéro Wave et montant réellement payé.</span>
+          </div>
+          <div class="guide-card">
+            <strong>2 · Montant</strong>
+            <span>Écris le montant ou touche un montant rapide.</span>
+          </div>
+          <div class="guide-card">
+            <strong>3 · Capture</strong>
+            <span>Ajoute la capture Wave si tu l’as sous la main.</span>
+          </div>
+          <div class="guide-card">
+            <strong>4 · Envoie</strong>
+            <span>La preuve part pour traitement. DIGIY ne prend pas l’argent.</span>
+          </div>
+        </div>
+      </div>
+
 
       <div class="hr"></div>
 
@@ -219,6 +435,18 @@
       <div class="box">
         <div class="label">Montant payé (FCFA)</div>
         <input class="in" id="payAmount" inputmode="numeric" placeholder="Ex : 5000" />
+
+        <div class="amount-quick" aria-label="Montants rapides">
+          <button type="button" data-amount-preset="1000">1 000</button>
+          <button type="button" data-amount-preset="2000">2 000</button>
+          <button type="button" data-amount-preset="5000">5 000</button>
+          <button type="button" data-amount-preset="10000">10 000</button>
+          <button type="button" data-amount-preset="15000">15 000</button>
+          <button type="button" data-amount-preset="25000">25 000</button>
+          <button type="button" data-amount-preset="50000">50 000</button>
+          <button type="button" data-amount-preset="100000">100 000</button>
+        </div>
+
         <p class="muted" style="margin-top:8px;font-size:12px;">
           Mets ici le montant réellement envoyé sur Wave.
         </p>
@@ -244,6 +472,18 @@
       <div class="box">
         <div class="label">Capture Wave</div>
         <input class="in" type="file" id="proofFile" accept="image/*" />
+
+        <div class="hr"></div>
+
+        <div class="label">Type de preuve</div>
+        <div class="proof-type-row" aria-label="Type de preuve">
+          <button type="button" class="proof-type active" data-proof-type="capture">🧾 Capture Wave</button>
+          <button type="button" class="proof-type" data-proof-type="reference">🔢 Référence paiement</button>
+          <button type="button" class="proof-type" data-proof-type="message">💬 Message client</button>
+        </div>
+
+        <input class="in proof-ref" id="proofRef" type="text" placeholder="Référence ou petit message si besoin" maxlength="120" />
+
 
         <div class="steps" id="stepsBox">
           1️⃣ Vérifie le nom et le numéro.<br>
@@ -285,6 +525,7 @@
       const sb = window.supabase?.createClient
         ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: {
+              storageKey: "digiy-pay-public-payer-auth-token",
               persistSession: false,
               autoRefreshToken: false,
               detectSessionInUrl: false,
@@ -323,7 +564,11 @@
             "pay_phone",
             "access_note",
             "keybox_code",
-            "keybox_location"
+            "keybox_location",
+            "module",
+            "return",
+            "from",
+            "v"
           ].forEach(function(key){
             if(url.searchParams.has(key)){
               url.searchParams.delete(key);
@@ -719,7 +964,63 @@
       });
     })();
   </script>
-<script src="./pay-proof.js?v=7"></script>
+
+<script>
+  (() => {
+    "use strict";
+
+    function $(id){ return document.getElementById(id); }
+
+    function setAmount(value){
+      const input = $("payAmount");
+      if(!input) return;
+      input.value = String(value || "").replace(/[^\d]/g, "");
+      input.dispatchEvent(new Event("input", { bubbles:true }));
+      input.dispatchEvent(new Event("change", { bubbles:true }));
+
+      document.querySelectorAll("[data-amount-preset]").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-amount-preset") === String(value));
+      });
+    }
+
+    function setProofType(value){
+      document.querySelectorAll("[data-proof-type]").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-proof-type") === String(value || ""));
+      });
+
+      try{
+        sessionStorage.setItem("digiy_pay_public_proof_type", String(value || "capture"));
+      }catch(_){}
+    }
+
+    function bindGuides(){
+      document.querySelectorAll("[data-amount-preset]").forEach(btn => {
+        btn.addEventListener("click", () => setAmount(btn.getAttribute("data-amount-preset") || ""));
+      });
+
+      document.querySelectorAll("[data-proof-type]").forEach(btn => {
+        btn.addEventListener("click", () => setProofType(btn.getAttribute("data-proof-type") || "capture"));
+      });
+
+      const proofRef = $("proofRef");
+      if(proofRef){
+        proofRef.addEventListener("input", () => {
+          try{
+            sessionStorage.setItem("digiy_pay_public_proof_note", proofRef.value || "");
+          }catch(_){}
+        });
+      }
+    }
+
+    if(document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", bindGuides);
+    }else{
+      bindGuides();
+    }
+  })();
+</script>
+
+<script src="./pay-proof.js?v=pay-public-payer-20260510-v1-guide"></script>
 <script>
   setTimeout(() => {
     const msg = document.getElementById("payMsg");
@@ -730,5 +1031,102 @@
   }, 400);
 </script>
  
+
+<script>
+  window.DIGIY_PAYER_AUDIO_TEXT =
+    "Tu es sur la page de confirmation de paiement DIGIY PAY. Ici, tu ne payes plus : tu as déjà payé dans Wave. Cette page sert seulement à laisser une preuve propre au professionnel. Vérifie d’abord le nom, le numéro Wave et le montant. Ensuite, choisis un montant rapide ou écris le montant réel. Ajoute la capture Wave si tu l’as. Puis touche Envoyer la preuve. DIGIY ne garde pas l’argent. DIGIY aide seulement à transmettre une trace claire pour que le professionnel retrouve ton paiement.";
+</script>
+
+<button id="payerAudioBtn" type="button" aria-label="Écouter l’aide paiement">🎧 Aide</button>
+
+<style>
+  #payerAudioBtn{
+    position:fixed;
+    right:14px;
+    bottom:14px;
+    z-index:99999;
+    min-height:48px;
+    border-radius:999px;
+    border:1px solid rgba(121,83,12,.28);
+    background:linear-gradient(135deg,#facc15,#fff3c4);
+    color:#1f2a1f;
+    padding:12px 16px;
+    font-size:15px;
+    font-weight:900;
+    box-shadow:0 12px 28px rgba(77,52,22,.18);
+    cursor:pointer;
+  }
+</style>
+
+<script>
+  (() => {
+    "use strict";
+
+    function canSpeak(){
+      return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+    }
+
+    function getVoice(){
+      try{
+        const voices = window.speechSynthesis.getVoices() || [];
+        return voices.find(v => /fr[-_]?fr/i.test(v.lang || "")) ||
+               voices.find(v => /^fr/i.test(v.lang || "")) ||
+               voices[0] ||
+               null;
+      }catch(_){ return null; }
+    }
+
+    function stop(){
+      try{ if(canSpeak()) window.speechSynthesis.cancel(); }catch(_){}
+      const btn = document.getElementById("payerAudioBtn");
+      if(btn) btn.textContent = "🎧 Aide";
+    }
+
+    function speak(){
+      if(!canSpeak()) return;
+      stop();
+
+      const run = () => {
+        const u = new SpeechSynthesisUtterance(window.DIGIY_PAYER_AUDIO_TEXT || "");
+        const voice = getVoice();
+        if(voice) u.voice = voice;
+        u.lang = voice?.lang || "fr-FR";
+        u.rate = 0.86;
+        u.pitch = 1.04;
+        u.volume = 1;
+
+        const btn = document.getElementById("payerAudioBtn");
+        if(btn) btn.textContent = "⏹ Stop";
+
+        u.onend = () => { if(btn) btn.textContent = "🎧 Aide"; };
+        u.onerror = () => { if(btn) btn.textContent = "🎧 Aide"; };
+
+        window.speechSynthesis.speak(u);
+      };
+
+      const voices = window.speechSynthesis.getVoices();
+      if(voices && voices.length) run();
+      else{
+        window.speechSynthesis.onvoiceschanged = run;
+        setTimeout(run, 650);
+      }
+    }
+
+    function bind(){
+      const btn = document.getElementById("payerAudioBtn");
+      if(!btn) return;
+      btn.addEventListener("click", () => {
+        if(window.speechSynthesis && window.speechSynthesis.speaking) stop();
+        else speak();
+      });
+      window.addEventListener("pagehide", stop);
+      document.addEventListener("visibilitychange", () => { if(document.hidden) stop(); });
+    }
+
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
+    else bind();
+  })();
+</script>
+
 </body>
 </html>
