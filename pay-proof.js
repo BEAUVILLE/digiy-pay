@@ -1,4 +1,5 @@
 window.DIGIY_PAY_PROOF_READY = true;
+// DIGIY PAY · pay-proof public memory · 2026-05-10
 
 (() => {
   "use strict";
@@ -9,6 +10,9 @@ window.DIGIY_PAY_PROOF_READY = true;
   const PUBLIC_CARD_BY_CODE_PREFIX = "digiy_pay_public_card_";
   const LAST_PROOF_KEY = "DIGIY_PAY_LAST_PROOF";
   const LAST_PROOF_BY_REF_PREFIX = "DIGIY_PAY_PROOF_REF_";
+  const PROOF_LIST_KEY = "DIGIY_PAY_PROOF_LIST";
+  const PROOF_LIST_MAX = 50;
+  const CACHE_TTL_MS = 5 * 60 * 1000;
   const DEFAULT_MODULE = "PAY";
 
   const q = new URLSearchParams(location.search);
@@ -18,6 +22,7 @@ window.DIGIY_PAY_PROOF_READY = true;
     payPhone: document.getElementById("payPhone"),
     paySlug: document.getElementById("paySlug"),
     proofFile: document.getElementById("proofFile"),
+    proofRef: document.getElementById("proofRef"),
     btnSendProof: document.getElementById("btnSendProof"),
     payMsg: document.getElementById("payMsg"),
     btnBack: document.getElementById("btnBack")
@@ -36,6 +41,7 @@ window.DIGIY_PAY_PROOF_READY = true;
     window.supabase?.createClient && SUPABASE_URL && SUPABASE_ANON_KEY
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           auth: {
+            storageKey: "digiy-pay-public-proof-auth-token",
             persistSession: false,
             autoRefreshToken: false,
             detectSessionInUrl: false,
@@ -111,7 +117,11 @@ window.DIGIY_PAY_PROOF_READY = true;
       const host = u.hostname.toLowerCase();
       const sameOrigin = u.origin === window.location.origin;
       const digiyHost = host === "digiylyfe.com" || host.endsWith(".digiylyfe.com");
-      if ((u.protocol === "http:" || u.protocol === "https:") && (sameOrigin || digiyHost)) return u.toString();
+
+      if ((u.protocol === "http:" || u.protocol === "https:") && (sameOrigin || digiyHost)) {
+        return u.toString();
+      }
+
       return "";
     } catch {
       return "";
@@ -137,7 +147,11 @@ window.DIGIY_PAY_PROOF_READY = true;
         "pay_phone",
         "access_note",
         "keybox_code",
-        "keybox_location"
+        "keybox_location",
+        "module",
+        "return",
+        "from",
+        "v"
       ].forEach((key) => {
         if (url.searchParams.has(key)) {
           url.searchParams.delete(key);
@@ -172,8 +186,8 @@ window.DIGIY_PAY_PROOF_READY = true;
       try {
         const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
         const parsed = safeJsonParse(raw);
-        if (!parsed || typeof parsed !== "object") continue;
 
+        if (!parsed || typeof parsed !== "object") continue;
         if (parsed.ts && Date.now() - Number(parsed.ts) > CACHE_TTL_MS) continue;
         if (code && parsed.code && normCode(parsed.code) !== code) continue;
 
@@ -196,8 +210,75 @@ window.DIGIY_PAY_PROOF_READY = true;
     els.payMsg.textContent = text || "";
   }
 
+  function readProofType() {
+    try {
+      return (
+        sessionStorage.getItem("digiy_pay_public_proof_type") ||
+        localStorage.getItem("digiy_pay_public_proof_type") ||
+        "capture"
+      );
+    } catch {
+      return "capture";
+    }
+  }
+
+  function readProofNote() {
+    const fieldValue = String(els.proofRef?.value || "").trim();
+
+    if (fieldValue) return fieldValue;
+
+    try {
+      return String(
+        sessionStorage.getItem("digiy_pay_public_proof_note") ||
+        localStorage.getItem("digiy_pay_public_proof_note") ||
+        ""
+      ).trim();
+    } catch {
+      return "";
+    }
+  }
+
+  function readProofList() {
+    try {
+      const raw = localStorage.getItem(PROOF_LIST_KEY);
+      const parsed = safeJsonParse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveProofListItem(payload) {
+    try {
+      const list = readProofList();
+
+      const item = {
+        ref: payload.ref || "",
+        code: payload.code || "",
+        public_label: payload.public_label || "",
+        amount_xof: payload.amount_xof || 0,
+        channel: payload.channel || "wave",
+        status: payload.status || "pending_proof",
+        proof_type: payload.proof_type || "capture",
+        proof_note: payload.proof_note || "",
+        created_at: payload.created_at || new Date().toISOString(),
+        persisted: !!payload.persisted,
+        persist_mode: payload.persist_mode || ""
+      };
+
+      const next = [
+        item,
+        ...list.filter((x) => x && x.ref !== item.ref)
+      ].slice(0, PROOF_LIST_MAX);
+
+      localStorage.setItem(PROOF_LIST_KEY, JSON.stringify(next));
+      sessionStorage.setItem(PROOF_LIST_KEY, JSON.stringify(next));
+    } catch {}
+  }
+
   function getFileMeta(file) {
     if (!file) return null;
+
     return {
       name: file.name || "",
       size: Number(file.size || 0),
@@ -210,6 +291,7 @@ window.DIGIY_PAY_PROOF_READY = true;
     const cleanCode = normCode(code) || "X";
     const last6 = (normPhone(phone) || "").slice(-6) || "000000";
     const stamp = Date.now().toString(36).toUpperCase();
+
     return `PAY-${cleanCode}-${last6}-${stamp}`;
   }
 
@@ -248,6 +330,7 @@ window.DIGIY_PAY_PROOF_READY = true;
     if (els.payPhone && !els.payPhone.value && st.phone) {
       els.payPhone.value = st.phone;
     }
+
     if (els.paySlug && !els.paySlug.value && st.slug) {
       els.paySlug.value = st.slug;
     }
@@ -259,9 +342,12 @@ window.DIGIY_PAY_PROOF_READY = true;
 
   function validate(st) {
     if (!st.code) return "Code DIGIY manquant.";
-    if (!st.phone || st.phone.length < 12) return "Numéro Wave manquant ou invalide. Reviens à la carte puis ouvre à nouveau la preuve.";
+    if (!st.phone || st.phone.length < 12) {
+      return "Numéro Wave manquant ou invalide. Reviens à la carte puis ouvre à nouveau la preuve.";
+    }
     if (!st.amount_xof || st.amount_xof <= 0) return "Montant payé manquant ou invalide.";
     if (!els.proofFile?.files?.[0]) return "Ajoute la capture Wave avant d’envoyer la preuve.";
+
     return "";
   }
 
@@ -299,6 +385,7 @@ window.DIGIY_PAY_PROOF_READY = true;
     }
 
     const pub = sb.storage.from(bucket).getPublicUrl(path);
+
     return {
       ok: true,
       skipped: false,
@@ -316,29 +403,45 @@ window.DIGIY_PAY_PROOF_READY = true;
     const { data, error } = await sb.rpc(rpcName, { p_payload: payload });
 
     if (error) {
-      return { ok: false, skipped: false, mode: "rpc", error: error.message || "rpc_failed" };
+      return {
+        ok: false,
+        skipped: false,
+        mode: "rpc",
+        error: error.message || "rpc_failed"
+      };
     }
 
-    return { ok: true, skipped: false, mode: "rpc", data };
+    return {
+      ok: true,
+      skipped: false,
+      mode: "rpc",
+      data
+    };
   }
 
   function saveLocal(payload) {
     try {
       localStorage.setItem(LAST_PROOF_KEY, JSON.stringify(payload));
       sessionStorage.setItem(LAST_PROOF_KEY, JSON.stringify(payload));
+
       if (payload.ref) {
         localStorage.setItem(LAST_PROOF_BY_REF_PREFIX + payload.ref, JSON.stringify(payload));
         sessionStorage.setItem(LAST_PROOF_BY_REF_PREFIX + payload.ref, JSON.stringify(payload));
       }
+
+      saveProofListItem(payload);
     } catch {}
   }
 
   function buildWaitUrl(payload) {
     const u = new URL(WAIT_URL, location.href);
+
     if (payload.ref) u.searchParams.set("ref", payload.ref);
     if (payload.code) u.searchParams.set("code", payload.code);
     if (payload.module) u.searchParams.set("module", payload.module);
+
     u.searchParams.set("status", payload.status || "pending_proof");
+
     return u.toString();
   }
 
@@ -378,11 +481,14 @@ window.DIGIY_PAY_PROOF_READY = true;
       status: "pending_proof",
       created_at: new Date().toISOString(),
       return_url: st.returnUrl || "",
-      proof_file: getFileMeta(file)
+      proof_file: getFileMeta(file),
+      proof_type: readProofType(),
+      proof_note: readProofNote()
     };
 
     try {
       const upload = await uploadProofIfConfigured(ref, file);
+
       if (upload.ok) {
         basePayload.proof_path = upload.proof_path;
         basePayload.proof_url = upload.proof_url;
@@ -397,7 +503,10 @@ window.DIGIY_PAY_PROOF_READY = true;
 
       basePayload.persist_mode = persistResult.mode || "";
       basePayload.persisted = !!persistResult.ok;
-      if (persistResult.error) basePayload.persist_error = persistResult.error;
+
+      if (persistResult.error) {
+        basePayload.persist_error = persistResult.error;
+      }
 
       saveLocal(basePayload);
 
@@ -430,4 +539,21 @@ window.DIGIY_PAY_PROOF_READY = true;
   if (!sb) {
     setMsg("Supabase indisponible. La preuve sera préparée localement si tu continues.", "bad");
   }
+
+  window.DIGIY_PAY_PROOF_MEMORY = {
+    lastKey: LAST_PROOF_KEY,
+    listKey: PROOF_LIST_KEY,
+    readLast: function () {
+      try {
+        return (
+          safeJsonParse(localStorage.getItem(LAST_PROOF_KEY)) ||
+          safeJsonParse(sessionStorage.getItem(LAST_PROOF_KEY)) ||
+          null
+        );
+      } catch {
+        return null;
+      }
+    },
+    readList: readProofList
+  };
 })();
