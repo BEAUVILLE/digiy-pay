@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>DIGIY PAY — Confirmer mon paiement</title>
+  <title>DIGIY PAY — Confirmer mon paiement · Audio guide</title>
   <meta name="theme-color" content="#f4ead2"/>
   <meta name="robots" content="noindex"/>
   <meta name="digiy-build" content="pay-public-payer-20260510-v1-guide"/>
@@ -336,6 +336,49 @@
       #btnSendProof{min-height:58px; font-size:17px !important}
     }
 
+
+    /* DIGIY PAY PUBLIC — panneau audio visible */
+    .audio-help-panel{
+      margin:14px 0 0;
+      padding:15px;
+      border-radius:20px;
+      border:2px solid rgba(22,101,52,.24);
+      background:
+        radial-gradient(circle at right top,rgba(34,197,94,.10),transparent 34%),
+        linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96));
+      box-shadow:0 10px 24px rgba(77,52,22,.12);
+      color:#1f2a1f;
+      display:grid;
+      gap:10px;
+    }
+
+    .audio-help-panel strong{
+      color:#14532d !important;
+      font-size:17px;
+      font-weight:900;
+      line-height:1.2;
+    }
+
+    .audio-help-panel span{
+      color:#3d3324 !important;
+      font-size:15px;
+      font-weight:900;
+      line-height:1.5;
+    }
+
+    .audio-help-panel button{
+      width:100%;
+      min-height:52px;
+      border-radius:999px;
+      border:1px solid rgba(121,83,12,.28);
+      background:linear-gradient(135deg,#facc15,#fff3c4);
+      color:#1f2a1f;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      font-family:inherit;
+    }
+
   </style>
 </head>
 
@@ -359,6 +402,17 @@
       <div class="status" id="flowInfo">
         Parcours : <span class="mono">carte publique DIGIY → preuve → attente de traitement</span>
       </div>
+
+
+      <div class="audio-help-panel" id="audioHelpPanel">
+        <strong>🎧 Besoin d’aide avant d’envoyer ?</strong>
+        <span>
+          Écoute DIGIY : cette page ne te fait pas payer une deuxième fois.
+          Elle sert seulement à envoyer une preuve claire au professionnel.
+        </span>
+        <button id="payerAudioPanelBtn" type="button">🎧 Écouter l’explication</button>
+      </div>
+
 
 
       <div class="guide-pay-proof" id="guidePayProof">
@@ -1125,6 +1179,30 @@
 
     if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", bind);
     else bind();
+  })();
+</script>
+
+
+<script>
+  (() => {
+    "use strict";
+
+    function bindAudioPanel(){
+      const panelBtn = document.getElementById("payerAudioPanelBtn");
+      const floatingBtn = document.getElementById("payerAudioBtn");
+
+      if(!panelBtn || !floatingBtn) return;
+
+      panelBtn.addEventListener("click", () => {
+        floatingBtn.click();
+      });
+    }
+
+    if(document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", bindAudioPanel);
+    }else{
+      bindAudioPanel();
+    }
   })();
 </script>
 
