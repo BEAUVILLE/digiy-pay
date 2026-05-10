@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Mon argent — payer ce professionnel</title>
-  <meta name="theme-color" content="#04110d" />
+  <title>DIGIY PAY — Payer un professionnel</title>
+  <meta name="theme-color" content="#f4ead2" />
   <meta
     name="description"
     content="Carte publique Mon argent by DIGIY : vérifier le professionnel, payer directement via Wave, puis laisser une trace claire."
@@ -14,6 +14,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png?v=1" />
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png?v=1" />
   <link rel="manifest" href="./site.webmanifest?v=1" />
+
+
+  <meta name="digiy-build" content="pay-public-20260510-v1-doctrine" />
 
   <script>
     window.DIGIY_SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
@@ -688,6 +691,246 @@
         flex:1;
       }
     }
+
+    /* =========================================================
+       DIGIY PAY PUBLIC — FAÇADE CLAIRE TERRAIN
+       Le client comprend vite : vérifier, payer direct, confirmer.
+       ========================================================= */
+    :root{
+      --bg:#f4ead2;
+      --card:#fff7e6;
+      --line:rgba(83,58,26,.22);
+      --text:#1f2a1f;
+      --muted:rgba(31,42,31,.78);
+      --green:#16a34a;
+      --green2:#15803d;
+      --gold:#facc15;
+      --danger:#dc2626;
+      --shadow:0 12px 28px rgba(77,52,22,.16);
+    }
+
+    body{
+      color:#1f2a1f !important;
+      background:
+        radial-gradient(circle at top left,rgba(250,204,21,.20),transparent 34%),
+        radial-gradient(circle at bottom right,rgba(22,101,52,.09),transparent 28%),
+        linear-gradient(180deg,#f6edd8,#ead9b7 56%,#dfc99c) !important;
+      font-size:17px;
+      font-weight:850;
+    }
+
+    .card,
+    .panel,
+    .paybox,
+    .trust,
+    .trust-mini,
+    .return-house,
+    .note,
+    .box,
+    .steps,
+    .sticky-paybar-inner,
+    .digiy-bottom-nav-inner{
+      background:linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96)) !important;
+      border:2px solid rgba(83,58,26,.22) !important;
+      box-shadow:0 10px 24px rgba(77,52,22,.12) !important;
+      color:#1f2a1f !important;
+    }
+
+    h1,
+    .name,
+    .nm,
+    .return-house strong,
+    .sticky-paybar-text strong,
+    .hero-action strong{
+      color:#241a0d !important;
+      font-weight:900 !important;
+      text-shadow:none !important;
+    }
+
+    .sub,
+    .hint,
+    .trust span,
+    .note,
+    .foot,
+    .helper,
+    .steps,
+    .return-house span,
+    .sticky-paybar-text small,
+    .box .small{
+      color:#3d3324 !important;
+      font-size:15px !important;
+      line-height:1.55 !important;
+      font-weight:900 !important;
+    }
+
+    .brand-mark{
+      background:linear-gradient(135deg,#facc15,#fff3c4) !important;
+      color:#1f2a1f !important;
+      box-shadow:0 12px 26px rgba(77,52,22,.16) !important;
+    }
+
+    .hero-action{
+      background:linear-gradient(135deg,#facc15,#fff3c4) !important;
+      color:#1f2a1f !important;
+      border:2px solid rgba(121,83,12,.24);
+    }
+
+    .hero-action-primary,
+    .btn.primary,
+    .sticky-paid,
+    .digiy-bottom-nav a.active,
+    .digiy-bottom-nav button.active{
+      background:linear-gradient(135deg,#16a34a,#bbf7d0) !important;
+      color:#052215 !important;
+      border:1px solid rgba(22,101,52,.28) !important;
+    }
+
+    .hero-action-secondary,
+    .btn,
+    .btn.ghost,
+    .btn.gold,
+    .sticky-open,
+    .digiy-bottom-nav a,
+    .digiy-bottom-nav button{
+      background:rgba(255,255,255,.66) !important;
+      color:#1f2a1f !important;
+      border:1px solid rgba(83,58,26,.22) !important;
+      font-weight:900 !important;
+    }
+
+    .chip,
+    .chip.ok,
+    .chip.gold{
+      background:rgba(255,255,255,.66) !important;
+      color:#1f2a1f !important;
+      border:1px solid rgba(83,58,26,.22) !important;
+      font-weight:900 !important;
+    }
+
+    .panel h2,
+    .lbl{
+      color:#5f4308 !important;
+      font-weight:900 !important;
+    }
+
+    input{
+      background:rgba(255,255,255,.80) !important;
+      color:#1f2a1f !important;
+      border:2px solid rgba(83,58,26,.24) !important;
+      font-size:18px !important;
+      font-weight:900 !important;
+    }
+
+    input::placeholder{
+      color:rgba(31,42,31,.50) !important;
+    }
+
+    code{
+      background:rgba(255,255,255,.78) !important;
+      border:2px solid rgba(83,58,26,.20) !important;
+      color:#14532d !important;
+      font-size:22px !important;
+      font-weight:900 !important;
+    }
+
+    .msg{
+      background:rgba(254,243,199,.92) !important;
+      color:#6b4e09 !important;
+      border-color:rgba(121,83,12,.28) !important;
+    }
+
+    .err,
+    .unavailable{
+      background:rgba(254,226,226,.90) !important;
+      color:#9f1239 !important;
+      border-color:rgba(159,18,57,.28) !important;
+    }
+
+    .unavailable strong,
+    .unavailable span{
+      color:#9f1239 !important;
+    }
+
+    .public-guide{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:22px;
+      border:2px solid rgba(121,83,12,.24);
+      background:linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96));
+      box-shadow:0 10px 24px rgba(77,52,22,.12);
+    }
+
+    .public-guide-title{
+      color:#6b4e09;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+      text-align:center;
+    }
+
+    .public-guide-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .public-guide-card{
+      border:1px solid rgba(83,58,26,.20);
+      border-radius:18px;
+      background:rgba(255,255,255,.64);
+      padding:13px;
+      display:grid;
+      gap:5px;
+    }
+
+    .public-guide-card strong{
+      color:#241a0d;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.2;
+    }
+
+    .public-guide-card span{
+      color:#3d3324;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:900;
+    }
+
+    #digiy-audio-btn{
+      color:#1f2a1f !important;
+      background:linear-gradient(135deg,#facc15,#fff3c4) !important;
+      border:1px solid rgba(121,83,12,.28) !important;
+    }
+
+    @media(max-width:640px){
+      .public-guide-grid{
+        grid-template-columns:1fr;
+      }
+
+      body{
+        font-size:18px;
+      }
+
+      h1,
+      .name{
+        font-size:28px !important;
+      }
+
+      .sticky-paybar{
+        bottom:calc(78px + env(safe-area-inset-bottom,0px)) !important;
+      }
+
+      #digiy-audio-btn{
+        left:10px !important;
+        right:10px !important;
+        bottom:calc(166px + env(safe-area-inset-bottom,0px)) !important;
+        justify-content:center;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -740,6 +983,30 @@
       <div class="trust-mini">
         🎧 Besoin d’être rassuré ? Écoute la voix DIGIY : elle explique à un novice ce que cette carte fait, et ce qu’elle ne fait pas.
       </div>
+
+
+      <div class="public-guide" id="publicGuide">
+        <div class="public-guide-title">🧭 Comment payer proprement ?</div>
+        <div class="public-guide-grid">
+          <div class="public-guide-card">
+            <strong>1 · Vérifie</strong>
+            <span>Regarde le nom du professionnel affiché par DIGIY.</span>
+          </div>
+          <div class="public-guide-card">
+            <strong>2 · Copie</strong>
+            <span>Copie le numéro Wave public du professionnel.</span>
+          </div>
+          <div class="public-guide-card">
+            <strong>3 · Paie</strong>
+            <span>Tu payes directement dans Wave, pas dans DIGIY.</span>
+          </div>
+          <div class="public-guide-card">
+            <strong>4 · Confirme</strong>
+            <span>Après paiement, touche “J’ai payé” pour laisser une trace.</span>
+          </div>
+        </div>
+      </div>
+
 
       <div class="panel" id="searchPanel">
         <h2>Code du professionnel</h2>
@@ -912,7 +1179,11 @@
           "pay_phone",
           "access_note",
           "keybox_code",
-          "keybox_location"
+          "keybox_location",
+          "module",
+          "return",
+          "from",
+          "v"
         ].forEach(function(key){
           if(url.searchParams.has(key)){
             url.searchParams.delete(key);
@@ -1019,6 +1290,7 @@
     if (window.supabase?.createClient){
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
+          storageKey: "digiy-pay-public-auth-token",
           persistSession: false,
           autoRefreshToken: false,
           detectSessionInUrl: false,
@@ -1495,7 +1767,7 @@
   window.DIGIY_AUDIO_CONFIG = {
     label: "Écouter avant de payer",
     stopLabel: "Arrêter",
-    text: "Bienvenue sur la carte publique Mon argent by DIGIY. Si tu découvres cette page, elle sert à éviter les erreurs de paiement. Elle ne remplace pas Wave et elle ne garde pas l’argent. Elle affiche simplement la bonne carte du professionnel. Tu entres son code DIGIY ou tu scannes son QR. Ensuite, tu vérifies son nom, tu vérifies son numéro Wave, puis tu payes directement dans ton application de paiement. Après le paiement, tu peux cliquer sur J’ai payé. Ce bouton ne prend pas ton argent : il sert à laisser une trace claire pour que le professionnel sache qu’un paiement a été fait. DIGIY aide donc à voir qui reçoit, où payer, et pourquoi le paiement doit rester direct. Côté professionnel, cette trace peut nourrir Mon argent, pour mieux comprendre ce qui entre dans l’activité. Simple, direct, sans commission DIGIY.",
+    text: "Bienvenue sur DIGIY PAY. Cette page sert à payer un professionnel sans se tromper. Elle ne remplace pas Wave, elle ne garde pas l’argent et elle ne prélève pas de commission. Elle t’aide seulement à vérifier le bon professionnel. Première étape : regarde le nom affiché. Deuxième étape : copie ou vérifie le numéro Wave public. Troisième étape : paie directement dans Wave. Quatrième étape : reviens ici et touche J’ai payé pour laisser une trace claire. Ce bouton ne prend pas ton argent. Il aide seulement le professionnel à savoir qu’un paiement a été fait et à mieux ranger son activité dans Mon Argent. Le bon réflexe : vérifie le nom, vérifie le numéro, paie en direct, puis confirme. DIGIY montre la route, le professionnel garde son argent.",
     buttonBg: "linear-gradient(135deg,#d4af37,#b78b34)",
     buttonColor: "#111827",
     bottom: "24px",
