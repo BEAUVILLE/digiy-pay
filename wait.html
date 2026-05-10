@@ -1,313 +1,886 @@
-from pathlib import Path
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DIGIY PAY — Preuve en attente</title>
+  <meta name="theme-color" content="#f4ead2" />
+  <meta name="robots" content="noindex" />
+  <meta name="digiy-build" content="pay-public-wait-20260510-v1-memory" />
 
-src = Path("/mnt/data/Texte collé(905).txt")
-html = src.read_text(encoding="utf-8")
-if html.startswith(">"):
-    html = html[1:]
+  <style>
+    :root{
+      --bg:#f4ead2;
+      --bg2:#ead9b7;
+      --card:#fff7e6;
+      --line:rgba(83,58,26,.22);
+      --line2:rgba(83,58,26,.34);
+      --text:#1f2a1f;
+      --muted:rgba(31,42,31,.76);
+      --gold:#facc15;
+      --green:#16a34a;
+      --green2:#15803d;
+      --red:#9f1239;
+      --shadow:0 12px 28px rgba(77,52,22,.16);
+      --max:760px;
+      --ff:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    }
 
-# Title/copy
-html = html.replace("<title>DIGIY — Validation en cours</title>", "<title>Mon argent — validation en cours</title>")
-html = html.replace("Dès que c’est confirmé, on te redirige automatiquement vers ta destination.", "Dès que c’est confirmé, la preuve reste lisible et le professionnel peut la traiter proprement.")
-html = html.replace("carte publique DIGIY → payer.html → wait.html → destination finale", "carte publique DIGIY → preuve → attente de validation")
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      min-height:100vh;
+      font-family:var(--ff);
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 0%,rgba(250,204,21,.20),transparent 34%),
+        radial-gradient(circle at 100% 100%,rgba(22,101,52,.10),transparent 30%),
+        linear-gradient(180deg,var(--bg),var(--bg2) 56%,#dfc99c);
+      padding:14px;
+      font-size:17px;
+      font-weight:850;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
 
-# Labels visible: remove phone/slug/url final exposure
-html = html.replace('<div class="label">Statut / destination</div>', '<div class="label">Statut</div>')
-html = html.replace('<div class="label">Destination</div>', '<div class="label">Espace concerné</div>')
-html = html.replace('<div class="label">Téléphone</div>', '<div class="label">Contact pro</div>')
-html = html.replace('<div class="label">Identifiant</div>', '<div class="label">Référence protégée</div>')
-html = html.replace('<div class="label">URL finale</div>', '<div class="label">Suite</div>')
+    .wrap{
+      width:min(var(--max),100%);
+      margin:0 auto;
+      padding:14px 0 110px;
+    }
 
-# Add top return links after flow maybe before status? Simple top actions after flow block.
-html = html.replace(
-'''<div class="hr"></div>
+    .card{
+      border:2px solid var(--line);
+      border-radius:28px;
+      background:linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-      <div class="status" id="statusBox">''',
-'''<div class="hr"></div>
+    .hero{
+      padding:22px 18px 12px;
+      text-align:center;
+    }
 
-      <div class="row">
-        <a class="btn" href="./index.html">⬅️ Retour carte</a>
-        <a class="btn" href="https://digiylyfe.com/">🌍 Site</a>
-        <a class="btn" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
+    .mark{
+      width:68px;
+      height:68px;
+      margin:0 auto 12px;
+      border-radius:24px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,var(--green),#bbf7d0);
+      color:#052215;
+      font-size:34px;
+      font-weight:900;
+      box-shadow:0 12px 24px rgba(77,52,22,.16);
+    }
+
+    .eyebrow{
+      color:#6b4e09;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    h1{
+      margin:0;
+      color:#241a0d;
+      font-size:clamp(34px,7vw,52px);
+      line-height:1.02;
+      letter-spacing:-.04em;
+      font-weight:900;
+    }
+
+    .sub{
+      margin:12px auto 0;
+      max-width:62ch;
+      color:#3d3324;
+      font-size:16px;
+      line-height:1.55;
+      font-weight:900;
+    }
+
+    .actions{
+      padding:0 18px 18px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+    }
+
+    .btn,
+    button.btn{
+      min-height:52px;
+      border-radius:999px;
+      border:1px solid rgba(83,58,26,.22);
+      background:rgba(255,255,255,.70);
+      color:#1f2a1f;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px 16px;
+      text-decoration:none;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+      font-family:inherit;
+      box-shadow:0 8px 18px rgba(77,52,22,.08);
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg,#facc15,#fff3c4);
+      border-color:rgba(121,83,12,.28);
+    }
+
+    .btn.green{
+      background:linear-gradient(135deg,#16a34a,#bbf7d0);
+      border-color:rgba(22,101,52,.28);
+    }
+
+    .panel{
+      margin:0 18px 16px;
+      padding:16px;
+      border-radius:22px;
+      border:2px solid var(--line);
+      background:rgba(255,255,255,.58);
+      box-shadow:0 8px 18px rgba(77,52,22,.08);
+    }
+
+    .status{
+      border-color:rgba(22,101,52,.26);
+      background:rgba(220,252,231,.82);
+      color:#14532d;
+    }
+
+    .status.warn{
+      border-color:rgba(121,83,12,.30);
+      background:rgba(254,243,199,.86);
+      color:#6b4e09;
+    }
+
+    .status.bad{
+      border-color:rgba(159,18,57,.30);
+      background:rgba(254,226,226,.90);
+      color:#9f1239;
+    }
+
+    .panel-title{
+      color:#6b4e09;
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .status .panel-title{
+      color:inherit;
+    }
+
+    .status-main{
+      font-size:22px;
+      line-height:1.16;
+      font-weight:900;
+      color:#052e16;
+    }
+
+    .status.warn .status-main{color:#4a3508}
+    .status.bad .status-main{color:#7f1d1d}
+
+    .status-text{
+      margin-top:8px;
+      color:inherit;
+      font-size:15px;
+      font-weight:900;
+      line-height:1.55;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .info{
+      border:1px solid rgba(83,58,26,.20);
+      border-radius:18px;
+      background:rgba(255,255,255,.66);
+      padding:13px;
+      display:grid;
+      gap:5px;
+      min-width:0;
+    }
+
+    .label{
+      color:#5f4308;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .value{
+      color:#241a0d;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.35;
+      word-break:break-word;
+    }
+
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      letter-spacing:-.02em;
+    }
+
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .step{
+      border:1px solid rgba(83,58,26,.20);
+      border-radius:18px;
+      background:rgba(255,255,255,.66);
+      padding:13px;
+      display:grid;
+      gap:5px;
+    }
+
+    .step strong{
+      color:#241a0d;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.2;
+    }
+
+    .step span{
+      color:#3d3324;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:900;
+    }
+
+    .history-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .history-item{
+      border:1px solid rgba(83,58,26,.20);
+      border-radius:18px;
+      background:rgba(255,255,255,.66);
+      padding:13px;
+      display:grid;
+      gap:7px;
+    }
+
+    .history-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+
+    .history-ref{
+      color:#241a0d;
+      font-size:14px;
+      font-weight:900;
+      word-break:break-word;
+    }
+
+    .badge{
+      border-radius:999px;
+      border:1px solid rgba(22,101,52,.24);
+      background:rgba(220,252,231,.86);
+      color:#14532d;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .history-meta{
+      color:#3d3324;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:900;
+    }
+
+    .empty{
+      color:#3d3324;
+      font-size:15px;
+      line-height:1.55;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .note{
+      margin:0 18px 18px;
+      border:2px solid rgba(121,83,12,.22);
+      border-radius:22px;
+      background:rgba(254,243,199,.86);
+      color:#4a3508;
+      padding:15px;
+      font-size:15px;
+      line-height:1.55;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .foot{
+      padding:0 18px 22px;
+      color:#3d3324;
+      font-size:13px;
+      line-height:1.65;
+      font-weight:850;
+      text-align:center;
+    }
+
+    .audio{
+      position:fixed;
+      right:14px;
+      bottom:14px;
+      z-index:99999;
+      min-height:50px;
+      border-radius:999px;
+      border:1px solid rgba(121,83,12,.28);
+      background:linear-gradient(135deg,#facc15,#fff3c4);
+      color:#1f2a1f;
+      padding:12px 16px;
+      font-size:15px;
+      font-weight:900;
+      box-shadow:0 12px 28px rgba(77,52,22,.18);
+      cursor:pointer;
+      font-family:inherit;
+    }
+
+    @media(max-width:720px){
+      body{padding:10px}
+      .wrap{padding-top:6px}
+      .grid,
+      .steps{
+        grid-template-columns:1fr;
+      }
+
+      .actions .btn{
+        width:100%;
+      }
+
+      .panel{
+        margin-left:10px;
+        margin-right:10px;
+      }
+
+      .note,
+      .foot{
+        margin-left:10px;
+        margin-right:10px;
+      }
+
+      .audio{
+        left:10px;
+        right:10px;
+        bottom:10px;
+        width:auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="hero">
+        <div class="mark">🧾</div>
+        <div class="eyebrow">DIGIY PAY · preuve envoyée</div>
+        <h1>Preuve en attente.</h1>
+        <div class="sub">
+          Ta preuve est gardée avec une référence. Le professionnel peut maintenant vérifier le paiement.
+        </div>
       </div>
 
-      <div class="hr"></div>
+      <div class="actions">
+        <a class="btn" id="backCardBtn" href="./index.html">⬅️ Retour carte</a>
+        <a class="btn primary" id="newProofBtn" href="./payer.html">📤 Envoyer une autre preuve</a>
+        <button class="btn green" id="copyRefBtn" type="button">📋 Copier la référence</button>
+        <button class="btn" id="supportBtn" type="button">💬 Support</button>
+      </div>
 
-      <div class="status" id="statusBox">'''
-)
+      <div class="panel status" id="statusPanel">
+        <div class="panel-title">Statut</div>
+        <div class="status-main" id="statusMain">Lecture de la preuve…</div>
+        <div class="status-text" id="statusText">DIGIY prépare la mémoire locale.</div>
+      </div>
 
-# add a{ styles? Buttons are button only, but .btn applies to buttons; CSS .btn no text-decoration? It doesn't set display inline-flex? We'll update
-html = html.replace(
-'''.btn{width:100%;min-height:50px;border-radius:16px;cursor:pointer;border:1px solid var(--line);background:rgba(0,0,0,.10);color:var(--text);padding:12px 14px;font-weight:900}''',
-'''.btn{width:100%;min-height:50px;border-radius:16px;cursor:pointer;border:1px solid var(--line);background:rgba(0,0,0,.10);color:var(--text);padding:12px 14px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;text-align:center;font-family:inherit}'''
-)
+      <div class="panel">
+        <div class="panel-title">🧭 Que se passe-t-il maintenant ?</div>
+        <div class="steps">
+          <div class="step">
+            <strong>1 · Preuve reçue</strong>
+            <span>La référence est gardée sur ce téléphone.</span>
+          </div>
+          <div class="step">
+            <strong>2 · Pro vérifie</strong>
+            <span>Le professionnel compare montant, nom et preuve.</span>
+          </div>
+          <div class="step">
+            <strong>3 · Confirmation</strong>
+            <span>Le paiement pourra être confirmé côté pro.</span>
+          </div>
+          <div class="step">
+            <strong>4 · Argent direct</strong>
+            <span>DIGIY ne garde pas l’argent. Le pro reste payé en direct.</span>
+          </div>
+        </div>
+      </div>
 
-# Replace support label
-html = html.replace("💬 Support WhatsApp", "💬 Support")
+      <div class="panel">
+        <div class="panel-title">Récapitulatif visible</div>
+        <div class="grid">
+          <div class="info">
+            <div class="label">Référence preuve</div>
+            <div class="value mono" id="refBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Code DIGIY</div>
+            <div class="value mono" id="codeBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Professionnel</div>
+            <div class="value" id="proBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Montant</div>
+            <div class="value mono" id="amountBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Type de preuve</div>
+            <div class="value" id="proofTypeBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Date</div>
+            <div class="value mono" id="dateBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Mémoire</div>
+            <div class="value" id="memoryBox">—</div>
+          </div>
+          <div class="info">
+            <div class="label">Statut technique</div>
+            <div class="value" id="persistBox">—</div>
+          </div>
+        </div>
+      </div>
 
-# Add clean URL and harden safeRedirectUrl/redirect behavior + remove MODULE_URLS
-start = '''    const SUPPORT_WA = "+221771342889";
-    const MAX_TRIES = 150;
-    const DELAY_MS = 2000;
-    const LOCAL_KEY = "DIGIY_PAY_LAST_PROOF";
-    const LOCAL_REF_PREFIX = "DIGIY_PAY_PROOF_REF_";
+      <div class="panel">
+        <div class="panel-title">🗂️ Historique local récent</div>
+        <div class="history-list" id="historyList">
+          <div class="empty">Aucune preuve locale affichée pour le moment.</div>
+        </div>
+      </div>
 
-    const MODULE_URLS = {
-      DRIVER: "https://beauville.github.io/digiy-driver/?slug=",
-      LOC: "https://beauville.github.io/digiy-loc-pro/?slug=",
-      RESTO: "https://beauville.github.io/digiy-resto-pro/?slug=",
-      RESTO_RESA: "https://beauville.github.io/digiy-resa/?slug=",
-      POS_PRO: "https://commerce-pro.digiylyfe.com/?slug=",
-      PAY: "https://pay.digiylyfe.com/cockpit.html?slug=",
-      MARKET: "https://beauville.github.io/digiy-market/?slug=",
-      BUILD: "https://beauville.github.io/digiy-build/?slug=",
-      EXPLORE: "https://beauville.github.io/digiy-explore/?slug=",
-      FRET_PRO: "https://beauville.github.io/digiy-fret-pro/?slug=",
-      FRET_CLIENT_PRO: "https://beauville.github.io/digiy-fret-client/?slug="
-    };
+      <div class="note">
+        Cette page n’est pas une banque et ne valide pas l’argent à la place du professionnel.
+        Elle garde une trace claire : référence, montant, code DIGIY et statut.
+      </div>
 
-    const qp = new URLSearchParams(location.search);
-    const ref = (qp.get("ref") || "").trim();'''
-replacement = '''    const SUPPORT_WA = "+221771342889";
-    const MAX_TRIES = 150;
-    const DELAY_MS = 2000;
-    const LOCAL_KEY = "DIGIY_PAY_LAST_PROOF";
-    const LOCAL_REF_PREFIX = "DIGIY_PAY_PROOF_REF_";
+      <div class="foot">
+        DIGIY PAY aide à vérifier et à transmettre proprement une preuve.
+        Le paiement reste direct entre le client et le professionnel.
+      </div>
+    </section>
+  </main>
 
-    const qp = new URLSearchParams(location.search);
-    const ref = (qp.get("ref") || "").trim();
+  <button class="audio" id="audioBtn" type="button">🎧 Aide</button>
 
-    cleanPublicUrl();'''
-if start not in html:
-    raise RuntimeError("constants block not found")
-html = html.replace(start, replacement)
+  <script>
+    (() => {
+      "use strict";
 
-# Insert cleanPublicUrl function after wa maybe before setTag
-html = html.replace(
-'''    function wa(msg){
-      const num = SUPPORT_WA.replace(/\\+/g,"");
-      location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
-    }
+      const SUPPORT_WA = "221771342889";
+      const LAST_PROOF_KEY = "DIGIY_PAY_LAST_PROOF";
+      const LAST_PROOF_BY_REF_PREFIX = "DIGIY_PAY_PROOF_REF_";
+      const PROOF_LIST_KEY = "DIGIY_PAY_PROOF_LIST";
 
-    function setTag(tone, label){''',
-'''    function wa(msg){
-      const num = SUPPORT_WA.replace(/\\+/g,"");
-      location.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
-    }
+      const SENSITIVE_KEYS = [
+        "phone",
+        "tel",
+        "owner_phone",
+        "owner_id",
+        "slug",
+        "pay_slug",
+        "subscription_slug",
+        "business_phone",
+        "wave_phone",
+        "wallet_phone",
+        "pay_phone",
+        "access_note",
+        "keybox_code",
+        "keybox_location",
+        "return",
+        "redirect_url",
+        "url",
+        "from",
+        "v"
+      ];
 
-    function cleanPublicUrl(){
-      try{
-        const url = new URL(location.href);
-        let changed = false;
+      const q = new URLSearchParams(location.search);
+      const $ = (id) => document.getElementById(id);
 
-        [
-          "phone",
-          "tel",
-          "owner_phone",
-          "owner_id",
-          "slug",
-          "pay_slug",
-          "subscription_slug",
-          "business_phone",
-          "wave_phone",
-          "wallet_phone",
-          "pay_phone",
-          "return",
-          "redirect_url",
-          "url"
-        ].forEach(function(key){
-          if(url.searchParams.has(key)){
-            url.searchParams.delete(key);
-            changed = true;
+      function esc(value){
+        return String(value ?? "")
+          .replace(/&/g,"&amp;")
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/"/g,"&quot;");
+      }
+
+      function safeJsonParse(raw){
+        try{return JSON.parse(raw)}catch(_){return null}
+      }
+
+      function cleanCode(value){
+        return String(value || "")
+          .trim()
+          .toUpperCase()
+          .replace(/\s+/g,"")
+          .replace(/[^A-Z0-9_-]/g,"");
+      }
+
+      function cleanUrl(){
+        try{
+          const url = new URL(location.href);
+          let changed = false;
+
+          SENSITIVE_KEYS.forEach((key) => {
+            if(url.searchParams.has(key)){
+              url.searchParams.delete(key);
+              changed = true;
+            }
+          });
+
+          if(changed){
+            history.replaceState({}, document.title, url.pathname + url.search + url.hash);
           }
-        });
+        }catch(_){}
+      }
 
-        if(changed){
-          history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+      function formatFcfa(value){
+        const n = Number(value || 0);
+        return n > 0 ? Math.round(n).toLocaleString("fr-FR") + " FCFA" : "—";
+      }
+
+      function formatDate(value){
+        if(!value) return "—";
+        const d = new Date(value);
+        if(Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleString("fr-FR", {
+          year:"numeric",
+          month:"2-digit",
+          day:"2-digit",
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+      }
+
+      function typeLabel(value){
+        const map = {
+          capture: "Capture Wave",
+          reference: "Référence paiement",
+          message: "Message client"
+        };
+        return map[String(value || "")] || String(value || "Capture Wave");
+      }
+
+      function statusLabel(value){
+        const map = {
+          pending_proof: "En attente de vérification",
+          proof_received: "Preuve reçue",
+          payment_to_verify: "Paiement à vérifier",
+          payment_confirmed: "Paiement confirmé",
+          confirmed: "Confirmé",
+          rejected: "À reprendre"
+        };
+        return map[String(value || "")] || "En attente de vérification";
+      }
+
+      function readByRef(ref){
+        if(!ref) return null;
+        try{
+          return (
+            safeJsonParse(localStorage.getItem(LAST_PROOF_BY_REF_PREFIX + ref)) ||
+            safeJsonParse(sessionStorage.getItem(LAST_PROOF_BY_REF_PREFIX + ref))
+          );
+        }catch(_){
+          return null;
         }
-      }catch(_){}
-    }
-
-    function setTag(tone, label){'''
-)
-
-# Harden safeRedirectUrl
-html = html.replace(
-'''    function safeRedirectUrl(url){
-      try{
-        if(!url) return "";
-        const u = new URL(url, window.location.origin);
-        if(u.protocol === "http:" || u.protocol === "https:") return u.toString();
-        return "";
-      }catch(_){
-        return "";
       }
-    }''',
-'''    function safeRedirectUrl(url){
-      try{
-        if(!url) return "";
-        const u = new URL(url, window.location.origin);
-        const host = u.hostname.toLowerCase();
-        const sameOrigin = u.origin === window.location.origin;
-        const digiyHost = host === "digiylyfe.com" || host.endsWith(".digiylyfe.com");
 
-        if(!(u.protocol === "http:" || u.protocol === "https:")) return "";
-        if(!(sameOrigin || digiyHost)) return "";
+      function readLast(){
+        try{
+          return (
+            safeJsonParse(localStorage.getItem(LAST_PROOF_KEY)) ||
+            safeJsonParse(sessionStorage.getItem(LAST_PROOF_KEY))
+          );
+        }catch(_){
+          return null;
+        }
+      }
 
-        [
-          "phone",
-          "tel",
-          "owner_phone",
-          "owner_id",
-          "slug",
-          "pay_slug",
-          "subscription_slug",
-          "business_phone",
-          "wave_phone",
-          "wallet_phone",
-          "pay_phone"
-        ].forEach(function(key){
-          u.searchParams.delete(key);
+      function readList(){
+        try{
+          const raw =
+            localStorage.getItem(PROOF_LIST_KEY) ||
+            sessionStorage.getItem(PROOF_LIST_KEY);
+          const parsed = safeJsonParse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        }catch(_){
+          return [];
+        }
+      }
+
+      function currentProof(){
+        const ref = String(q.get("ref") || "").trim();
+        return readByRef(ref) || readLast() || {
+          ref,
+          code: cleanCode(q.get("code") || ""),
+          module: cleanCode(q.get("module") || "PAY"),
+          status: String(q.get("status") || "pending_proof"),
+          created_at: new Date().toISOString()
+        };
+      }
+
+      function setText(id, value){
+        const node = $(id);
+        if(node) node.textContent = value || "—";
+      }
+
+      function renderStatus(proof){
+        const panel = $("statusPanel");
+        const main = $("statusMain");
+        const text = $("statusText");
+
+        const status = String(proof.status || q.get("status") || "pending_proof");
+        const persisted = proof.persisted === true;
+
+        panel.classList.remove("warn","bad");
+
+        if(status === "payment_confirmed" || status === "confirmed"){
+          main.textContent = "Paiement confirmé.";
+          text.textContent = "Le professionnel a confirmé la preuve.";
+          return;
+        }
+
+        if(status === "rejected"){
+          panel.classList.add("bad");
+          main.textContent = "Preuve à reprendre.";
+          text.textContent = "Le professionnel peut demander une nouvelle preuve ou une vérification.";
+          return;
+        }
+
+        if(persisted){
+          main.textContent = "Preuve envoyée.";
+          text.textContent = "La preuve est partie au système. Le professionnel doit maintenant vérifier.";
+          return;
+        }
+
+        panel.classList.add("warn");
+        main.textContent = "Preuve gardée localement.";
+        text.textContent = "La preuve est visible sur ce téléphone. Si le réseau était faible, garde la référence et montre-la au professionnel.";
+      }
+
+      function renderProof(proof){
+        const ref = proof.ref || String(q.get("ref") || "").trim() || "—";
+        const code = cleanCode(proof.code || q.get("code") || "");
+        const amount = proof.amount_xof || proof.amount || 0;
+
+        setText("refBox", ref);
+        setText("codeBox", code || "—");
+        setText("proBox", proof.public_label || proof.business_name || "Professionnel DIGIY");
+        setText("amountBox", formatFcfa(amount));
+        setText("proofTypeBox", typeLabel(proof.proof_type));
+        setText("dateBox", formatDate(proof.created_at));
+        setText("memoryBox", proof.ref ? "Référence gardée" : "Mémoire limitée");
+        setText("persistBox", proof.persisted ? "Envoyée au système" : "Locale / à vérifier");
+
+        const cardUrl = "./index.html" + (code ? "?pro=" + encodeURIComponent(code) : "");
+        const payerUrl = "./payer.html" + (code ? "?code=" + encodeURIComponent(code) : "");
+
+        $("backCardBtn").href = cardUrl;
+        $("newProofBtn").href = payerUrl;
+
+        renderStatus(proof);
+      }
+
+      function renderHistory(){
+        const node = $("historyList");
+        if(!node) return;
+
+        const list = readList().slice(0, 6);
+
+        if(!list.length){
+          node.innerHTML = '<div class="empty">Aucune preuve locale récente.</div>';
+          return;
+        }
+
+        node.innerHTML = list.map((item) => {
+          const ref = esc(item.ref || "—");
+          const amount = esc(formatFcfa(item.amount_xof || 0));
+          const code = esc(cleanCode(item.code || "") || "—");
+          const label = esc(item.public_label || "Professionnel DIGIY");
+          const status = esc(statusLabel(item.status || "pending_proof"));
+          const date = esc(formatDate(item.created_at));
+
+          return `
+            <article class="history-item">
+              <div class="history-top">
+                <div class="history-ref">${ref}</div>
+                <span class="badge">${status}</span>
+              </div>
+              <div class="history-meta">
+                ${label} · ${amount}<br>
+                Code : ${code} · ${date}
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      async function copyText(text){
+        const value = String(text || "");
+        if(!value) return false;
+
+        try{
+          if(navigator.clipboard && navigator.clipboard.writeText){
+            await navigator.clipboard.writeText(value);
+            return true;
+          }
+        }catch(_){}
+
+        try{
+          const input = document.createElement("input");
+          input.value = value;
+          input.setAttribute("readonly","");
+          input.style.position = "fixed";
+          input.style.left = "-9999px";
+          document.body.appendChild(input);
+          input.select();
+          const ok = document.execCommand("copy");
+          input.remove();
+          return !!ok;
+        }catch(_){
+          return false;
+        }
+      }
+
+      function support(proof){
+        const ref = proof.ref || $("refBox").textContent || "";
+        const code = cleanCode(proof.code || $("codeBox").textContent || "");
+        const amount = formatFcfa(proof.amount_xof || proof.amount || 0);
+
+        const msg =
+          "DIGIY PAY — support preuve\n\n" +
+          "Référence : " + ref + "\n" +
+          "Code : " + code + "\n" +
+          "Montant : " + amount + "\n" +
+          "Statut : " + statusLabel(proof.status || "pending_proof") + "\n\n" +
+          "Merci de vérifier cette preuve sans afficher les données sensibles.";
+
+        location.href = "https://wa.me/" + SUPPORT_WA + "?text=" + encodeURIComponent(msg);
+      }
+
+      function canSpeak(){
+        return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+      }
+
+      function getVoice(){
+        try{
+          const voices = speechSynthesis.getVoices() || [];
+          return voices.find(v => /fr[-_]?fr/i.test(v.lang || "")) ||
+                 voices.find(v => /^fr/i.test(v.lang || "")) ||
+                 voices[0] ||
+                 null;
+        }catch(_){
+          return null;
+        }
+      }
+
+      function stopAudio(){
+        try{ if(canSpeak()) speechSynthesis.cancel(); }catch(_){}
+        const btn = $("audioBtn");
+        if(btn) btn.textContent = "🎧 Aide";
+      }
+
+      function speakAudio(){
+        if(!canSpeak()) return;
+
+        stopAudio();
+
+        const text =
+          "Ta preuve de paiement est maintenant en attente. Cette page affiche la référence, le montant, le code DIGIY et le statut. Le professionnel doit vérifier le paiement avant de confirmer. DIGIY ne garde pas l’argent et ne remplace pas Wave. Garde la référence si le réseau est lent ou si le professionnel te la demande.";
+
+        const run = () => {
+          const u = new SpeechSynthesisUtterance(text);
+          const voice = getVoice();
+          if(voice) u.voice = voice;
+          u.lang = voice?.lang || "fr-FR";
+          u.rate = 0.86;
+          u.pitch = 1.04;
+          u.volume = 1;
+
+          const btn = $("audioBtn");
+          if(btn) btn.textContent = "⏹ Stop";
+
+          u.onend = () => { if(btn) btn.textContent = "🎧 Aide"; };
+          u.onerror = () => { if(btn) btn.textContent = "🎧 Aide"; };
+
+          speechSynthesis.speak(u);
+        };
+
+        const voices = speechSynthesis.getVoices();
+        if(voices && voices.length) run();
+        else{
+          speechSynthesis.onvoiceschanged = run;
+          setTimeout(run, 650);
+        }
+      }
+
+      function bind(proof){
+        $("copyRefBtn")?.addEventListener("click", async () => {
+          const ref = $("refBox")?.textContent || proof.ref || "";
+          const ok = await copyText(ref);
+          $("copyRefBtn").textContent = ok ? "✅ Référence copiée" : "📋 Copier la référence";
+          setTimeout(() => {
+            $("copyRefBtn").textContent = "📋 Copier la référence";
+          }, 1500);
         });
 
-        return u.toString();
-      }catch(_){
-        return "";
+        $("supportBtn")?.addEventListener("click", () => support(proof));
+
+        $("audioBtn")?.addEventListener("click", () => {
+          if(canSpeak() && speechSynthesis.speaking) stopAudio();
+          else speakAudio();
+        });
+
+        window.addEventListener("pagehide", stopAudio);
+        document.addEventListener("visibilitychange", () => {
+          if(document.hidden) stopAudio();
+        });
       }
-    }'''
-)
 
-# Remove fallback URL functions that add slug
-html = html.replace(
-'''    function buildFallbackUrl(module, slug){
-      const m = normalizeModule(module);
-      const s = normalizeSlug(slug);
-      if(!m || !s) return "";
-      const base = MODULE_URLS[m] || "";
-      return base ? (base + encodeURIComponent(s)) : "";
-    }
+      cleanUrl();
 
-    function buildReturnUrl(returnUrl, slug){
-      const clean = safeRedirectUrl(returnUrl);
-      const s = normalizeSlug(slug);
-      if(!clean || !s) return "";
-      try{
-        const u = new URL(clean);
-        if(!u.searchParams.get("slug")) u.searchParams.set("slug", s);
-        return u.toString();
-      }catch(_){
-        return "";
-      }
-    }''',
-'''    function buildFallbackUrl(){
-      return "";
-    }
+      const proof = currentProof();
+      renderProof(proof);
+      renderHistory();
+      bind(proof);
+    })();
+  </script>
+</body>
+</html>
 
-    function buildReturnUrl(returnUrl){
-      return safeRedirectUrl(returnUrl);
-    }'''
-)
-
-# getState no qp phone/slug/return. Use local/data only and hide in display.
-html = html.replace(
-'''        phone: displayPhone(data?.phone || data?.pro_phone || local.phone || qp.get("phone") || ""),
-        slug: normalizeSlug(data?.slug || local.slug || qp.get("slug") || ""),
-        amount: fmtFcfa(data?.amount || data?.amount_xof || local.amount || local.amount_xof || qp.get("amount") || ""),
-        url: safeRedirectUrl(data?.url || data?.redirect_url || local.url || local.redirect_url || ""),
-        returnUrl: safeRedirectUrl(data?.return_url || local.return_url || qp.get("return") || ""),''',
-'''        phone: data?.phone || data?.pro_phone || local.phone ? "Protégé" : "—",
-        slug: normalizeSlug(data?.slug || local.slug || "") ? "OK" : "—",
-        amount: fmtFcfa(data?.amount || data?.amount_xof || local.amount || local.amount_xof || qp.get("amount") || ""),
-        url: safeRedirectUrl(data?.url || data?.redirect_url || local.url || local.redirect_url || ""),
-        returnUrl: safeRedirectUrl(data?.return_url || local.return_url || ""),'''
-)
-
-# resolveFinalUrl should not use slug for fallback
-html = html.replace(
-'''      const returnUrl = buildReturnUrl(st.returnUrl, st.slug);
-      if(returnUrl) return returnUrl;
-
-      return buildFallbackUrl(st.module, st.slug);''',
-'''      const returnUrl = buildReturnUrl(st.returnUrl);
-      if(returnUrl) return returnUrl;
-
-      return "";'''
-)
-
-# hydrate: set display fields
-html = html.replace(
-'''      setField("phoneBox", st.phone || "—");
-      setField("slugBox", st.slug || "—");''',
-'''      setField("phoneBox", st.phone || "—");
-      setField("slugBox", st.slug || "—");'''
-)
-
-# But setDest currently includes slug
-html = html.replace(
-'''      setDest((modDisplay || "—") + " / " + (st.slug || "—"));''',
-'''      setDest(modDisplay || "—");'''
-)
-
-# urlBox final URL should not show raw URL maybe show "OK / —"
-html = html.replace(
-'''      setField("urlBox", finalUrl || "—");''',
-'''      setField("urlBox", finalUrl ? "Lien sécurisé prêt" : "Validation manuelle");'''
-)
-
-# On confirmed, redirect only if finalUrl exists and is safe; otherwise ok text no bad
-html = html.replace(
-'''              if(finalUrl){
-                setField("urlBox", finalUrl);
-                setText("✅ Confirmé. Redirection…");
-                setTag("ok","CONFIRMÉ");
-                location.href = finalUrl;
-                return;
-              }
-
-              setText("✅ Confirmé mais URL finale manquante. Contacte support.");
-              setTag("bad","URL ?");
-              return;''',
-'''              if(finalUrl){
-                setField("urlBox", "Lien sécurisé prêt");
-                setText("✅ Confirmé. Redirection…");
-                setTag("ok","CONFIRMÉ");
-                location.href = finalUrl;
-                return;
-              }
-
-              setText("✅ Confirmé. Le professionnel peut maintenant traiter la preuve.");
-              setTag("ok","CONFIRMÉ");
-              return;'''
-)
-
-# Support message remove slug phone
-old = '''      wa(
-        "DIGIY — Support validation\\n\\n" +
-        "Référence: " + $("refBox").textContent + "\\n" +
-        "Module: " + $("moduleBox").textContent + "\\n" +
-        "Plan: " + $("planBox").textContent + "\\n" +
-        "Boost: " + $("boostBox").textContent + "\\n" +
-        "Slug: " + $("slugBox").textContent + "\\n" +
-        "Téléphone: " + $("phoneBox").textContent + "\\n" +
-        "Montant: " + $("amountBox").textContent + "\\n" +
-        "Merci de vérifier et confirmer si OK."
-      );'''
-new = '''      wa(
-        "DIGIY — Support validation\\n\\n" +
-        "Référence: " + $("refBox").textContent + "\\n" +
-        "Module: " + $("moduleBox").textContent + "\\n" +
-        "Plan: " + $("planBox").textContent + "\\n" +
-        "Boost: " + $("boostBox").textContent + "\\n" +
-        "Montant: " + $("amountBox").textContent + "\\n" +
-        "Merci de vérifier cette preuve sans afficher les données sensibles."
-      );'''
-if old not in html:
-    raise RuntimeError("support message block not found")
-html = html.replace(old, new)
-
-# Replace text "Téléphone" occurrences maybe already label but support
-html = html.replace("Slug:", "Référence:")
-html = html.replace("Téléphone:", "Contact:")
-
-out = Path("/mnt/data/wait-pay-public-securise.html")
-out.write_text(html, encoding="utf-8")
-print(f"Fichier créé : {out.name}")
