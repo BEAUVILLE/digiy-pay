@@ -1,0 +1,226 @@
+name: Patch PAY public module opening
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/patch-pay-public-module-opening.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add public PAY module opening block
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          html = path.read_text(encoding="utf-8")
+          before = html
+
+          pay_url = "https://commencer-a-payer.digiylyfe.com/?module=PAY"
+
+          css = r'''
+
+    /* DIGIY PAY PUBLIC — ouverture pro module Mon argent */
+    .pay-pro-open{
+      margin:16px 18px 0;
+      padding:16px;
+      border-radius:22px;
+      border:2px solid rgba(121,83,12,.24);
+      background:
+        radial-gradient(620px 220px at 100% 0%,rgba(250,204,21,.22),transparent 62%),
+        radial-gradient(520px 220px at 0% 100%,rgba(34,197,94,.14),transparent 62%),
+        linear-gradient(160deg,rgba(255,250,238,.98),rgba(246,232,202,.96));
+      box-shadow:0 12px 28px rgba(77,52,22,.14);
+      color:#1f2a1f;
+    }
+    .pay-pro-open-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid rgba(22,101,52,.28);
+      background:rgba(220,252,231,.72);
+      color:#14532d;
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .pay-pro-open h2{
+      margin:0;
+      color:#241a0d;
+      font-size:clamp(25px,5vw,36px);
+      line-height:1.05;
+      font-weight:1000;
+      letter-spacing:-.03em;
+    }
+    .pay-pro-open p{
+      margin:9px 0 0;
+      color:#3d3324;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.58;
+    }
+    .pay-pro-prices{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:9px;
+      margin-top:13px;
+    }
+    .pay-pro-price{
+      border-radius:18px;
+      border:1px solid rgba(83,58,26,.22);
+      background:rgba(255,255,255,.66);
+      padding:12px;
+      display:grid;
+      gap:6px;
+      color:#1f2a1f;
+    }
+    .pay-pro-price strong{
+      color:#14532d;
+      font-size:17px;
+      font-weight:1000;
+      line-height:1.1;
+    }
+    .pay-pro-price span{
+      color:#6b4e09;
+      font-size:15px;
+      font-weight:1000;
+    }
+    .pay-pro-price small{
+      color:#3d3324;
+      font-size:13px;
+      font-weight:900;
+      line-height:1.35;
+    }
+    .pay-pro-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+    .pay-pro-actions a{
+      min-height:54px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:12px 14px;
+      font-weight:1000;
+      text-decoration:none;
+    }
+    .pay-pro-actions .activate{
+      background:linear-gradient(135deg,#16a34a,#bbf7d0);
+      color:#052215;
+      border:1px solid rgba(22,101,52,.28);
+    }
+    .pay-pro-actions .wa{
+      background:rgba(255,255,255,.68);
+      color:#1f2a1f;
+      border:1px solid rgba(83,58,26,.22);
+    }
+    .pay-pro-mini{
+      margin-top:10px;
+      color:#14532d;
+      font-size:14px;
+      font-weight:1000;
+      line-height:1.45;
+    }
+    @media(max-width:640px){
+      .pay-pro-prices{grid-template-columns:1fr}
+      .pay-pro-actions{grid-template-columns:1fr}
+      .pay-pro-open{padding:14px}
+    }
+          '''
+
+          block = f'''
+
+      <div class="pay-pro-open" id="activer-pay-pro">
+        <div class="pay-pro-open-kicker">💳 Tu es professionnel ?</div>
+        <h2>Activer mon module PAY · Mon argent</h2>
+        <p>
+          PAY n’est pas une banque. PAY aide le professionnel à voir clair : recettes, dépenses,
+          dettes clients, preuves Wave, cash, réserve, reste à recevoir et pression du mois.
+          Le pro garde son argent, son client et sa décision.
+        </p>
+        <div class="pay-pro-prices" aria-label="Tarifs PAY">
+          <a class="pay-pro-price" href="https://commencer-a-payer.digiylyfe.com/?module=PAY&plan=9A&code=9A">
+            <strong>9A · Starter</strong>
+            <span>4 900 FCFA · 9 €</span>
+            <small>Entrées, dépenses, réserve simple.</small>
+          </a>
+          <a class="pay-pro-price" href="https://commencer-a-payer.digiylyfe.com/?module=PAY&plan=9B&code=9B">
+            <strong>9B · Pro</strong>
+            <span>9 900 FCFA · 19 €</span>
+            <small>Dettes clients, preuves, suivi plus clair.</small>
+          </a>
+          <a class="pay-pro-price" href="https://commencer-a-payer.digiylyfe.com/?module=PAY&plan=9C&code=9C">
+            <strong>9C · Business</strong>
+            <span>24 900 FCFA · 39 €</span>
+            <small>Lecture renforcée et activité plus dense.</small>
+          </a>
+        </div>
+        <div class="pay-pro-actions">
+          <a class="activate" href="{pay_url}">🚀 Activer mon module PAY</a>
+          <a class="wa" href="https://wa.me/221771342889?text=Bonjour%20JB%2C%20je%20veux%20activer%20le%20module%20PAY%20Mon%20argent.">💬 Parler à JB</a>
+        </div>
+        <div class="pay-pro-mini">DIGIY prépare. Le professionnel vérifie. Le professionnel valide. Rien ne devient cash sans paiement réel confirmé.</div>
+      </div>
+          '''
+
+          if ".pay-pro-open" not in html:
+              html = html.replace("\n  </style>", css + "\n  </style>", 1)
+
+          if "id=\"activer-pay-pro\"" not in html:
+              marker = '''        <div class="hero-action-row">
+            <button id="btnFocusCode" class="hero-action-primary" type="button">🔎 Entrer un code</button>
+            <button id="btnScrollPay" class="hero-action-secondary" type="button">💳 Voir la carte</button>
+            <a class="hero-action-secondary" href="https://digiylyfe.com/">🌍 Site</a>
+            <a class="hero-action-secondary" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
+            <a class="hero-action-secondary" href="https://tarifs.digiylyfe.com/" target="_blank" rel="noopener noreferrer">📦 Tarifs</a>
+          </div>'''
+              if marker in html:
+                  new_marker = marker.replace('</div>', f'            <a class="hero-action-secondary" href="{pay_url}">🚀 Activer PAY</a>\n          </div>', 1)
+                  html = html.replace(marker, new_marker, 1)
+
+              insert_after = '''      <div class="trust-mini">
+        Le bon réflexe : <b>vérifie le nom</b>, <b>vérifie le numéro</b>, puis paie dans Wave.
+      </div>'''
+              if insert_after in html:
+                  html = html.replace(insert_after, insert_after + block, 1)
+              else:
+                  html = html.replace('<div class="panel" id="searchPanel">', block + '\n\n      <div class="panel" id="searchPanel">', 1)
+
+          if html != before:
+              path.write_text(html, encoding="utf-8")
+              print("Ouverture pro PAY ajoutée sur la page publique.")
+          else:
+              print("Aucun changement : bloc déjà présent ou structure différente.")
+          PY
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Add public PAY module activation block"
+          git push
