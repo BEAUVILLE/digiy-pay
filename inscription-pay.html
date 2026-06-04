@@ -1,1 +1,645 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="index,follow"><meta name="theme-color" content="#f4ead2"><meta name="digiy-version" content="pay-inscription-wave-paiement-preuve-20260601"><title>Inscription PAY — Mon argent</title><style>:root{--bg:#f4ead2;--ink:#1f2a1f;--muted:#66715f;--green:#166534;--gold:#facc15;--line:rgba(83,58,26,.22)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f4ead2,#ead9b7);color:var(--ink);font-size:18px;font-weight:850}.wrap{max-width:1060px;margin:auto;padding:14px 14px 100px}.top{position:sticky;top:0;background:rgba(244,234,210,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}.top .wrap{padding:10px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.brand{font-weight:1000}.nav{display:flex;gap:8px;flex-wrap:wrap}a,button{font:inherit;font-weight:1000}a{text-decoration:none;color:inherit}.btn,button{min-height:48px;border-radius:16px;border:1px solid var(--line);background:white;color:var(--ink);padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}.gold{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#111;border:0}.green{background:linear-gradient(135deg,#22c55e,#16a34a);color:#062014;border:0}.clear{background:#fff7df;color:#7a4d00}.hero,.card{border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.68);box-shadow:0 16px 42px rgba(77,52,22,.13)}.hero{padding:20px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px}h1{margin:0;font-size:clamp(36px,6vw,60px);line-height:1;font-weight:1000}p{color:var(--muted);line-height:1.55}.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-top:14px}.card{padding:16px}.prices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.option{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;text-align:left;min-height:135px;display:grid;gap:6px}.option.active{background:rgba(250,204,21,.22);border-color:#facc15}.code{display:inline-flex;width:max-content;min-width:48px;height:38px;border-radius:12px;align-items:center;justify-content:center;background:linear-gradient(135deg,#22c55e,#facc15);font-weight:1000}.amount{color:#7a4d00;font-weight:1000}.summary{position:sticky;top:82px}.choiceLine,.totalLine{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:8px 0}.totalLine.final{font-size:24px;color:var(--green);border-bottom:0}.totals,.dateBox,.selected{margin-top:12px;border:1px solid var(--line);border-radius:18px;background:rgba(250,204,21,.13);padding:12px}.payment{margin-top:12px;border:1px solid rgba(250,204,21,.55);border-radius:20px;background:linear-gradient(145deg,rgba(250,204,21,.18),rgba(34,197,94,.12));padding:12px}.waveHero{margin-top:12px;padding:18px;border-radius:20px;background:linear-gradient(135deg,#facc15,#f59e0b);color:#111;border:1px solid rgba(250,204,21,.78);box-shadow:0 14px 32px rgba(77,52,22,.20)}.waveHero small{display:block;font-size:13px;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;opacity:.88;margin-bottom:7px}.waveHero strong{display:block;font-size:clamp(24px,5.6vw,38px);line-height:1.12;font-weight:1000;letter-spacing:-.035em}.paymentTitle{font-size:20px;color:#7a4d00;font-weight:1000;margin-bottom:8px}.payLine{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px;font-weight:1000}.payLine:last-child{border-bottom:0}.payLine strong{color:#7a4d00}.proof{margin-top:10px;padding:10px;border-radius:14px;background:rgba(255,255,255,.72);border:1px dashed rgba(250,204,21,.55);color:#7a4d00;line-height:1.45;font-weight:950}.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:14px}.benefits{line-height:1.55}.floating{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;border-radius:18px}.wave{font-weight:1000;color:var(--green)}@media(max-width:850px){.hero,.grid{grid-template-columns:1fr}.summary{position:relative;top:auto}.prices{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.payLine{display:grid;gap:3px}}</style></head><body><header class="top"><div class="wrap"><div class="brand">💳 DIGIY PAY · inscription</div><nav class="nav"><a class="btn" href="./index.html">← PAY public</a><a class="btn" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a></nav></div></header><main class="wrap"><section class="hero"><div><h1>Mon argent reste clair.</h1><p>PAY n’est pas une banque. PAY aide le pro à suivre recettes, dépenses, dettes clients, preuves, réserve et reste à recevoir. Aucun tarif n’est précoché.</p></div><div><div class="waveHero"><small>Paiement Wave</small><strong>Wave : JB BEAUVILLE · +221 77 134 28 89</strong></div><p>Le paiement se fait directement sur Wave. Après paiement, envoie la preuve sur WhatsApp.</p></div></section><section class="grid"><article class="card"><h2>Tarif PAY</h2><p>Clique un ou plusieurs choix. Si tu te trompes, efface.</p><div class="prices" id="options"></div></article><aside class="card summary" id="summary"><h2>Ce que l’abonnement m’apporte</h2><div class="selected" id="selectedBox"><strong>Aucun choix sélectionné</strong><br><span>Choisis au moins un tarif.</span></div><div id="choiceList"></div><div class="totals"><div class="totalLine"><span>Sous-total</span><strong id="subtotalText">0 FCFA</strong></div><div class="totalLine"><span>Ajustement / remise</span><strong>0 FCFA</strong></div><div class="totalLine final"><span>Total</span><strong id="totalText">0 FCFA</strong></div></div><div class="payment"><div class="paymentTitle">💳 Paiement Wave</div><div class="waveHero"><small>Nom et numéro de paiement</small><strong>Wave : JB BEAUVILLE · +221 77 134 28 89</strong></div><div class="payLine"><span>Montant à payer</span><strong id="payTotal">0 FCFA</strong></div><div class="proof">Après paiement Wave, envoie la capture ou la preuve par WhatsApp. DIGIY vérifie puis accompagne l’ouverture / visibilité PAY.</div></div><div class="dateBox" id="dateBox">Date de demande : —</div><ul class="benefits" id="benefits"></ul><div class="actions"><a class="btn" id="btnWa">💬 WhatsApp</a><button class="btn green" id="btnSms" type="button">📱 SMS</button><button class="btn clear" id="btnClear" type="button">🧹 Effacer</button></div><div class="actions"><button class="btn" id="btnCopyWave" type="button">📋 Copier Wave</button><a class="btn gold" id="btnProof">📸 Envoyer preuve</a><a class="btn gold" href="https://pro-pay.digiylyfe.com/">🔐 Espace pro</a></div><p>Message avec date, choix, sous-total, total et preuve Wave.</p></aside></section></main><button class="gold floating" id="btnFloating">📱 Voir total</button><script>(function(){const TEL='221771342889';const WAVE_LABEL='Wave : JB BEAUVILLE · +221 77 134 28 89';const PLANS=[{code:'9A',name:'PAY Starter',fcfa:4900,amount:'4 900 FCFA · 9 €',desc:'Recettes, dépenses, réserve simple.',bonus:['Recettes et dépenses rangées','Cash, Wave, Orange Money','Réserve visible']},{code:'9B',name:'PAY Pro',fcfa:9900,amount:'9 900 FCFA · 19 €',desc:'Dettes clients, preuves et suivi.',bonus:['Dettes clients','Preuves de paiement','Messages de relance']},{code:'9C',name:'PAY Business',fcfa:24900,amount:'24 900 FCFA · 39 €',desc:'Lecture renforcée activité dense.',bonus:['Lecture avancée','Dépenses récurrentes','Liens POS LOC DRIVER RESA MARKET']}];const COMMON=['Carte de visite complète','Logiciel Mon argent','Voix DIGIY','Textes prêts','Validation humaine','0% commission'];let selected=new Set();const $=id=>document.getElementById(id), grid=$('options'), summary=$('summary');function money(n){return new Intl.NumberFormat('fr-FR').format(n)+' FCFA'}function date(){return new Date().toLocaleString('fr-FR',{dateStyle:'full',timeStyle:'short'})}function chosen(){return PLANS.filter(p=>selected.has(p.code))}function render(){grid.innerHTML=PLANS.map(p=>`<button class="option ${selected.has(p.code)?'active':''}" data-code="${p.code}"><span class="code">${p.code}</span><b>${p.name}</b><span class="amount">${p.amount}</span><span>${p.desc}</span></button>`).join('');grid.querySelectorAll('button').forEach(b=>b.onclick=()=>{selected.has(b.dataset.code)?selected.delete(b.dataset.code):selected.add(b.dataset.code);update(true)})}function msg(){const items=chosen(), sub=items.reduce((s,p)=>s+p.fcfa,0), lines=items.map(p=>`- ${p.code} · ${p.name} · ${money(p.fcfa)}`).join('\n')||'Aucun choix sélectionné';return `Bonjour JB, je veux avancer avec DIGIY PAY.\n\nDate de demande : ${date()}\n\nChoix :\n${lines}\n\nSous-total : ${money(sub)}\nAjustement / remise : 0 FCFA\nTotal : ${money(sub)}\n\nPaiement Wave : ${WAVE_LABEL}\n\nAprès paiement, je vous envoie la preuve ici.\n\nCanal souhaité : WhatsApp ou SMS.`}function proofMsg(){const items=chosen(), sub=items.reduce((s,p)=>s+p.fcfa,0), lines=items.map(p=>`- ${p.code} · ${p.name} · ${money(p.fcfa)}`).join('\n')||'Aucun choix sélectionné';return `Bonjour JB, voici la preuve de paiement Wave pour DIGIY PAY.\n\nDate de demande : ${date()}\n\n${WAVE_LABEL}\nMontant : ${money(sub)}\n\nChoix :\n${lines}\n\nJe joins la capture / preuve de paiement à ce message.`}function update(scroll){render();const items=chosen(), sub=items.reduce((s,p)=>s+p.fcfa,0);$('selectedBox').innerHTML=items.length?`<strong>${items.length} choix sélectionné${items.length>1?'s':''}</strong><br><span>Ajoute ou retire en recliquant.</span>`:`<strong>Aucun choix sélectionné</strong><br><span>Rien n’est précoché.</span>`;$('choiceList').innerHTML=items.length?items.map(p=>`<div class="choiceLine"><span>${p.code} · ${p.name}</span><b>${money(p.fcfa)}</b></div>`).join(''):`<div class="choiceLine"><span>Aucun choix</span><b>0 FCFA</b></div>`;$('subtotalText').textContent=money(sub);$('totalText').textContent=money(sub);$('payTotal').textContent=money(sub);$('dateBox').textContent='Date de demande : '+date();$('benefits').innerHTML=(items.length?[...COMMON,...items.flatMap(p=>p.bonus)]:[]).slice(0,18).map(x=>`<li>✅ ${x}</li>`).join('');$('btnWa').href='https://wa.me/'+TEL+'?text='+encodeURIComponent(msg());$('btnProof').href='https://wa.me/'+TEL+'?text='+encodeURIComponent(proofMsg());if(scroll&&matchMedia('(max-width:850px)').matches)summary.scrollIntoView({behavior:'smooth',block:'start'})}$('btnSms').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(msg()).then(()=>{$('btnSms').textContent='✅ Message SMS copié';setTimeout(()=>$('btnSms').textContent='📱 SMS',1600)});$('btnCopyWave').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(WAVE_LABEL).then(()=>{$('btnCopyWave').textContent='✅ Wave copié';setTimeout(()=>$('btnCopyWave').textContent='📋 Copier Wave',1600)});$('btnClear').onclick=()=>{selected.clear();update(true)};$('btnFloating').onclick=()=>summary.scrollIntoView({behavior:'smooth',block:'start'});update(false)})();</script></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#f4ead2">
+  <meta name="digiy-version" content="pay-inscription-wave-note-paiement-readable-20260604">
+  <title>Inscription PAY — Mon argent</title>
+
+  <style>
+    :root{
+      --bg:#f4ead2;
+      --ink:#1f2a1f;
+      --muted:#66715f;
+      --green:#166534;
+      --gold:#facc15;
+      --gold2:#f59e0b;
+      --line:rgba(83,58,26,.22);
+      --card:rgba(255,255,255,.68);
+      --shadow:0 16px 42px rgba(77,52,22,.13);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#f4ead2,#ead9b7);
+      color:var(--ink);
+      font-size:18px;
+      font-weight:850;
+    }
+
+    a{color:inherit;text-decoration:none}
+    a,button,input,textarea{font:inherit}
+
+    .wrap{
+      max-width:1060px;
+      margin:auto;
+      padding:14px 14px 108px;
+    }
+
+    .top{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(244,234,210,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .top .wrap{
+      padding:10px 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .brand{font-weight:1000}
+
+    .nav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .btn,
+    button{
+      min-height:48px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:white;
+      color:var(--ink);
+      padding:0 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      cursor:pointer;
+      font-weight:1000;
+      text-align:center;
+    }
+
+    .gold{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#111!important;
+      border:0!important;
+    }
+
+    .green{
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#062014!important;
+      border:0!important;
+    }
+
+    .clear{
+      background:#fff7df!important;
+      color:#7a4d00!important;
+    }
+
+    .hero,
+    .card{
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      padding:20px;
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(36px,6vw,60px);
+      line-height:1;
+      font-weight:1000;
+      letter-spacing:-.045em;
+    }
+
+    h2{
+      margin:0 0 10px;
+      font-size:24px;
+    }
+
+    p{
+      color:var(--muted);
+      line-height:1.55;
+      font-weight:850;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .card{padding:16px}
+
+    .prices{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+
+    .option{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+      text-align:left;
+      min-height:135px;
+      display:grid;
+      gap:6px;
+      width:100%;
+    }
+
+    .option.active{
+      background:rgba(250,204,21,.22);
+      border-color:#facc15;
+    }
+
+    .code{
+      display:inline-flex;
+      width:max-content;
+      min-width:48px;
+      height:38px;
+      border-radius:12px;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#22c55e,#facc15);
+      font-weight:1000;
+    }
+
+    .amount{
+      color:#7a4d00;
+      font-weight:1000;
+    }
+
+    .summary{
+      position:sticky;
+      top:82px;
+    }
+
+    .choiceLine,
+    .totalLine{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px solid var(--line);
+      padding:8px 0;
+    }
+
+    .totalLine.final{
+      font-size:24px;
+      color:var(--green);
+      border-bottom:0;
+    }
+
+    .totals,
+    .dateBox,
+    .selected,
+    .noteBox{
+      margin-top:12px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(250,204,21,.13);
+      padding:12px;
+    }
+
+    .payment{
+      margin-top:12px;
+      border:1px solid rgba(250,204,21,.55);
+      border-radius:20px;
+      background:linear-gradient(145deg,rgba(250,204,21,.18),rgba(34,197,94,.12));
+      padding:12px;
+    }
+
+    .waveHero{
+      margin-top:12px;
+      padding:18px;
+      border-radius:20px;
+      background:linear-gradient(135deg,#facc15,#f59e0b);
+      color:#111;
+      border:1px solid rgba(250,204,21,.78);
+      box-shadow:0 14px 32px rgba(77,52,22,.20);
+    }
+
+    .waveHero small{
+      display:block;
+      font-size:13px;
+      font-weight:1000;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      opacity:.88;
+      margin-bottom:7px;
+    }
+
+    .waveHero strong{
+      display:block;
+      font-size:clamp(24px,5.6vw,38px);
+      line-height:1.12;
+      font-weight:1000;
+      letter-spacing:-.035em;
+    }
+
+    .paymentTitle{
+      font-size:20px;
+      color:#7a4d00;
+      font-weight:1000;
+      margin-bottom:8px;
+    }
+
+    .payLine{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:8px 0;
+      border-bottom:1px solid var(--line);
+      font-size:15px;
+      font-weight:1000;
+    }
+
+    .payLine:last-child{border-bottom:0}
+    .payLine strong{color:#7a4d00}
+
+    .proof{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      background:rgba(255,255,255,.72);
+      border:1px dashed rgba(250,204,21,.55);
+      color:#7a4d00;
+      line-height:1.45;
+      font-weight:950;
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      color:#7a4d00;
+      font-weight:1000;
+      margin:0 0 6px;
+    }
+
+    textarea{
+      width:100%;
+      min-height:98px;
+      resize:vertical;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#fffdf5;
+      color:var(--ink);
+      padding:12px;
+      font-weight:900;
+      line-height:1.45;
+      outline:none;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:9px;
+      margin-top:14px;
+    }
+
+    .benefits{line-height:1.55}
+
+    .floating{
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:12px;
+      z-index:20;
+      border-radius:18px;
+    }
+
+    @media(max-width:850px){
+      .hero,
+      .grid{grid-template-columns:1fr}
+
+      .summary{
+        position:relative;
+        top:auto;
+      }
+
+      .prices,
+      .actions{grid-template-columns:1fr}
+
+      .payLine{
+        display:grid;
+        gap:3px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">💳 DIGIY PAY · inscription</div>
+      <nav class="nav">
+        <a class="btn" href="./index.html">← PAY public</a>
+        <a class="btn" href="https://digiy-hub.digiylyfe.com/">🧭 HUB</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h1>Mon argent reste clair.</h1>
+        <p>
+          PAY n’est pas une banque. PAY aide le pro à suivre recettes, dépenses,
+          dettes clients, preuves, réserve et reste à recevoir.
+          Aucun tarif n’est précoché.
+        </p>
+      </div>
+
+      <div>
+        <div class="waveHero">
+          <small>Paiement Wave</small>
+          <strong>Wave : JB BEAUVILLE · +221 77 134 28 89</strong>
+        </div>
+        <p>Le paiement se fait directement sur Wave. Après paiement, envoie la preuve sur WhatsApp.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Tarif PAY</h2>
+        <p>Clique un ou plusieurs choix. Si tu te trompes, efface.</p>
+        <div class="prices" id="options"></div>
+      </article>
+
+      <aside class="card summary" id="summary">
+        <h2>Ce que l’abonnement m’apporte</h2>
+
+        <div class="selected" id="selectedBox">
+          <strong>Aucun choix sélectionné</strong><br>
+          <span>Choisis au moins un tarif.</span>
+        </div>
+
+        <div id="choiceList"></div>
+
+        <div class="totals">
+          <div class="totalLine">
+            <span>Sous-total</span>
+            <strong id="subtotalText">0 FCFA</strong>
+          </div>
+          <div class="totalLine">
+            <span>Ajustement / remise</span>
+            <strong>0 FCFA</strong>
+          </div>
+          <div class="totalLine final">
+            <span>Total</span>
+            <strong id="totalText">0 FCFA</strong>
+          </div>
+        </div>
+
+        <div class="payment">
+          <div class="paymentTitle">💳 Paiement Wave</div>
+
+          <div class="waveHero">
+            <small>Nom et numéro de paiement</small>
+            <strong>Wave : JB BEAUVILLE · +221 77 134 28 89</strong>
+          </div>
+
+          <div class="payLine">
+            <span>Montant à payer</span>
+            <strong id="payTotal">0 FCFA</strong>
+          </div>
+
+          <div class="proof">
+            Après paiement Wave, envoie la capture ou la preuve par WhatsApp.
+            DIGIY vérifie puis accompagne l’ouverture / visibilité PAY.
+          </div>
+        </div>
+
+        <div class="noteBox">
+          <label for="paymentNote">📝 Note / preuve paiement</label>
+          <textarea id="paymentNote" placeholder="Ex : Paiement Wave envoyé pour PAY 9B — 9 900 FCFA — au nom de Mamadou Diop — tél +221 77 000 00 00."></textarea>
+        </div>
+
+        <div class="dateBox" id="dateBox">Date de demande : —</div>
+        <ul class="benefits" id="benefits"></ul>
+
+        <div class="actions">
+          <a class="btn" id="btnWa">💬 WhatsApp</a>
+          <button class="btn green" id="btnSms" type="button">📱 SMS</button>
+          <button class="btn clear" id="btnClear" type="button">🧹 Effacer</button>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="btnCopyWave" type="button">📋 Copier Wave</button>
+          <a class="btn gold" id="btnProof">📸 Envoyer preuve</a>
+          <a class="btn gold" href="https://pro-pay.digiylyfe.com/">🔐 Espace pro</a>
+        </div>
+
+        <p>Message avec date, choix, sous-total, total et preuve Wave.</p>
+      </aside>
+    </section>
+  </main>
+
+  <button class="gold floating" id="btnFloating">📱 Voir total</button>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const TEL = "221771342889";
+      const WAVE_LABEL = "Wave : JB BEAUVILLE · +221 77 134 28 89";
+
+      const PLANS = [
+        {
+          code:"9A",
+          name:"PAY Starter",
+          fcfa:4900,
+          amount:"4 900 FCFA · 9 €",
+          desc:"Recettes, dépenses, réserve simple.",
+          bonus:["Recettes et dépenses rangées","Cash, Wave, Orange Money","Réserve visible"]
+        },
+        {
+          code:"9B",
+          name:"PAY Pro",
+          fcfa:9900,
+          amount:"9 900 FCFA · 19 €",
+          desc:"Dettes clients, preuves et suivi.",
+          bonus:["Dettes clients","Preuves de paiement","Messages de relance"]
+        },
+        {
+          code:"9C",
+          name:"PAY Business",
+          fcfa:24900,
+          amount:"24 900 FCFA · 39 €",
+          desc:"Lecture renforcée activité dense.",
+          bonus:["Lecture avancée","Dépenses récurrentes","Liens POS LOC DRIVER RESA MARKET"]
+        }
+      ];
+
+      const COMMON = [
+        "Carte de visite complète",
+        "Logiciel Mon argent",
+        "Voix DIGIY",
+        "Textes prêts",
+        "Validation humaine",
+        "0% commission"
+      ];
+
+      let selected = new Set();
+
+      const $ = id => document.getElementById(id);
+      const grid = $("options");
+      const summary = $("summary");
+
+      function money(n){
+        return new Intl.NumberFormat("fr-FR").format(n) + " FCFA";
+      }
+
+      function date(){
+        return new Date().toLocaleString("fr-FR", {dateStyle:"full", timeStyle:"short"});
+      }
+
+      function chosen(){
+        return PLANS.filter(p => selected.has(p.code));
+      }
+
+      function paymentNote(){
+        return ($("paymentNote")?.value || "").trim();
+      }
+
+      function render(){
+        grid.innerHTML = PLANS.map(p => `
+          <button class="option ${selected.has(p.code) ? "active" : ""}" data-code="${p.code}" type="button">
+            <span class="code">${p.code}</span>
+            <b>${p.name}</b>
+            <span class="amount">${p.amount}</span>
+            <span>${p.desc}</span>
+          </button>
+        `).join("");
+
+        grid.querySelectorAll("button").forEach(btn => {
+          btn.onclick = () => {
+            selected.has(btn.dataset.code) ? selected.delete(btn.dataset.code) : selected.add(btn.dataset.code);
+            update(true);
+          };
+        });
+      }
+
+      function msg(){
+        const items = chosen();
+        const sub = items.reduce((s,p) => s + p.fcfa, 0);
+        const lines = items.map(p => `- ${p.code} · ${p.name} · ${money(p.fcfa)}`).join("\n") || "Aucun choix sélectionné";
+        const note = paymentNote() || "à compléter après paiement";
+
+        return `Bonjour JB, je veux avancer avec DIGIY PAY.\n\n` +
+          `Date de demande : ${date()}\n\n` +
+          `Choix :\n${lines}\n\n` +
+          `Sous-total : ${money(sub)}\n` +
+          `Ajustement / remise : 0 FCFA\n` +
+          `Total : ${money(sub)}\n\n` +
+          `Paiement Wave : ${WAVE_LABEL}\n\n` +
+          `Note / preuve : ${note}\n\n` +
+          `Après paiement, je vous envoie la preuve ici.\n\n` +
+          `Canal souhaité : WhatsApp ou SMS.`;
+      }
+
+      function proofMsg(){
+        const items = chosen();
+        const sub = items.reduce((s,p) => s + p.fcfa, 0);
+        const lines = items.map(p => `- ${p.code} · ${p.name} · ${money(p.fcfa)}`).join("\n") || "Aucun choix sélectionné";
+        const note = paymentNote() || "à compléter";
+
+        return `Bonjour JB, voici la preuve de paiement Wave pour DIGIY PAY.\n\n` +
+          `Date de demande : ${date()}\n\n` +
+          `${WAVE_LABEL}\n` +
+          `Montant : ${money(sub)}\n\n` +
+          `Choix :\n${lines}\n\n` +
+          `Note / preuve : ${note}\n\n` +
+          `Je joins la capture / preuve de paiement à ce message.`;
+      }
+
+      function update(scroll){
+        render();
+
+        const items = chosen();
+        const sub = items.reduce((s,p) => s + p.fcfa, 0);
+
+        $("selectedBox").innerHTML = items.length
+          ? `<strong>${items.length} choix sélectionné${items.length > 1 ? "s" : ""}</strong><br><span>Ajoute ou retire en recliquant.</span>`
+          : `<strong>Aucun choix sélectionné</strong><br><span>Rien n’est précoché.</span>`;
+
+        $("choiceList").innerHTML = items.length
+          ? items.map(p => `<div class="choiceLine"><span>${p.code} · ${p.name}</span><b>${money(p.fcfa)}</b></div>`).join("")
+          : `<div class="choiceLine"><span>Aucun choix</span><b>0 FCFA</b></div>`;
+
+        $("subtotalText").textContent = money(sub);
+        $("totalText").textContent = money(sub);
+        $("payTotal").textContent = money(sub);
+        $("dateBox").textContent = "Date de demande : " + date();
+
+        $("benefits").innerHTML = (items.length ? [...COMMON, ...items.flatMap(p => p.bonus)] : [])
+          .slice(0,18)
+          .map(x => `<li>✅ ${x}</li>`)
+          .join("");
+
+        $("btnWa").href = "https://wa.me/" + TEL + "?text=" + encodeURIComponent(msg());
+        $("btnProof").href = "https://wa.me/" + TEL + "?text=" + encodeURIComponent(proofMsg());
+
+        if(scroll && matchMedia("(max-width:850px)").matches){
+          summary.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      }
+
+      $("btnSms").onclick = async () => {
+        const text = msg();
+        try{
+          await navigator.clipboard.writeText(text);
+          $("btnSms").textContent = "✅ Message SMS copié";
+          setTimeout(() => $("btnSms").textContent = "📱 SMS", 1600);
+        }catch(_){
+          prompt("Copie le message :", text);
+        }
+      };
+
+      $("btnCopyWave").onclick = async () => {
+        try{
+          await navigator.clipboard.writeText(WAVE_LABEL);
+          $("btnCopyWave").textContent = "✅ Wave copié";
+          setTimeout(() => $("btnCopyWave").textContent = "📋 Copier Wave", 1600);
+        }catch(_){
+          prompt("Copie Wave :", WAVE_LABEL);
+        }
+      };
+
+      $("btnClear").onclick = () => {
+        selected.clear();
+        if($("paymentNote")) $("paymentNote").value = "";
+        update(true);
+      };
+
+      $("paymentNote").addEventListener("input", () => update(false));
+      $("btnFloating").onclick = () => summary.scrollIntoView({behavior:"smooth", block:"start"});
+
+      update(false);
+    })();
+  </script>
+
+  <!-- 🎧 DIGIY ACCUEIL — bouton flottant de bienvenue -->
+  <script
+    src="https://digiy-accueil.digiylyfe.com/assets/js/digiy-welcome-floating.js"
+    data-module="PAY"
+    defer>
+  </script>
+</body>
+</html>
