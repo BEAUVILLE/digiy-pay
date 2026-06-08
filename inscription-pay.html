@@ -217,6 +217,72 @@
       padding:12px;
     }
 
+
+    .proInfoBox{
+      margin-top:12px;
+      border:1px solid rgba(22,101,52,.22);
+      border-radius:18px;
+      background:rgba(255,255,255,.56);
+      padding:12px;
+      display:grid;
+      gap:10px;
+    }
+
+    .proInfoBox h3{
+      margin:0;
+      color:var(--green);
+      font-size:20px;
+      line-height:1.12;
+      font-weight:1000;
+    }
+
+    .proInfoBox p{
+      margin:0;
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .proGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    .proGrid label{
+      margin:0;
+      display:grid;
+      gap:6px;
+      color:#7a4d00;
+    }
+
+    .proGrid input{
+      width:100%;
+      min-height:48px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fffdf5;
+      color:var(--ink);
+      padding:0 12px;
+      font-weight:900;
+      outline:none;
+    }
+
+    .proGrid input:focus,
+    textarea:focus{
+      border-color:rgba(250,204,21,.85);
+      box-shadow:0 0 0 3px rgba(250,204,21,.18);
+    }
+
+    .miniAction{
+      min-height:38px;
+      width:max-content;
+      padding:0 12px;
+      border-radius:999px;
+      font-size:13px;
+      background:#fff7df!important;
+      color:#7a4d00!important;
+    }
+
     .payment{
       margin-top:12px;
       border:1px solid rgba(250,204,21,.55);
@@ -334,7 +400,8 @@
       }
 
       .prices,
-      .actions{grid-template-columns:1fr}
+      .actions,
+      .proGrid{grid-template-columns:1fr}
 
       .payLine{
         display:grid;
@@ -391,6 +458,39 @@
         </div>
 
         <div id="choiceList"></div>
+
+        <div class="proInfoBox" id="proInfoBox">
+          <h3>Infos pro pour le paiement</h3>
+          <p>
+            Ces informations servent seulement à identifier la demande PAY dans le message WhatsApp/SMS.
+            La fiche complète se construit ailleurs dans DIGIY.
+          </p>
+
+          <div class="proGrid">
+            <label>
+              Nom / responsable
+              <input id="proName" type="text" autocomplete="name" placeholder="Ex : Mamadou Diop">
+            </label>
+
+            <label>
+              Téléphone / WhatsApp
+              <input id="proPhone" type="tel" autocomplete="tel" placeholder="Ex : +221 77 000 00 00">
+            </label>
+
+            <label>
+              Zone / ville
+              <input id="proZone" type="text" autocomplete="address-level2" placeholder="Ex : Saly, Mbour, Dakar">
+            </label>
+
+            <label>
+              Activité / commerce
+              <input id="proBusiness" type="text" autocomplete="organization" placeholder="Ex : Boutique Diop">
+            </label>
+          </div>
+
+          <button class="miniAction" id="btnClearProInfo" type="button">Effacer infos pro</button>
+        </div>
+
 
         <div class="totals">
           <div class="totalLine">
@@ -514,8 +614,48 @@
         return PLANS.filter(p => selected.has(p.code));
       }
 
+      const PRO_MEMORY_KEY = "digiy_pay_payment_identity_v1";
+
       function paymentNote(){
         return ($("paymentNote")?.value || "").trim();
+      }
+
+      function proValue(id){
+        return ($(id)?.value || "").trim();
+      }
+
+      function proIdentityText(){
+        return [
+          "Nom / responsable : " + (proValue("proName") || "à compléter"),
+          "Téléphone / WhatsApp : " + (proValue("proPhone") || "à compléter"),
+          "Zone / ville : " + (proValue("proZone") || "à compléter"),
+          "Activité / commerce : " + (proValue("proBusiness") || "à compléter")
+        ].join("\n");
+      }
+
+      function loadProInfo(){
+        try{
+          const saved = JSON.parse(localStorage.getItem(PRO_MEMORY_KEY) || "{}");
+          ["proName","proPhone","proZone","proBusiness"].forEach(id => {
+            if($(id) && saved[id] && !$(id).value) $(id).value = saved[id];
+          });
+        }catch(_){}
+      }
+
+      function saveProInfo(){
+        const saved = {};
+        ["proName","proPhone","proZone","proBusiness"].forEach(id => {
+          if($(id)) saved[id] = $(id).value.trim();
+        });
+        localStorage.setItem(PRO_MEMORY_KEY, JSON.stringify(saved));
+      }
+
+      function clearProInfo(){
+        localStorage.removeItem(PRO_MEMORY_KEY);
+        ["proName","proPhone","proZone","proBusiness"].forEach(id => {
+          if($(id)) $(id).value = "";
+        });
+        update(false);
       }
 
       function render(){
@@ -544,6 +684,7 @@
 
         return `Bonjour JB, je veux avancer avec DIGIY PAY.\n\n` +
           `Date de demande : ${date()}\n\n` +
+          `Infos pro :\n${proIdentityText()}\n\n` +
           `Choix :\n${lines}\n\n` +
           `Sous-total : ${money(sub)}\n` +
           `Ajustement / remise : 0 FCFA\n` +
@@ -562,6 +703,7 @@
 
         return `Bonjour JB, voici la preuve de paiement Wave pour DIGIY PAY.\n\n` +
           `Date de demande : ${date()}\n\n` +
+          `Infos pro :\n${proIdentityText()}\n\n` +
           `${WAVE_LABEL}\n` +
           `Montant : ${money(sub)}\n\n` +
           `Choix :\n${lines}\n\n` +
@@ -628,9 +770,21 @@
         update(true);
       };
 
+      ["proName","proPhone","proZone","proBusiness"].forEach(id => {
+        if($(id)){
+          $(id).addEventListener("input", () => {
+            saveProInfo();
+            update(false);
+          });
+        }
+      });
+
+      if($("btnClearProInfo")) $("btnClearProInfo").onclick = clearProInfo;
+
       $("paymentNote").addEventListener("input", () => update(false));
       $("btnFloating").onclick = () => summary.scrollIntoView({behavior:"smooth", block:"start"});
 
+      loadProInfo();
       update(false);
     })();
   </script>
@@ -643,3 +797,4 @@
   </script>
 </body>
 </html>
+
