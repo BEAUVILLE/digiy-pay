@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <meta name="theme-color" content="#12100f"/>
   <meta name="robots" content="index,follow"/>
+  <meta name="digiy-fix-lang" content="pay-fr-en-retour-fr-natif-20260620"/>
   <title>DIGIY PAY — Ton argent sous contrôle · 0% commission</title>
   <meta name="description" content="DIGIY PAY — coffre PRO/PERSO, saisie rapide, note vocale, bilan automatique. 0% commission. Tout pour le pro du terrain."/>
 
@@ -309,6 +310,38 @@
       display:flex;align-items:center;justify-content:center;gap:10px;
     }
 
+
+    /* DIGIY PAY — switch FR/EN */
+    .langSwitch{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px;
+      border-radius:999px;
+      border:1px solid rgba(214,168,95,.22);
+      background:rgba(255,255,255,.055);
+    }
+    .langBtn{
+      min-height:32px;
+      border:0;
+      border-radius:999px;
+      padding:0 10px;
+      background:transparent;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:1000;
+      cursor:pointer;
+    }
+    .langBtn.active{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#17120e;
+      box-shadow:0 8px 18px rgba(214,168,95,.18);
+    }
+    @media(max-width:700px){
+      .langSwitch{margin-left:auto}
+      .nav{width:100%;justify-content:flex-start}
+    }
+
     /* RESPONSIVE */
     @media(max-width:700px){
       .hero-grid{grid-template-columns:1fr}
@@ -340,6 +373,10 @@
       <a href="#modules">Fonctions</a>
       <a href="#voix">Note vocale</a>
       <a href="https://tarifs.digiylyfe.com/" class="cta">💳 Tarifs</a>
+      <span class="langSwitch" aria-label="Choisir la langue">
+        <button class="langBtn active" type="button" data-lang-btn="fr" onclick="digiyPaySetLang('fr')">🇫🇷 FR</button>
+        <button class="langBtn" type="button" data-lang-btn="en" onclick="digiyPaySetLang('en')">🇬🇧 EN</button>
+      </span>
     </nav>
   </div>
 </header>
@@ -471,9 +508,145 @@
   </div>
 </div>
 
+
+<script>
+(function(){
+  "use strict";
+  const STORE = "digiy_pay_lang_v1";
+  function urlLang(){
+    try{
+      const u = new URL(window.location.href);
+      return u.searchParams.get("lang") === "en" ? "en" : "";
+    }catch(_){ return ""; }
+  }
+  function currentLang(){
+    const fromUrl = urlLang();
+    if(fromUrl === "en") return "en";
+    try{ return localStorage.getItem(STORE) === "en" ? "en" : "fr"; }catch(_){ return "fr"; }
+  }
+  window.DIGIY_PAY_LANG = currentLang();
+
+  window.digiyPaySetLang = function(lang){
+    try{
+      const u = new URL(window.location.href);
+      if(lang === "en"){
+        localStorage.setItem(STORE, "en");
+        u.searchParams.set("lang", "en");
+        window.location.replace(u.pathname + u.search + u.hash);
+        return;
+      }
+      localStorage.removeItem(STORE);
+      u.searchParams.delete("lang");
+      window.location.replace(u.pathname + u.search + u.hash);
+    }catch(_){
+      if(lang === "en"){
+        try{ localStorage.setItem(STORE, "en"); }catch(__){}
+      }else{
+        try{ localStorage.removeItem(STORE); }catch(__){}
+      }
+      window.location.reload();
+    }
+  };
+})();
+</script>
+
 <script>
 (function(){
   'use strict';
+
+  const PAY_LANG = window.DIGIY_PAY_LANG === "en" ? "en" : "fr";
+  const IS_EN = PAY_LANG === "en";
+  const TEXT = {
+    cardOpen: IS_EN ? "See how it works →" : "Voir comment ça marche →",
+    modalFeatures: IS_EN ? "What it does" : "Ce que ça fait",
+    modalExample: IS_EN ? "Field example" : "Exemple terrain",
+    modalCta: IS_EN ? "📝 Sign up for DIGIY PAY →" : "📝 S'inscrire à DIGIY PAY →"
+  };
+
+  const EN_MODULES = {"solde": {"title": "King Balance", "short": "The number in front. Flash at every movement.", "detail": {"desc": "Every time a trace is added, the PRO or PERSONAL balance updates immediately. The number flashes — you know where you stand without searching.", "feats": [{"ico": "⚡", "text": "<strong>Instant flash</strong> after every confirmed movement"}, {"ico": "👁", "text": "Discreet mode: one tap to <strong>hide the balance</strong>"}, {"ico": "💼", "text": "<strong>PRO and PERSONAL separated</strong> — two pockets, one view"}, {"ico": "📊", "text": "Daily income, daily expenses and <strong>net total calculated</strong> automatically"}], "demo": [{"label": "PRO balance", "val": "487,500 F", "cls": "plus"}, {"label": "Daily income", "val": "＋ 120,000 F", "cls": "plus"}, {"label": "Daily expenses", "val": "− 35,000 F", "cls": "minus"}, {"label": "Daily net", "val": "＋ 85,000 F", "cls": "plus"}]}}, "saisie": {"title": "Quick entry", "short": "3 taps. No typing. PAY files it.", "detail": {"desc": "Pick a usual label, a payment method and an amount. PAY automatically sorts it by source and pocket.", "feats": [{"ico": "🌊", "text": "<strong>Wave · Cash · Orange Money · Card · Sendwave</strong>"}, {"ico": "💼", "text": "Salary · Business · Pension · Gift · Rent · Sale and more"}, {"ico": "🔧", "text": "You <strong>add your own labels</strong> in Settings"}, {"ico": "🗂", "text": "Automatic sorting <strong>by money source</strong>"}], "demo": [{"label": "⛽ Fuel · Wave", "val": "− 15,000 F", "cls": "minus"}, {"label": "💡 Electricity · Wave", "val": "− 8,500 F", "cls": "minus"}, {"label": "💼 Salary · Wave", "val": "＋ 200,000 F", "cls": "plus"}, {"label": "🎒 School · Cash", "val": "− 25,000 F", "cls": "minus"}]}}, "voix": {"title": "Voice note", "short": "Say the movement. PAY records it.", "detail": {"desc": "You speak, PAY analyzes. It detects the label, the amount and the payment method. One tap to confirm. No form to open.", "feats": [{"ico": "🗣", "text": "<strong>\"Fuel 15000 Wave\"</strong> → recorded in 3 seconds"}, {"ico": "🧠", "text": "Automatic detection of <strong>type (income/expense)</strong>"}, {"ico": "📱", "text": "Native on Chrome and mobile Safari — <strong>zero installation</strong>"}, {"ico": "✅", "text": "You check before confirming — <strong>you always validate</strong>"}], "demo": [{"label": "🗣 \"Pension 350,000 Sendwave\"", "val": "＋ 350,000 F", "cls": "plus"}, {"label": "🗣 \"Stock refill 12,000 cash\"", "val": "− 12,000 F", "cls": "minus"}, {"label": "🗣 \"Business 80,000\"", "val": "＋ 80,000 F", "cls": "plus"}]}}, "bilan": {"title": "Automatic recap", "short": "At 8 PM, the day summary appears by itself.", "detail": {"desc": "After 8 PM, if movements were added during the day, PAY automatically displays a recap banner. You do not search — it brings it to you.", "feats": [{"ico": "🕗", "text": "<strong>Automatic trigger after 8 PM</strong>"}, {"ico": "📋", "text": "Income · Expenses · <strong>Daily net</strong> at a glance"}, {"ico": "✕", "text": "One tap to close — <strong>once per day</strong>"}, {"ico": "🔔", "text": "No push notification — <strong>discreet and local</strong>"}], "demo": [{"label": "Daily income", "val": "＋ 285,000 F", "cls": "plus"}, {"label": "Daily expenses", "val": "− 42,000 F", "cls": "minus"}, {"label": "Daily net", "val": "＋ 243,000 F", "cls": "plus"}]}}, "alerte": {"title": "Low balance alert", "short": "Your threshold. Your rules. The king number turns red.", "detail": {"desc": "You set an alert threshold. When the balance goes below it, the king number turns red and pulses. No notification — just a clear visual signal.", "feats": [{"ico": "🎯", "text": "<strong>Custom threshold</strong> — you decide the level"}, {"ico": "🔴", "text": "King balance <strong>red and pulsing</strong> below the threshold"}, {"ico": "🔕", "text": "<strong>Zero push notification</strong> — discreet, field-first"}, {"ico": "⚙️", "text": "Editable anytime — <strong>set 0 to disable</strong>"}], "demo": [{"label": "Configured threshold", "val": "50,000 F", "cls": ""}, {"label": "Current balance", "val": "38,200 F", "cls": "minus"}, {"label": "Status", "val": "🔴 Alert active", "cls": "minus"}]}}, "sources": {"title": "Money sources", "short": "Every DIGIY source connected to PAY.", "detail": {"desc": "DRIVER, LOC, RESA, BUILD, MARKET, SUBS, POS, NETWORK — each source appears in PAY. You enter the amount, PAY sorts it by source.", "feats": [{"ico": "🚗", "text": "<strong>DRIVER · LOC · RESA · BUILD · MARKET</strong>"}, {"ico": "💳", "text": "<strong>SUBS · POS · NETWORK · NDIMBAL</strong>"}, {"ico": "🏦", "text": "Pension · Sendwave · Bank transfer · Wave cash-out"}, {"ico": "＋", "text": "<strong>You add your own sources</strong> in seconds"}], "demo": [{"label": "DRIVER this month", "val": "＋ 180,000 F", "cls": "plus"}, {"label": "LOC this month", "val": "＋ 95,000 F", "cls": "plus"}, {"label": "SUBS this month", "val": "＋ 45,000 F", "cls": "plus"}, {"label": "Pension this month", "val": "＋ 350,000 F", "cls": "plus"}]}}, "historique": {"title": "History & search", "short": "Search, filter, find it in 2 seconds.", "detail": {"desc": "All your movements can be filtered by type and searched by label, amount or person. You find any trace without endless scrolling.", "feats": [{"ico": "🔎", "text": "<strong>Free search</strong>: label, amount, method, person"}, {"ico": "📅", "text": "Filter <strong>Income · Expenses · All</strong> in one tap"}, {"ico": "✏️", "text": "<strong>Edit or duplicate</strong> an existing movement"}, {"ico": "🗑", "text": "Delete with confirmation — <strong>secure</strong>"}], "demo": [{"label": "Search \"Wave\"", "val": "14 results", "cls": ""}, {"label": "Filtered total", "val": "＋ 340,000 F", "cls": "plus"}, {"label": "Last result", "val": "Fuel · yesterday", "cls": ""}]}}, "sauvegarde": {"title": "JSON backup", "short": "Export in one tap. Import when needed.", "detail": {"desc": "All your PAY data — movements, modules, directory — can be exported as JSON anytime. You import it on another device by pasting the file.", "feats": [{"ico": "⬇️", "text": "<strong>Download JSON</strong> or copy to clipboard"}, {"ico": "📂", "text": "<strong>Import a file</strong> or paste directly"}, {"ico": "🔄", "text": "Automatic backup before restore — <strong>zero loss</strong>"}, {"ico": "📱", "text": "Works <strong>offline</strong> — everything is local"}], "demo": [{"label": "Exported movements", "val": "247 traces", "cls": ""}, {"label": "Modules included", "val": "12 sources", "cls": ""}, {"label": "Contacts included", "val": "8 subscribers", "cls": ""}]}}};
+
+  function setTxt(selector, text, root){
+    const el = (root || document).querySelector(selector);
+    if(el) el.textContent = text;
+  }
+  function setHtml(selector, html, root){
+    const el = (root || document).querySelector(selector);
+    if(el) el.innerHTML = html;
+  }
+  function setAttr(selector, attr, value, root){
+    const el = (root || document).querySelector(selector);
+    if(el) el.setAttribute(attr, value);
+  }
+  function localizeStaticPay(){
+    document.documentElement.lang = IS_EN ? "en" : "fr";
+    document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-lang-btn") === PAY_LANG);
+    });
+    if(!IS_EN) return;
+
+    document.title = "DIGIY PAY — Your money under control · 0% commission";
+    const meta = document.querySelector('meta[name="description"]');
+    if(meta) meta.setAttribute("content", "DIGIY PAY — PRO/PERSONAL wallet, quick entry, voice note, automatic recap. 0% commission. Everything for the field professional.");
+
+    setTxt(".brand span", "PRO · PERSONAL · 0% commission");
+    setTxt('.nav a[href="#modules"]', "Features");
+    setTxt('.nav a[href="#voix"]', "Voice note");
+    setTxt(".nav .cta", "💳 Pricing");
+
+    setTxt(".eyebrow", "💰 DIGIY PAY by DIGIYLYFE");
+    setHtml(".hero h1", "Your money.<br><em>Under control.</em><br>On the field.");
+    setTxt(".lead", "PRO and PERSONAL pockets in one tool. 3-tap entry, voice note, automatic recap, low-balance alert. The owner sees, finds and decides.");
+    const heroBtns = document.querySelectorAll(".hero-actions .btn");
+    if(heroBtns[0]) heroBtns[0].textContent = "📝 Sign up";
+    if(heroBtns[1]) heroBtns[1].textContent = "💳 Pricing";
+    if(heroBtns[2]) heroBtns[2].textContent = "🔐 Pro access";
+    const chips = document.querySelectorAll(".chips .chip");
+    const chipTexts = ["0% commission","Direct payment","PRO + PERSONAL","Voice note","Auto recap","Balance alert","JSON backup","Wave · Cash · OM"];
+    chips.forEach((chip,i) => { if(chipTexts[i]) chip.textContent = chipTexts[i]; });
+
+    setTxt(".roi-label", "PRO balance — today");
+    setTxt(".roi-sub", "The king number · flash at every movement");
+    const roi = document.querySelectorAll(".roi-pill");
+    if(roi[0]) roi[0].textContent = "＋ Income 120,000 F";
+    if(roi[1]) roi[1].textContent = "− Expenses 35,000 F";
+    setTxt(".roi-flash", "⚡ Balance updated at every trace");
+
+    setHtml("#modules .section-title h2", "Everything <em>PAY does</em> for you");
+    setTxt("#modules .section-title p", "Tap each feature to see how it works in the field.");
+
+    setHtml("#voix .big-card h3", "You speak.<br><em>PAY understands.</em>");
+    const voixPs = document.querySelectorAll("#voix .big-card p");
+    if(voixPs[0]) voixPs[0].textContent = "Hands busy? Say the movement out loud. PAY detects the label, the amount and the payment method. One tap to confirm.";
+    if(voixPs[1]) voixPs[1].textContent = "Available on Chrome and mobile Safari. No installation.";
+    const voixBtn = document.querySelector('#voix .big-card button');
+    if(voixBtn) voixBtn.textContent = "See how it works →";
+
+    const voiceExamples = [
+      ["🗣", "\"Fuel 15,000 Wave\"", "− 15,000 · Wave"],
+      ["🗣", "\"Salary income 200,000\"", "＋ 200,000 · Wave"],
+      ["🗣", "\"Pension 350,000 Sendwave\"", "＋ 350,000 · Sendwave"],
+      ["🗣", "\"School 25,000 cash\"", "− 25,000 · Cash"],
+      ["🗣", "\"Electricity 8,500\"", "− 8,500 · Wave"]
+    ];
+    document.querySelectorAll(".voice-line").forEach((line,i) => {
+      const row = voiceExamples[i];
+      if(!row) return;
+      const parts = line.querySelectorAll("span");
+      if(parts[0]) parts[0].textContent = row[0];
+      if(parts[1]) parts[1].textContent = row[1];
+      if(parts[2]) parts[2].textContent = row[2];
+    });
+
+    setHtml(".cta-box h2", "Step by step.<br><em>The owner keeps control.</em>");
+    setHtml(".cta-box p", "DIGIY PAY — fixed subscription, 0% commission.<br>Your money never goes through DIGIY. It goes directly to the pro.");
+    const ctaBtns = document.querySelectorAll(".cta-actions .btn");
+    if(ctaBtns[0]) ctaBtns[0].textContent = "📝 Sign up";
+    if(ctaBtns[1]) ctaBtns[1].textContent = "💳 Pricing";
+    if(ctaBtns[2]) ctaBtns[2].textContent = "🔐 Pro access";
+    if(ctaBtns[3]) ctaBtns[3].textContent = "💬 WhatsApp";
+  }
+
+  localizeStaticPay();
 
   // ── DONNÉES FONCTIONS ──
   const MODULES = [
@@ -642,6 +815,17 @@
     },
   ];
 
+
+  if(IS_EN){
+    MODULES.forEach(m => {
+      const en = EN_MODULES[m.id];
+      if(!en) return;
+      m.title = en.title || m.title;
+      m.short = en.short || m.short;
+      if(en.detail) m.detail = en.detail;
+    });
+  }
+
   // ── RENDER FONCTIONS GRID ──
   const grid = document.getElementById('modulesGrid');
   MODULES.forEach(m => {
@@ -652,7 +836,7 @@
       <div class="mc-ico">${m.ico}</div>
       <div class="mc-title">${m.title}</div>
       <div class="mc-body">${m.short}</div>
-      <span class="mc-open">Voir comment ça marche →</span>
+      <span class="mc-open">${TEXT.cardOpen}</span>
     `;
     grid.appendChild(card);
   });
@@ -668,19 +852,19 @@
     modTitle.textContent = m.ico + ' ' + m.title;
     const d = m.detail;
     let html = `<div class="modal-section"><p>${d.desc}</p></div>`;
-    html += `<div class="modal-section"><h4>Ce que ça fait</h4><div class="modal-feat">`;
+    html += `<div class="modal-section"><h4>${TEXT.modalFeatures}</h4><div class="modal-feat">`;
     d.feats.forEach(f => {
       html += `<div class="modal-feat-item"><span class="mfi-ico">${f.ico}</span><div class="mfi-text">${f.text}</div></div>`;
     });
     html += `</div></div>`;
     if(d.demo && d.demo.length){
-      html += `<div class="modal-section"><h4>Exemple terrain</h4><div class="modal-demo">`;
+      html += `<div class="modal-section"><h4>${TEXT.modalExample}</h4><div class="modal-demo">`;
       d.demo.forEach(r => {
         html += `<div class="demo-row"><span>${r.label}</span><span class="${r.cls}">${r.val}</span></div>`;
       });
       html += `</div></div>`;
     }
-    html += `<a href="./inscription-pay.html" class="modal-cta-link">📝 S'inscrire à DIGIY PAY →</a>`;
+    html += `<a href="./inscription-pay.html" class="modal-cta-link">${TEXT.modalCta}</a>`;
     modBody.innerHTML = html;
     modalBg.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -703,6 +887,7 @@
 </script>
 </body>
 </html>
+
 
 
 
