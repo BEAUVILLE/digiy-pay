@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <!-- PUBLIC PAY : page de présentation indexable. Accès pro via pin.html?next=cockpit.html -->
+  <!-- PUBLIC PAY : page de présentation indexable. Accès pro sécurisé via https://pro-pay.digiylyfe.com/ -->
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <meta name="theme-color" content="#12100f"/>
@@ -73,6 +73,10 @@
     .nav .cta{
       color:#17120e;background:linear-gradient(135deg,var(--gold),var(--gold2));
       font-weight:1000;box-shadow:0 10px 24px rgba(214,168,95,.22);
+    }
+    .nav .procta{
+      color:#101812;background:linear-gradient(135deg,var(--green),#99c5a7);
+      font-weight:1000;box-shadow:0 10px 24px rgba(111,162,126,.20);
     }
     .nav .signup{
       color:#101812;background:linear-gradient(135deg,var(--green),#99c5a7);
@@ -360,6 +364,51 @@
       .modules-grid{grid-template-columns:1fr}
       h1{font-size:32px}
     }
+
+
+    /* DIGIY PAY — sécurité accès PRO bas de page */
+    .pay-pro-secure-dock{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:55;
+      padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));
+      background:linear-gradient(180deg,rgba(18,16,15,0),rgba(18,16,15,.92) 24%,rgba(18,16,15,.98));
+      backdrop-filter:blur(12px);
+      pointer-events:none;
+    }
+    .pay-pro-secure-inner{
+      width:min(var(--max),calc(100% - 0px));
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      pointer-events:auto;
+    }
+    .pay-pro-secure-inner a{
+      min-height:56px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:0 14px;
+      font-weight:1000;
+      box-shadow:var(--shadow);
+    }
+    .pay-pro-secure-inner .signup{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#17120e;
+    }
+    .pay-pro-secure-inner .pro{
+      background:linear-gradient(135deg,var(--green),#99c5a7);
+      color:#101812;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    @media(max-width:560px){
+      .pay-pro-secure-inner{grid-template-columns:1fr;}
+    }
   </style>
 </head>
 <body>
@@ -379,6 +428,7 @@
       <a href="#voix">Note vocale</a>
       <a href="https://pay.digiylyfe.com/inscription-pay.html" class="signup">📝 Inscription PAY</a>
       <a href="https://tarifs.digiylyfe.com/" class="cta">💳 Tarifs</a>
+      <a href="https://pro-pay.digiylyfe.com/" class="procta">🔐 Ouvrir PAY PRO</a>
       <span class="langSwitch" aria-label="Choisir la langue">
         <button class="langBtn active" type="button" data-lang-btn="fr" onclick="digiyPaySetLang('fr')">🇫🇷 FR</button>
         <button class="langBtn" type="button" data-lang-btn="en" onclick="digiyPaySetLang('en')">🇬🇧 EN</button>
@@ -402,7 +452,7 @@
         <div class="hero-actions">
           <a class="btn btn-primary" href="https://pay.digiylyfe.com/inscription-pay.html">📝 S'inscrire</a>
           <a class="btn btn-secondary" href="https://tarifs.digiylyfe.com/">💳 Tarifs</a>
-          <a class="btn btn-green" href="./pin.html?next=cockpit.html">🔐 Accès Pro</a>
+          <a class="btn btn-green" href="https://pro-pay.digiylyfe.com/">🔐 Ouvrir PAY PRO</a>
         </div>
         <div class="chips">
           <span class="chip gold">0% commission</span>
@@ -494,7 +544,7 @@
         <div class="cta-actions">
           <a class="btn btn-primary" href="https://pay.digiylyfe.com/inscription-pay.html">📝 S'inscrire</a>
           <a class="btn btn-secondary" href="https://tarifs.digiylyfe.com/">💳 Tarifs</a>
-          <a class="btn btn-green" href="./pin.html?next=cockpit.html">🔐 Accès Pro</a>
+          <a class="btn btn-green" href="https://pro-pay.digiylyfe.com/">🔐 Ouvrir PAY PRO</a>
           <a class="btn btn-secondary" href="https://wa.me/221771342889?text=Bonjour%20DIGIY%2C%20je%20veux%20activer%20PAY" target="_blank">💬 WhatsApp</a>
         </div>
       </div>
@@ -502,6 +552,16 @@
   </section>
 
 </main>
+
+
+
+<!-- DIGIY PAY — dock sécurisé bas de page : inscription publique + PRO par PIN -->
+<nav class="pay-pro-secure-dock" aria-label="Accès PAY sécurisé">
+  <div class="pay-pro-secure-inner">
+    <a class="signup" href="https://pay.digiylyfe.com/inscription-pay.html">📝 Inscription PAY</a>
+    <a class="pro" href="https://pro-pay.digiylyfe.com/">🔐 Ouvrir PAY PRO</a>
+  </div>
+</nav>
 
 <!-- MODAL -->
 <div class="modal-bg" id="modalBg">
@@ -599,6 +659,7 @@
     setTxt('.nav a[href="#voix"]', "Voice note");
     setTxt(".nav .signup", "📝 Sign up");
     setTxt(".nav .cta", "💳 Pricing");
+    setTxt(".nav .procta", "🔐 Open PAY PRO");
 
     setTxt(".eyebrow", "💰 DIGIY PAY by DIGIYLYFE");
     setHtml(".hero h1", "Your money.<br><em>Under control.</em><br>On the field.");
@@ -606,7 +667,7 @@
     const heroBtns = document.querySelectorAll(".hero-actions .btn");
     if(heroBtns[0]) heroBtns[0].textContent = "📝 Sign up";
     if(heroBtns[1]) heroBtns[1].textContent = "💳 Pricing";
-    if(heroBtns[2]) heroBtns[2].textContent = "🔐 Pro access";
+    if(heroBtns[2]) heroBtns[2].textContent = "🔐 Open PAY PRO";
     const chips = document.querySelectorAll(".chips .chip");
     const chipTexts = ["0% commission","Direct payment","PRO + PERSONAL","Voice note","Auto recap","Balance alert","JSON backup","Wave · Cash · OM"];
     chips.forEach((chip,i) => { if(chipTexts[i]) chip.textContent = chipTexts[i]; });
@@ -649,7 +710,7 @@
     const ctaBtns = document.querySelectorAll(".cta-actions .btn");
     if(ctaBtns[0]) ctaBtns[0].textContent = "📝 Sign up";
     if(ctaBtns[1]) ctaBtns[1].textContent = "💳 Pricing";
-    if(ctaBtns[2]) ctaBtns[2].textContent = "🔐 Pro access";
+    if(ctaBtns[2]) ctaBtns[2].textContent = "🔐 Open PAY PRO";
     if(ctaBtns[3]) ctaBtns[3].textContent = "💬 WhatsApp";
   }
 
@@ -894,6 +955,12 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
